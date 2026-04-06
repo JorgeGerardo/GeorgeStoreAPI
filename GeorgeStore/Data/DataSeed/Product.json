@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "price": 1500,
+    "description": "High performance laptop",
+    "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 2,
+    "name": "Smartphone",
+    "price": 800,
+    "description": "Latest model smartphone",
+    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 3,
+    "name": "T-Shirt",
+    "price": 25,
+    "description": "Cotton t-shirt",
+    "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 4,
+    "name": "Jeans",
+    "price": 60,
+    "description": "Blue denim jeans",
+    "image": "https://images.unsplash.com/photo-1542272604-787c3835535d",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 5,
+    "name": "Blender",
+    "price": 120,
+    "description": "Kitchen blender",
+    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 6,
+    "name": "Microwave",
+    "price": 200,
+    "description": "Microwave oven",
+    "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c",
+    "isActive": true,
+    "categoryId": 3
+  }
+]

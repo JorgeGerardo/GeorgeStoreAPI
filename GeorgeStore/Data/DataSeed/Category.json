@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Electronics",
+    "price": 0,
+    "description": "Devices and electronic gadgets",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475"
+  },
+  {
+    "id": 2,
+    "name": "Clothing",
+    "price": 0,
+    "description": "Men and women clothing",
+    "image": "https://images.unsplash.com/photo-1521334884684-d80222895322"
+  },
+  {
+    "id": 3,
+    "name": "Home",
+    "price": 0,
+    "description": "Home and kitchen products",
+    "image": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
+  }
+]
