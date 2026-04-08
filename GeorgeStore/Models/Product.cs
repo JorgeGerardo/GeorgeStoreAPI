@@ -1,4 +1,6 @@
-﻿namespace GeorgeStore.Models;
+﻿using GeorgeStore.Core;
+
+namespace GeorgeStore.Models;
 
 public class Product : Entity
 {
@@ -12,10 +14,20 @@ public class Product : Entity
 
     public ProductDto ToDTO(string categoryName)
     {
-        return new ProductDto(Id, Name, Price, Description, Image, CategoryId, categoryName);
+        return new(Id, Name, Price, Description, Image, CategoryId, categoryName);
     }
 }
-public record ProductDto(int id, string Name, float Price, string Description, string Image, int CategoryId, string categoryName);
+public record ProductDto(int Id, string Name, float Price, string Description, string Image, int CategoryId, string CategoryName);
 
-public record ProductCreateDTO(string name, float price, string description, string image, int categoryId);
+public record ProductCreateDTO(string Name, float Price, string Description, string Image, int CategoryId);
 
+
+
+public static class ProductError
+{
+    public static readonly Error Notfound =
+        new("Product not found", "Can't find product selected", "Product.Notfound");
+    public static readonly Error Conflict =
+        new("Has occurred an error", "Try again in some times", "Product.Conflict");
+
+}

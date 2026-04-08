@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using GeorgeStore.Core;
 using GeorgeStore.Data;
 using GeorgeStore.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,29 +9,33 @@ namespace GeorgeStore.Services;
 
 public class ProductRepository(IDbConnectionFactory dbConnection, AppDbContext context) : IProductRepository
 {
-    public async Task<bool> Create(ProductCreateDTO request)
+    public async Task<Result> Create(ProductCreateDTO request)
     {
-        var newProdcut = new Product
+        Product newProdcut = new()
         {
-            Name = request.name,
-            Description = request.description,
-            CategoryId = request.categoryId,
-            Image = request.image,
-            Price = request.price,
+            Name = request.Name,
+            Description = request.Description,
+            CategoryId = request.CategoryId,
+            Image = request.Image,
+            Price = request.Price,
         };
 
         context.Products.Add(newProdcut);
-        return await context.SaveChangesAsync() > 0;
+        return await context.SaveChangesAsync() > 0
+            ? Result.Success()
+            : Result.Failure(ProductError.Conflict);
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<Result> Delete(int id)
     {
         var product = await context.Products.FirstOrDefaultAsync(p => p.Id == id);
         if (product is null)
-            return false;
+            return Result.Failure(ProductError.Notfound);
 
         product.IsActive = false;
-        return await context.SaveChangesAsync() > 0;
+        return await context.SaveChangesAsync() > 0
+            ? Result.Success()
+            : Result.Failure(ProductError.Conflict);
     }
 
     public async Task<bool> Exist(int id)
@@ -40,34 +45,44 @@ public class ProductRepository(IDbConnectionFactory dbConnection, AppDbContext c
 
 
 
-    public async Task<ProductDto?> GetById(int id)
+    public async Task<Result<ProductDto>> GetById(int id)
     {
         Product? product = await context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
         if (product is null)
-            return null;
+            return Result.Failure<ProductDto>(ProductError.Notfound);
 
-        return new ProductDto(product.Id, product.Name, product.Price, product.Description, product.Image, product.CategoryId, product.Category!.Name);
+        return Result.Success(
+                new ProductDto(
+                    product.Id, 
+                    product.Name, 
+                    product.Price, 
+                    product.Description, 
+                    product.Image, 
+                    product.CategoryId, 
+                    product.Category!.Name
+                )
+        );
     }
 
     public async Task<IEnumerable<ProductDto>> GetProducts(QueryParams prms)
     {
         using var conn = dbConnection.CreateConnection();
-        StringBuilder query = new StringBuilder("""
+        StringBuilder query = new("""
                 SELECT p.Id, p.Name, p.Price, p.[Description], p.[Image], p.CategoryId, c.Name as [categoryName] FROM Products as p
                 INNER JOIN Categories as c on p.CategoryId = c.Id 
             """);
-        if (prms.term is not null)
-            query.Append($"WHERE p.Name like ('%{prms.term}%')");
+        if (prms.Term is not null)
+            query.Append($"WHERE p.Name like ('%{prms.Term}%')");
 
         query.Append("""
                     ORDER by p.Id
                     OFFSET @offset Rows
                     FETCH NEXT @pageSize ROWS ONLY
         """);
-        return await conn.QueryAsync<ProductDto>(query.ToString(), new { prms.offset, prms.pageSize });
+        return await conn.QueryAsync<ProductDto>(query.ToString(), new { prms.Offset, prms.PageSize });
     }
 
 }
 
-public record QueryParams(int pageSize = 10, int offset = 0, string? term = null);
+public record QueryParams(int PageSize = 10, int Offset = 0, string? Term = null);
 

@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Data;
+﻿using GeorgeStore.Core;
+using GeorgeStore.Data;
 using GeorgeStore.Models;
 using GeorgeStore.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +25,8 @@ public class ProductController(IProductRepository productRepository) : Controlle
     [HttpPost]
     public async Task<ActionResult> Create(ProductCreateDTO request)
     {
-        bool result = await productRepository.Create(request);
-        return result is true ? Ok() : BadRequest();
+        Result result = await productRepository.Create(request);
+        return result.IsSuccess ? Ok() : BadRequest();
     }
 
     [HttpGet("delete/{id}")]

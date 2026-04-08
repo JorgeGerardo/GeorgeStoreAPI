@@ -1,7 +1,7 @@
-﻿using GeorgeStore.Data;
+﻿using GeorgeStore.Core;
+using GeorgeStore.Data;
 using GeorgeStore.Models;
 using GeorgeStore.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Controllers;
@@ -13,23 +13,23 @@ public class UserController(IUserRepository userService, TokenService tokenServi
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest credentials)
     {
-        User? user = await userService.Login(credentials.email, credentials.password);
-        if (user is null)
-            return BadRequest(new ProblemDetails { Detail = "Credentials not valid" });
+        Result<User> result = await userService.Login(credentials.Email, credentials.Password);
+        if (!result.IsSuccess)  
+            return BadRequest(new ProblemDetails { Title = result.Error.Tittle, Detail = result.Error.Message });
         
-        return Ok(tokenService.GenerateToken(user));
+        return Ok(tokenService.GenerateToken(result.Value));
     }
 
     [HttpPost("register")]
     public async Task<ActionResult> Create(CreateUserRequest credentials)
     {
-        bool result = await userService.Register(credentials.userName, credentials.email, credentials.password);
-        if (result)
+        Result result = await userService.Register(credentials.UserName, credentials.Email, credentials.Password);
+        if (result.IsSuccess)
             return Ok();
-        return BadRequest();
+        return BadRequest(new ProblemDetails { Title = result.Error.Tittle, Detail = result.Error.Message});
     }
 
 }
 
-public record LoginRequest(string email, string password);
-public record CreateUserRequest(string userName, string email, string password);
+public record LoginRequest(string Email, string Password);
+public record CreateUserRequest(string UserName, string Email, string Password);
