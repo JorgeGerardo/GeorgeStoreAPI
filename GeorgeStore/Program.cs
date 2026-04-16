@@ -1,5 +1,5 @@
 using GeorgeStore.Extensions;
-using GeorgeStore.Services;
+using GeorgeStore.Features.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 

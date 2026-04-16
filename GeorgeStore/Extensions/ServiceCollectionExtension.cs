@@ -1,6 +1,8 @@
-﻿using GeorgeStore.Data;
-using GeorgeStore.Models;
-using GeorgeStore.Services;
+﻿using GeorgeStore.Features.Carts;
+using GeorgeStore.Features.Categories;
+using GeorgeStore.Features.Products;
+using GeorgeStore.Features.Users;
+using GeorgeStore.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +12,7 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddDBConnection(this IServiceCollection collection, WebApplicationBuilder builder)
     {
-        collection.AddDbContext<AppDbContext>(opts =>
+        collection.AddDbContext<GeorgeStoreContext>(opts =>
             opts.UseSqlServer(builder.Configuration
                 .GetConnectionString("GeorgeStoreConnection"))
         );
@@ -28,7 +30,7 @@ public static class ServiceCollectionExtension
             options.Password.RequireLowercase = false;
 
         })
-            .AddEntityFrameworkStores<AppDbContext>()
+            .AddEntityFrameworkStores<GeorgeStoreContext>()
             .AddDefaultTokenProviders();
 
         return collection;
@@ -36,7 +38,11 @@ public static class ServiceCollectionExtension
 
     public static IServiceCollection AddDependencies(this IServiceCollection collection)
     {
-        collection.AddScoped<IUserRepository, UserService>();
+
+        collection.AddSingleton<KeyedAsyncLock>();
+        collection.AddScoped<ICategoryRepository, CategoryRepository>();
+        collection.AddScoped<IUserService, UserService>();
+        collection.AddScoped<ICartRepository, CartRepository>();
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
         collection.AddScoped<TokenService>();
