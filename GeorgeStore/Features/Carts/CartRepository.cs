@@ -1,11 +1,13 @@
 ﻿
+using Dapper;
 using GeorgeStore.Common;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace GeorgeStore.Features.Carts;
 
-public class CartRepository(GeorgeStoreContext context, KeyedAsyncLock locker) : ICartRepository
+public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbConnection, KeyedAsyncLock locker) : ICartRepository
 {
     public async Task<Result<Cart>> GetAsync(Guid UserId, CancellationToken ct = default)
     {
@@ -76,5 +78,17 @@ public class CartRepository(GeorgeStoreContext context, KeyedAsyncLock locker) :
         context.Carts.Add(newCart);
 
         return newCart;
+    }
+
+    public async Task<int> CountAsync(Guid UserId)
+    {
+        var connection = dbConnection.CreateConnection();
+        StringBuilder query = new("""
+                SELECT SUM(CI.Quantity) from Carts AS C
+                    INNER JOIN CartItems as CI
+                    ON CI.CartId = C.Id
+                    WHERE UserId = @UserId AND C.[Status] = @Status
+            """);
+        return await connection.ExecuteScalarAsync<int>(query.ToString(), new { UserId, Status = CartStatus.Draft });
     }
 }
