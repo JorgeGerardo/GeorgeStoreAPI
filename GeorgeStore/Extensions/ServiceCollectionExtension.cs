@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Features.Carts;
+﻿using GeorgeStore.Features.Addresses;
+using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
@@ -40,6 +41,7 @@ public static class ServiceCollectionExtension
     {
 
         collection.AddSingleton<KeyedAsyncLock>();
+        collection.AddScoped<IAddressRepository, AddressRepository>();
         collection.AddScoped<ICategoryRepository, CategoryRepository>();
         collection.AddScoped<IUserService, UserService>();
         collection.AddScoped<ICartRepository, CartRepository>();
