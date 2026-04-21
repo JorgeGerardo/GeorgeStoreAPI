@@ -58,13 +58,15 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
                 SELECT p.Id, p.Name, p.Price, p.[Description], p.[Image], p.CategoryId, c.Name as [categoryName] FROM Products as p
                 INNER JOIN Categories as c on p.CategoryId = c.Id 
             """);
+
+        query.Append($"WHERE IsActive = 1");
         if (prms.Term is not null)
-            query.Append($"WHERE p.Name like @term");
+            query.Append($"AND p.Name like @term");
 
         query.Append("""
-                    ORDER by p.Id
-                    OFFSET @offset Rows
-                    FETCH NEXT @pageSize ROWS ONLY
+                ORDER by p.Id
+                OFFSET @offset Rows
+                FETCH NEXT @pageSize ROWS ONLY
         """);
         return await conn.QueryAsync<ProductDto>(query.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize });
     }
