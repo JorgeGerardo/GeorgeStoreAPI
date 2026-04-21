@@ -1,5 +1,6 @@
 ﻿using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
+using GeorgeStore.Features.PaymentMethods;
 using Microsoft.AspNetCore.Identity;
 
 namespace GeorgeStore.Features.Users;
@@ -10,6 +11,7 @@ public class User : IdentityUser<Guid>
     public DateTime DateRegister { get; set; }
     public List<Cart> Carts { get; set; } = [];
     public List<Address> Addresses { get; set; } = [];
+    public List<PaymentMethod> PaymentMethods { get; set; } = [];
 
     public User(string UserName, string Email)
     {
