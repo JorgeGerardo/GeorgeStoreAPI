@@ -13,6 +13,15 @@ public class UserService(UserManager<User> manager) : IUserService
             Result.Success(user);
     }
 
+    public async Task<Result<UserDataDto>> GetProfile(Guid userId)
+    {
+        User? user = await manager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return Result.Failure<UserDataDto>(UserError.Notfound);
+
+        return Result.Success(new UserDataDto(user.Email!, user.UserName!, user.DateRegister));
+    }
+
     public async Task<Result<User>> Login(string email, string password)
     {
         var result = await Exist(email);
@@ -26,11 +35,7 @@ public class UserService(UserManager<User> manager) : IUserService
 
     public async Task<Result> Register(string userName, string email, string password)
     {
-        User newUser = new()
-        {
-            UserName = userName,
-            Email = email
-        };
+        User newUser = new(userName, email);
         var result = await manager.CreateAsync(newUser, password);
         
         if (!result.Succeeded)

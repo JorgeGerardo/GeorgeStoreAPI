@@ -1,5 +1,6 @@
 ﻿using GeorgeStore.Common;
 using GeorgeStore.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Users;
@@ -8,6 +9,16 @@ namespace GeorgeStore.Features.Users;
 [ApiController]
 public class UserController(IUserService userService, TokenService tokenService) : ControllerBase
 {
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<ActionResult<UserDataDto>> GetProfile()
+    {
+        Guid userId = HttpContext.User.GetUserId();
+        var result = await userService.GetProfile(userId);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(ProblemDetailFactory.FromError(result.Error));
+
+    }
+
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest credentials)
     {

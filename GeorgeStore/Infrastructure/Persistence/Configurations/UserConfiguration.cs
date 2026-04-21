@@ -9,11 +9,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("Users");
+        builder.Property(u => u.UserName).IsRequired();
+        builder.Property(e => e.Email).IsRequired();
 
         builder.HasData(
-            new User
+            new User("jorguito", "Jorguito@gmail.com")
             {
                 Id = new Guid("7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9"),
+                DateRegister = new DateTime(2022, 5, 10),
                 UserName = "jorguito",
                 NormalizedUserName = "JORGUITO",
                 Email = "Jorguito@gmail.com",
