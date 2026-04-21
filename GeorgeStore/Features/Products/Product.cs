@@ -12,9 +12,15 @@ public class Product : Entity
     public bool IsActive { get; set; }
     public int CategoryId { get; set; }
     public Category Category { get; set; } = default!;
-
-    public ProductDto ToDTO()
+    public static Product Create( string name, string description, int categoryId, string image,float price)
     {
-        return new(Id, Name, Price, Description, Image, CategoryId, Category.Name);
+        return new Product
+        {
+            Name = name,
+            Description = description,
+            CategoryId = categoryId,
+            Image = image,
+            Price = price,
+        };
     }
 }

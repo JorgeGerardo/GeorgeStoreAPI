@@ -11,4 +11,16 @@ public class CartItem : Entity
     public required int ProductId { get; set; }
     public required uint Quantity { get; set; }
 
+    public CartItemDto ToDto()
+    {
+        return new CartItemDto(
+            Id, 
+            Item.Name, 
+            Item.Price, 
+            Quantity, 
+            Item.Description, 
+            Item.Image
+        );
+    }
+
 }

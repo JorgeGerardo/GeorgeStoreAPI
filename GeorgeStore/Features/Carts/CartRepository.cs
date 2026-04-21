@@ -69,14 +69,8 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 
     private Cart CreateDraft(Guid UserId)
     {
-        var newCart = new Cart
-        {
-            UserId = UserId,
-            Items = [],
-            Status = CartStatus.Draft,
-        };
+        var newCart = Cart.Create(UserId);
         context.Carts.Add(newCart);
-
         return newCart;
     }
 

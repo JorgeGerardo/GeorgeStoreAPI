@@ -16,29 +16,17 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
             WHERE UserId = @UserId
          """;
 
-        return  await connection.QueryAsync<AddressDto>(query, new { UserId });
+        return await connection.QueryAsync<AddressDto>(query, new { UserId });
     }
 
-    public async Task<Result> Add(Guid UserId, AddressDto Dto)
+    public async Task<Result> Add(Guid UserId, AddressCreateDto Dto)
     {
         int AddressesRegistered = await context.Addresses.CountAsync(a => a.UserId == UserId);
         if (AddressesRegistered >= AddressLimits.MaxAddressesPerUser)
             return Result.Failure(AddressError.LimitReached);
 
-        context.Addresses.Add(new Address
-        {
-            Alias = Dto.Alias,
-            UserId = UserId,
-            Street = Dto.Street,
-            City = Dto.City,
-            Neighborhood = Dto.Neighborhood,
-            State = Dto.State,
-            PostalCode = Dto.PostalCode,
-            ExternalNumber = Dto.ExternalNumber,
-            InternalNumber = Dto.InternalNumber,
-            References = Dto.References
-
-        });
+        Address newAddress = Address.Create(UserId, Dto.Alias, Dto.Street, Dto.Neighborhood, Dto.City, Dto.State, Dto.PostalCode, Dto.ExternalNumber, Dto.InternalNumber, Dto.References);
+        context.Addresses.Add(newAddress);
 
         return await context.SaveChangesAsync() > 0
             ? Result.Success()

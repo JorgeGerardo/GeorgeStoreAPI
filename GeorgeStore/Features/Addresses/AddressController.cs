@@ -17,7 +17,7 @@ public class AddressController(IAddressRepository addressRepository) : Controlle
     }
 
     [HttpPost]
-    public async Task<ActionResult> Add(AddressDto request)
+    public async Task<ActionResult> Add(AddressCreateDto request)
     {
         Guid UserId = HttpContext.User.GetUserId();
         Result result = await addressRepository.Add(UserId, request);

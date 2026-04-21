@@ -19,7 +19,7 @@ public class ProductController(IProductRepository productRepository) : Controlle
     {
         var result = await productRepository.GetById(id);
         return result.IsSuccess 
-            ? Ok(result.Value.ToDTO()) 
+            ? Ok(ProductDto.FromEntity(result.Value))
             : NotFound(ProblemDetailFactory.FromError(result.Error));
     }
 

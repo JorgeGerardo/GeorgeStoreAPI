@@ -15,4 +15,31 @@ public class Address : Entity
     public string? ExternalNumber { get; set; }
     public string? InternalNumber { get; set; }
     public string? References { get; set; }
+
+    public static Address Create(
+        Guid userId,
+        string alias,
+        string street,
+        string neighborhood,
+        string city,
+        string state,
+        string postalCode,
+        string? externalNumber,
+        string? internalNumber,
+        string? references)
+    {
+        return new Address()
+        {
+            Alias = alias,
+            UserId = userId,
+            Street = street,
+            Neighborhood = neighborhood,
+            City = city,
+            State = state,
+            PostalCode = postalCode,
+            ExternalNumber = externalNumber,
+            InternalNumber = internalNumber,
+            References = references,
+        };
+    }
 }

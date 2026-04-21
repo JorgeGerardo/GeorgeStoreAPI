@@ -11,6 +11,6 @@ public class CategoryController(ICategoryRepository categoryRepository) : Contro
     public async Task<ActionResult<List<CategoryDto>>> Get([FromQuery] QueryParams prms)
     {
         var categories = await categoryRepository.GetAsync(prms);
-        return Ok(categories.Select(c => c.ToDto()));
+        return Ok(categories.Select(CategoryDto.FromEntity));
     }
 }

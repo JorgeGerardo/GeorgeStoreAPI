@@ -18,9 +18,7 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
         if (!result.IsSuccess)
             return NotFound(ProblemDetailFactory.FromError(result.Error));
 
-        var itemsDto = result.Value.Items.Select(i =>
-            new CartItemDto(i.Id, i.Item.Name, i.Item.Price, i.Quantity, i.Item.Description, i.Item.Image)
-        ).ToList();
+        var itemsDto = result.Value.Items.Select(i => i.ToDto()).ToList();
 
         return Ok(new CartDto(itemsDto, result.Value.Total));
     }

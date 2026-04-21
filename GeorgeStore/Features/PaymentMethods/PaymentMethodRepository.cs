@@ -9,7 +9,7 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
 {
     public async Task<Result> Add(Guid UserId, PaymentMethodCreateDto Dto)
     {
-        var result = PaymentMethod.Create(Dto);
+        var result = PaymentMethod.Create(Dto.UserId, Dto.CardNumber, Dto.Brand, Dto.ExpMonth, Dto.ExpYear, Dto.CardHolderName, Dto.IsDefault);
         if (!result.IsSuccess)
             return Result.Failure(result.Error);
 

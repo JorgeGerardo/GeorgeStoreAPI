@@ -10,14 +10,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
 {
     public async Task<Result> Create(ProductCreateDTO request)
     {
-        Product newProdcut = new()
-        {
-            Name = request.Name,
-            Description = request.Description,
-            CategoryId = request.CategoryId,
-            Image = request.Image,
-            Price = request.Price,
-        };
+        Product newProdcut = Product.Create(request.Name, request.Description, request.CategoryId, request.Image, request.Price);
 
         context.Products.Add(newProdcut);
         return await context.SaveChangesAsync() > 0
