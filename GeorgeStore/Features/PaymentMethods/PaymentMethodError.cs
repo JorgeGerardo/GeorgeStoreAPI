@@ -15,4 +15,7 @@ public static class PaymentMethodError
 
     public static readonly Error InvalidExpYear =
         new("Range out", "The expiration year is out of range", "PaymentMethod.InvalidExpYear");
+
+    public static readonly Error PaymentMethodLimitReached =
+        new("Limit reached", "Payment-methods limit reached", "PaymentMethod.PaymentMethodLimitReached");
 }

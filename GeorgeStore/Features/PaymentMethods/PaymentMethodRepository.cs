@@ -9,9 +9,19 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
 {
     public async Task<Result> Add(Guid UserId, PaymentMethodCreateDto Dto)
     {
-        var result = PaymentMethod.Create(Dto.UserId, Dto.CardNumber, Dto.Brand, Dto.ExpMonth, Dto.ExpYear, Dto.CardHolderName, Dto.IsDefault);
+        var result = PaymentMethod.Create(UserId, Dto.CardNumber, Dto.Brand, Dto.ExpMonth, Dto.ExpYear, Dto.CardHolderName, Dto.IsDefault);
+        if (Dto.IsDefault)
+        {
+            var userPaymentMethods = await context.PaymentMethods.Where(p => p.UserId == UserId).ToListAsync();
+            userPaymentMethods.ForEach(p => p.IsDefault = false);
+        }
+
         if (!result.IsSuccess)
             return Result.Failure(result.Error);
+
+        var methodsRegister = await context.PaymentMethods.CountAsync(p => p.UserId == UserId);
+        if (methodsRegister >= 10)
+            return Result.Failure(PaymentMethodError.PaymentMethodLimitReached);
 
         context.PaymentMethods.Add(result.Value);
         return await context.SaveChangesAsync() > 0
@@ -41,6 +51,19 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
         context.PaymentMethods.Remove(method);
         return await context.SaveChangesAsync() > 0
             ? Result.Success()
+            : Result.Failure(PaymentMethodError.UnexpectedError);
+    }
+
+    public async Task<Result> SetAsDefault(Guid UserId, int PaymentMethodId)
+    {
+        var userPaymentMethods = await context.PaymentMethods.Where(p => p.UserId == UserId).ToListAsync();
+        if (!userPaymentMethods.Any(p => p.Id == PaymentMethodId))
+            return Result.Failure(PaymentMethodError.NotFound);
+
+        userPaymentMethods.ForEach(p => p.IsDefault = p.Id == PaymentMethodId);
+
+        return await context.SaveChangesAsync() > 0 
+            ? Result.Success() 
             : Result.Failure(PaymentMethodError.UnexpectedError);
     }
 }

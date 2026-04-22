@@ -33,4 +33,12 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Cont
         var result = await repository.Remove(userId, paymentMethodId);
         return result.IsSuccess ? Ok() : NotFound(result.Error);
     }
+
+    [HttpPut("{paymentMethodId:int}")]
+    public async Task<ActionResult> UpdateDefaultPaymentMethod(int paymentMethodId)
+    {
+        Guid userId = HttpContext.User.GetUserId();
+        var result = await repository.SetAsDefault(userId, paymentMethodId);
+        return result.IsSuccess ? Ok() : Conflict(result.Error);
+    }
 }
