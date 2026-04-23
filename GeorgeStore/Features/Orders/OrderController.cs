@@ -1,0 +1,30 @@
+﻿using GeorgeStore.Common;
+using GeorgeStore.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace GeorgeStore.Features.Orders;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class OrderController(IOrderService orderService) : ControllerBase
+{
+    [HttpGet]
+    public async Task<ActionResult<dynamic>> Get([FromQuery] QueryParams Prms)
+    {
+        Guid UserId = HttpContext.User.GetUserId();
+        var orders = await orderService.Get(UserId, Prms);
+        return Ok(orders);
+    }
+
+    [HttpGet("{OrderId:int}")]
+    public async Task<ActionResult<dynamic>> GetById([FromRoute] int OrderId)
+    {
+        Guid UserId = HttpContext.User.GetUserId();
+        var result = await orderService.GetById(UserId ,OrderId);
+        return result.IsSuccess 
+            ? Ok(result.Value) 
+            : NotFound(ProblemDetailFactory.FromError(result.Error));
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
+using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
@@ -21,6 +22,8 @@ public class GeorgeStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Gu
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Address> Addresses { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderDetail> OrderDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

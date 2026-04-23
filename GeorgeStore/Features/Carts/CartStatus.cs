@@ -2,11 +2,6 @@
 
 public enum CartStatus
 {
-    Draft = 0,
-    Pending,
-    Paid,       
-    Processing,
-    Completed,
-    Canceled,
-    PaymentFailed
+    Active = 0,
+    Converted,
 }

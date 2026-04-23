@@ -1,6 +1,7 @@
 ﻿using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
+using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
@@ -42,6 +43,7 @@ public static class ServiceCollectionExtension
     {
 
         collection.AddSingleton<KeyedAsyncLock>();
+        collection.AddScoped<IOrderService, OrderService>();
         collection.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
         collection.AddScoped<IAddressRepository, AddressRepository>();
         collection.AddScoped<ICategoryRepository, CategoryRepository>();

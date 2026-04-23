@@ -14,7 +14,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         Cart? cart = await context.Carts
                                 .Include(c => c.Items)
                                 .ThenInclude(i => i.Item)
-                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Draft, ct);
+                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
 
         if (cart is null)
             return Result.Failure<Cart>(CartError.Notfound);
@@ -27,7 +27,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10), ct);
         Cart? cart = await context.Carts
                                 .Include(p => p.Items)
-                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Draft, ct);
+                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
 
         cart ??= CreateDraft(UserId);
 
@@ -51,7 +51,10 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10), ct);
 
-        Cart? cart = await context.Carts.Include(p => p.Items).FirstOrDefaultAsync(c => c.UserId == UserId, ct);
+        Cart? cart = await context.Carts
+                .Include(p => p.Items)
+                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
+
         if (cart is null)
             return Result.Failure(CartError.Notfound);
 
@@ -59,7 +62,6 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 
         if (cartItem is null)
             return Result.Failure(CartError.ItemNotfound);
-
 
         cart.Items.Remove(cartItem);
         return await context.SaveChangesAsync(ct) > 0 
@@ -83,6 +85,6 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
                     ON CI.CartId = C.Id
                     WHERE UserId = @UserId AND C.[Status] = @Status
             """);
-        return await connection.ExecuteScalarAsync<int>(query.ToString(), new { UserId, Status = CartStatus.Draft });
+        return await connection.ExecuteScalarAsync<int>(query.ToString(), new { UserId, Status = CartStatus.Active });
     }
 }
