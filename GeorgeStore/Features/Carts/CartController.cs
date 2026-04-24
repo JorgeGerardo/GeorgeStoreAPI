@@ -7,10 +7,10 @@ namespace GeorgeStore.Features.Carts;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CartController(ICartRepository cartRepository) : ControllerBase
 {
     [HttpGet]
-    [Authorize]
     public async Task<ActionResult<CartDto>> Get(CancellationToken ct = default)
     {
         Guid userId = HttpContext.User.GetUserId();
@@ -25,7 +25,6 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
 
 
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult> Add(AddItemRequest request, CancellationToken ct = default)
     {
         Guid userId = HttpContext.User.GetUserId();
@@ -35,8 +34,17 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
             : BadRequest(ProblemDetailFactory.FromError(result.Error));
     }
 
+    [HttpPut]
+    public async Task<ActionResult> DecreaseQuantity([FromBody] DecreaseItemDto request)
+    {
+        Guid userId = HttpContext.User.GetUserId();
+        Result result = await cartRepository.DecreaseAsync(userId, request.ProductId);
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(ProblemDetailFactory.FromError(result.Error));
+    }
+
     [HttpDelete("{ProductId}")]
-    [Authorize]
     public async Task<ActionResult> Remove([FromRoute] int ProductId, CancellationToken ct = default)
     {
         Guid userId = HttpContext.User.GetUserId();
@@ -48,7 +56,6 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
     }
 
     [HttpGet("count")]
-    [Authorize]
     public async Task<ActionResult<int>> GetCount()
     {
         Guid userId = HttpContext.User.GetUserId();
@@ -56,3 +63,4 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
         return Ok(count);
     }
 }
+

@@ -61,7 +61,7 @@ public class OrderService(IDbConnectionFactory connection) : IOrderService
     public async Task<Result<OrderDto>> GetById(Guid UserId, int OrderId)
     {
         var conn = connection.CreateConnection();
-        Dictionary<int, OrderDto> OrderDic = new();
+        Dictionary<int, OrderDto> OrderDic = [];
         const string query = """
                 SELECT
                     O.Id, O.UserId, O.DateUtc, O.Total, O.Status,

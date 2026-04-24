@@ -87,4 +87,30 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
             """);
         return await connection.ExecuteScalarAsync<int>(query.ToString(), new { UserId, Status = CartStatus.Active });
     }
+
+    public async Task<Result> DecreaseAsync(Guid UserId, int ProductId)
+    {
+        await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10));
+        Cart? cart = await context.Carts
+                                .Include(p => p.Items)
+                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active);
+
+        if (cart is null)
+            return Result.Failure(CartError.Notfound);
+
+        CartItem? cartItem = cart.Items.FirstOrDefault(p => p.ProductId == ProductId);
+        if (cartItem is null)
+            return Result.Failure(CartError.ProductNotfound);
+
+        if (cartItem.Quantity == 1)
+            return Result.Failure(CartError.DecreaseLimit);
+
+        if (cartItem is not null)
+            cartItem.Quantity--;
+
+
+        return await context.SaveChangesAsync() > 0
+            ? Result.Success()
+            : Result.Failure(CartError.UnexpectedError);
+    }
 }

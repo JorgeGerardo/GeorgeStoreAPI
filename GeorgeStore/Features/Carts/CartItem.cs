@@ -15,6 +15,7 @@ public class CartItem : Entity
     {
         return new CartItemDto(
             Id, 
+            ProductId,
             Item.Name, 
             Item.Price, 
             Quantity, 
