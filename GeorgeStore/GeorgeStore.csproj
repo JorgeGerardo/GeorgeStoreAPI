@@ -21,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Infrastructure\Migrations\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

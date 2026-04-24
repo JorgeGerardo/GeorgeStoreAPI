@@ -19,6 +19,7 @@ builder.Services.AddCors(opts =>
 });
 builder.AddJWT();
 var app = builder.Build();
+app.UseStaticFiles();
 app.UseCors("Develop");
 app.UseSwagger();
 app.UseSwaggerUI();

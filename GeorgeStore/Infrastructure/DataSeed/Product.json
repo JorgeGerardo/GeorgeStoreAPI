@@ -4,7 +4,7 @@
     "name": "Laptop",
     "price": 1500,
     "description": "High performance laptop",
-    "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+    "image": "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9",
     "isActive": true,
     "categoryId": 1
   },
@@ -13,7 +13,7 @@
     "name": "Smartphone",
     "price": 800,
     "description": "Latest model smartphone",
-    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+    "image": "https://images.unsplash.com/photo-1598327105666-5b89351aff97",
     "isActive": true,
     "categoryId": 1
   },
@@ -22,7 +22,7 @@
     "name": "T-Shirt",
     "price": 25,
     "description": "Cotton t-shirt",
-    "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
+    "image": "https://plus.unsplash.com/premium_photo-1718913936342-eaafff98834b",
     "isActive": true,
     "categoryId": 2
   },
@@ -40,7 +40,7 @@
     "name": "Blender",
     "price": 120,
     "description": "Kitchen blender",
-    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+    "image": "https://plus.unsplash.com/premium_photo-1718043036199-d98bef36af46",
     "isActive": true,
     "categoryId": 3
   },
@@ -49,8 +49,224 @@
     "name": "Microwave",
     "price": 200,
     "description": "Microwave oven",
+    "image": "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 7,
+    "name": "Headphones",
+    "price": 150,
+    "description": "Wireless headphones",
+    "image": "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 8,
+    "name": "Smartwatch",
+    "price": 250,
+    "description": "Smart wearable watch",
+    "image": "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 9,
+    "name": "Tablet",
+    "price": 600,
+    "description": "Portable tablet device",
+    "image": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 10,
+    "name": "Camera",
+    "price": 900,
+    "description": "Digital camera",
+    "image": "https://images.unsplash.com/photo-1502920917128-1aa500764cbd",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 11,
+    "name": "Keyboard",
+    "price": 80,
+    "description": "Mechanical keyboard",
+    "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 12,
+    "name": "Mouse",
+    "price": 40,
+    "description": "Wireless mouse",
+    "image": "https://images.unsplash.com/photo-1527814050087-3793815479db",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 13,
+    "name": "Jacket",
+    "price": 120,
+    "description": "Winter jacket",
+    "image": "https://images.unsplash.com/photo-1706765779494-2705542ebe74",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 14,
+    "name": "Sneakers",
+    "price": 90,
+    "description": "Running sneakers",
+    "image": "https://images.unsplash.com/photo-1556906781-9a412961c28c",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 15,
+    "name": "Hat",
+    "price": 20,
+    "description": "Casual hat",
+    "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 16,
+    "name": "Backpack",
+    "price": 70,
+    "description": "Travel backpack",
+    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 17,
+    "name": "Sofa",
+    "price": 700,
+    "description": "Living room sofa",
+    "image": "https://images.unsplash.com/photo-1493666438817-866a91353ca9",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 18,
+    "name": "Chair",
+    "price": 85,
+    "description": "Wooden chair",
+    "image": "https://images.unsplash.com/photo-1503602642458-232111445657",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 19,
+    "name": "Table",
+    "price": 200,
+    "description": "Dining table",
+    "image": "https://images.unsplash.com/photo-1505691938895-1758d7feb511",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 20,
+    "name": "Lamp",
+    "price": 45,
+    "description": "Desk lamp",
+    "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 21,
+    "name": "Monitor",
+    "price": 300,
+    "description": "HD computer monitor",
+    "image": "https://images.unsplash.com/photo-1593640408182-31c70c8268f5",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 22,
+    "name": "Speaker",
+    "price": 120,
+    "description": "Bluetooth speaker",
+    "image": "https://images.unsplash.com/photo-1490376840453-5f616fbebe5b",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 23,
+    "name": "Dress",
+    "price": 75,
+    "description": "Summer dress",
+    "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 24,
+    "name": "Shorts",
+    "price": 35,
+    "description": "Casual shorts",
+    "image": "https://images.unsplash.com/photo-1598522325074-042db73aa4e6",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 25,
+    "name": "Toaster",
+    "price": 55,
+    "description": "Electric toaster",
     "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c",
     "isActive": true,
     "categoryId": 3
+  },
+  {
+    "id": 26,
+    "name": "Coffee Maker",
+    "price": 110,
+    "description": "Coffee machine",
+    "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 27,
+    "name": "Fan",
+    "price": 65,
+    "description": "Electric fan",
+    "image": "https://images.unsplash.com/photo-1509395176047-4a66953fd231",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 28,
+    "name": "Air Fryer",
+    "price": 180,
+    "description": "Oil-free fryer",
+    "image": "https://plus.unsplash.com/premium_photo-1672192166555-8736f47194db",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 29,
+    "name": "Gaming Console",
+    "price": 500,
+    "description": "Next-gen console",
+    "image": "https://images.unsplash.com/photo-1606813907291-d86efa9b94db",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 30,
+    "name": "VR Headset",
+    "price": 350,
+    "description": "Virtual reality headset",
+    "image": "https://images.unsplash.com/photo-1593508512255-86ab42a8e620",
+    "isActive": true,
+    "categoryId": 1
   }
 ]
