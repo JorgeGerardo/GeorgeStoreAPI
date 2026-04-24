@@ -9,7 +9,7 @@ namespace GeorgeStore.Features.Products;
 public class ProductController(IProductRepository productRepository) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> Get([FromQuery] QueryParams prms)
+    public async Task<ActionResult<PagedResult<ProductDto>>> Get([FromQuery] QueryParams prms)
     {
         return Ok(await productRepository.GetProducts(prms));
     }

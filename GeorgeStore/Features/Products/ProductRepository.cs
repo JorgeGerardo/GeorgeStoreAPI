@@ -2,6 +2,7 @@
 using GeorgeStore.Common;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Text;
 
 namespace GeorgeStore.Features.Products;
@@ -51,11 +52,13 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         return Result.Success(product);
     }
 
-    public async Task<IEnumerable<ProductDto>> GetProducts(QueryParams prms)
+    public async Task<PagedResult<ProductDto>> GetProducts(QueryParams prms)
     {
         using var conn = dbConnection.CreateConnection();
         StringBuilder query = new("""
-                SELECT p.Id, p.Name, p.Price, p.[Description], p.[Image], p.CategoryId, c.Name as [categoryName] FROM Products as p
+             SELECT
+                p.Id, p.Name, p.Price, p.[Description], p.[Image], p.CategoryId, c.Name as [categoryName]
+             FROM Products as p
                 INNER JOIN Categories as c on p.CategoryId = c.Id 
             """);
 
@@ -68,7 +71,18 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
                 OFFSET @offset Rows
                 FETCH NEXT @pageSize ROWS ONLY
         """);
-        return await conn.QueryAsync<ProductDto>(query.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize });
+        var products = await conn.QueryAsync<ProductDto>(query.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize });
+        int total = prms.Term is not null
+            ? await GetTotal(prms, conn)
+            : await context.Products.CountAsync(p => p.IsActive);
+
+        return new PagedResult<ProductDto>(products, total);
+    }
+
+    private async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
+    {
+        string query = "SELECT COUNT(*) FROM Products WHERE IsActive = 1 AND [Name] like @Term";
+        return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
     }
 
 }
