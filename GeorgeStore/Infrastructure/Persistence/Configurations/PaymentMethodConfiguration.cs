@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Features.PaymentMethods;
+﻿using GeorgeStore.Extensions;
+using GeorgeStore.Features.PaymentMethods;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +13,6 @@ public class PaymentMethodConfiguration : IEntityTypeConfiguration<PaymentMethod
         builder.Property(p => p.ExpMonth).HasMaxLength(2);
         builder.Property(p => p.ExpYear).HasMaxLength(4);
 
-
+        builder.SeedFromJson("PaymentMethod.json");
     }
 }

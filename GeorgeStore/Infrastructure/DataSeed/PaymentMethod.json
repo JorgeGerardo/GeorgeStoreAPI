@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "lastDigits": "4242",
+    "brand": "Visa",
+    "expMonth": 12,
+    "expYear": 2028,
+    "cardHolderName": "Carlos Espinoza Juarez",
+    "isDefault": true,
+    "token": "51FC7D95-0050-4667-B25E-94C5262D065E",
+    "createdAt": "2026-04-01T10:00:00Z"
+  },
+  {
+    "id": 2,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "lastDigits": "1111",
+    "brand": "Mastercard",
+    "expMonth": 6,
+    "expYear": 2027,
+    "cardHolderName": "Jorge Emiliano Lopez Arriaga",
+    "isDefault": false,
+    "token": "1ABA38B8-02D1-4F42-9364-12392528617F",
+    "createdAt": "2026-03-15T12:30:00Z"
+  },
+  {
+    "id": 3,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "lastDigits": "0005",
+    "brand": "American Express",
+    "expMonth": 9,
+    "expYear": 2029,
+    "cardHolderName": "America Castro Rodriguez",
+    "isDefault": false,
+    "token": "DED9D853-CEC1-4583-8DBF-2C1813B5F14C",
+    "createdAt": "2026-02-10T08:45:00Z"
+  }
+]

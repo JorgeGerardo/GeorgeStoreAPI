@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "orderId": 1,
+    "productId": 1,
+    "quantity": 2,
+    "unitPrice": 1500,
+    "subTotal": 3000
+  },
+  {
+    "id": 2,
+    "orderId": 1,
+    "productId": 2,
+    "quantity": 5,
+    "unitPrice": 800,
+    "subTotal": 4000
+  },
+  {
+    "id": 3,
+    "orderId": 2,
+    "productId": 5,
+    "quantity": 10,
+    "unitPrice": 120,
+    "subTotal": 1200
+  },
+  {
+    "id": 4,
+    "orderId": 2,
+    "productId": 4,
+    "quantity": 5,
+    "unitPrice": 60,
+    "subTotal": 600
+  },
+  {
+    "id": 5,
+    "orderId": 3,
+    "productId": 3,
+    "quantity": 1,
+    "unitPrice": 25,
+    "subTotal": 25
+  },
+  {
+    "id": 6,
+    "orderId": 3,
+    "productId": 6,
+    "quantity": 1,
+    "unitPrice": 200,
+    "subTotal": 200
+  },
+  {
+    "id": 7,
+    "orderId": 4,
+    "productId": 1,
+    "quantity": 1,
+    "unitPrice": 1500,
+    "subTotal": 1500
+  }
+]

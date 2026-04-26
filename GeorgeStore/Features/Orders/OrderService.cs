@@ -2,7 +2,6 @@
 using GeorgeStore.Common;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Infrastructure.Data;
-using System;
 
 namespace GeorgeStore.Features.Orders;
 
@@ -99,12 +98,6 @@ public class OrderService(IDbConnectionFactory connection) : IOrderService
             : Result.Success(order);
         throw new NotImplementedException();
     }
-}
-
-public class OrderError
-{
-    public static readonly Error Notfound =
-        new("Order not found", "Can't find any order with this id", "Order.Notfound");
 }
 
 

@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "alias": "My principal house",
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "street": "Benito Juarez",
+    "neighborhood": "Roma",
+    "city": "Ciudad de México",
+    "state": "México",
+    "postalCode": "99999",
+    "externalNumber": "66",
+    "internalNumber": "04",
+    "references": "Behind an Oxxo"
+  },
+  {
+    "id": 2,
+    "alias": "Work",
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "street": "San Pablo TRE",
+    "neighborhood": "Roma",
+    "city": "Ciudad de México",
+    "state": "México",
+    "postalCode": "87392",
+    "externalNumber": "77",
+    "internalNumber": "02",
+    "references": "Next to an Oxxo"
+  }
+]

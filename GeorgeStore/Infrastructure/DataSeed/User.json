@@ -1,0 +1,14 @@
+[
+  {
+    "id": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "dateRegister": "2022-05-10T00:00:00Z",
+    "userName": "jorguito",
+    "normalizedUserName": "JORGUITO",
+    "email": "Jorguito@gmail.com",
+    "normalizedEmail": "JORGUITO@GMAIL.COM",
+    "emailConfirmed": true,
+    "passwordHash": "AQAAAAIAAYagAAAAECBVaFHLxUqWrsE1hmC3YZXfZup3yoYjXpBZFGDHX4PjbcrmcNq4BZ7L0OYieHT5Sg==",
+    "securityStamp": "STATIC_SECURITY_STAMP",
+    "concurrencyStamp": "STATIC_CONCURRENCY_STAMP"
+  }
+]

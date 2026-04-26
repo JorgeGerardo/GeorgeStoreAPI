@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "total": 7000,
+    "dateUtc": "2026-04-22T00:00:00Z",
+    "status":  1
+  },
+  {
+    "id": 2,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "total": 1800,
+    "dateUtc": "2026-04-20T00:00:00Z",
+    "status": 2
+  },
+  {
+    "id": 3,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "total": 9000,
+    "dateUtc": "2026-03-12T00:00:00Z",
+    "status": 3
+  },
+  {
+    "id": 4,
+    "userId": "7AA8DC3A-4E4C-44D0-82CB-28F746D0C2C9",
+    "total": 9000,
+    "dateUtc": "2026-01-02T00:00:00Z",
+    "status": 4
+  }
+]

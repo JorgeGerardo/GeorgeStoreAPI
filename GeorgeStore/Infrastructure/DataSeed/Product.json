@@ -268,5 +268,648 @@
     "image": "https://images.unsplash.com/photo-1593508512255-86ab42a8e620",
     "isActive": true,
     "categoryId": 1
+  },
+  {
+    "id": 31,
+    "name": "Desk",
+    "price": 220,
+    "description": "Office desk",
+    "image": "https://picsum.photos/seed/31/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 32,
+    "name": "Office Chair",
+    "price": 180,
+    "description": "Ergonomic chair",
+    "image": "https://picsum.photos/seed/32/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 33,
+    "name": "Notebook",
+    "price": 10,
+    "description": "Paper notebook",
+    "image": "https://picsum.photos/seed/33/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 34,
+    "name": "Pen Set",
+    "price": 15,
+    "description": "Writing pens",
+    "image": "https://picsum.photos/seed/34/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 35,
+    "name": "Router",
+    "price": 130,
+    "description": "WiFi router",
+    "image": "https://picsum.photos/seed/35/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+
+  {
+    "id": 36,
+    "name": "SSD Drive",
+    "price": 160,
+    "description": "Fast storage",
+    "image": "https://picsum.photos/seed/36/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 37,
+    "name": "USB Cable",
+    "price": 12,
+    "description": "Charging cable",
+    "image": "https://picsum.photos/seed/37/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 38,
+    "name": "Power Bank",
+    "price": 45,
+    "description": "Portable battery",
+    "image": "https://picsum.photos/seed/38/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 39,
+    "name": "Tripod",
+    "price": 60,
+    "description": "Camera tripod",
+    "image": "https://picsum.photos/seed/39/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 40,
+    "name": "Ring Light",
+    "price": 75,
+    "description": "Lighting setup",
+    "image": "https://picsum.photos/seed/40/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+
+  {
+    "id": 41,
+    "name": "Gloves",
+    "price": 18,
+    "description": "Winter gloves",
+    "image": "https://picsum.photos/seed/41/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 42,
+    "name": "Scarf",
+    "price": 22,
+    "description": "Warm scarf",
+    "image": "https://picsum.photos/seed/42/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 43,
+    "name": "Watch",
+    "price": 200,
+    "description": "Luxury watch",
+    "image": "https://picsum.photos/seed/43/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 44,
+    "name": "Sunglasses",
+    "price": 55,
+    "description": "UV protection",
+    "image": "https://picsum.photos/seed/44/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 45,
+    "name": "Wallet",
+    "price": 35,
+    "description": "Leather wallet",
+    "image": "https://picsum.photos/seed/45/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+
+  {
+    "id": 46,
+    "name": "Bed",
+    "price": 900,
+    "description": "Queen size bed",
+    "image": "https://picsum.photos/seed/46/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 47,
+    "name": "Pillow",
+    "price": 25,
+    "description": "Soft pillow",
+    "image": "https://picsum.photos/seed/47/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 48,
+    "name": "Blanket",
+    "price": 60,
+    "description": "Warm blanket",
+    "image": "https://picsum.photos/seed/48/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 49,
+    "name": "Curtains",
+    "price": 85,
+    "description": "Window curtains",
+    "image": "https://picsum.photos/seed/49/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 50,
+    "name": "Clock",
+    "price": 40,
+    "description": "Wall clock",
+    "image": "https://picsum.photos/seed/50/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+
+  {
+    "id": 51,
+    "name": "Gaming Mouse",
+    "price": 95,
+    "description": "RGB mouse",
+    "image": "https://picsum.photos/seed/51/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 52,
+    "name": "Gaming Keyboard",
+    "price": 150,
+    "description": "Mechanical RGB",
+    "image": "https://picsum.photos/seed/52/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 53,
+    "name": "Webcam",
+    "price": 85,
+    "description": "HD webcam",
+    "image": "https://picsum.photos/seed/53/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 54,
+    "name": "Microphone",
+    "price": 120,
+    "description": "Studio mic",
+    "image": "https://picsum.photos/seed/54/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 55,
+    "name": "Laptop Stand",
+    "price": 45,
+    "description": "Adjustable stand",
+    "image": "https://picsum.photos/seed/55/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+
+  {
+    "id": 56,
+    "name": "Cooking Pan",
+    "price": 70,
+    "description": "Non-stick pan",
+    "image": "https://picsum.photos/seed/56/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 57,
+    "name": "Knife Set",
+    "price": 95,
+    "description": "Kitchen knives",
+    "image": "https://picsum.photos/seed/57/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 58,
+    "name": "Cutting Board",
+    "price": 25,
+    "description": "Wood board",
+    "image": "https://picsum.photos/seed/58/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 59,
+    "name": "Mixer",
+    "price": 140,
+    "description": "Food mixer",
+    "image": "https://picsum.photos/seed/59/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 60,
+    "name": "Juicer",
+    "price": 130,
+    "description": "Fruit juicer",
+    "image": "https://picsum.photos/seed/60/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+
+  {
+    "id": 61,
+    "name": "Cap",
+    "price": 18,
+    "description": "Baseball cap",
+    "image": "https://picsum.photos/seed/61/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 62,
+    "name": "Socks",
+    "price": 12,
+    "description": "Cotton socks",
+    "image": "https://picsum.photos/seed/62/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 63,
+    "name": "Belt",
+    "price": 30,
+    "description": "Leather belt",
+    "image": "https://picsum.photos/seed/63/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 64,
+    "name": "Tie",
+    "price": 28,
+    "description": "Formal tie",
+    "image": "https://picsum.photos/seed/64/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 65,
+    "name": "Suit",
+    "price": 350,
+    "description": "Formal suit",
+    "image": "https://picsum.photos/seed/65/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+
+  {
+    "id": 66,
+    "name": "Bookshelf",
+    "price": 250,
+    "description": "Wood shelf",
+    "image": "https://picsum.photos/seed/66/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 67,
+    "name": "Drawer",
+    "price": 200,
+    "description": "Storage drawer",
+    "image": "https://picsum.photos/seed/67/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 68,
+    "name": "Mirror",
+    "price": 90,
+    "description": "Wall mirror",
+    "image": "https://picsum.photos/seed/68/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 69,
+    "name": "Plant",
+    "price": 35,
+    "description": "Indoor plant",
+    "image": "https://picsum.photos/seed/69/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 70,
+    "name": "Vase",
+    "price": 40,
+    "description": "Decorative vase",
+    "image": "https://picsum.photos/seed/70/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+
+  {
+    "id": 71,
+    "name": "Drone",
+    "price": 600,
+    "description": "Flying drone",
+    "image": "https://picsum.photos/seed/71/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 72,
+    "name": "Projector",
+    "price": 450,
+    "description": "HD projector",
+    "image": "https://picsum.photos/seed/72/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 73,
+    "name": "TV",
+    "price": 800,
+    "description": "Smart TV",
+    "image": "https://picsum.photos/seed/73/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 74,
+    "name": "Soundbar",
+    "price": 220,
+    "description": "Home audio",
+    "image": "https://picsum.photos/seed/74/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 75,
+    "name": "Gamepad",
+    "price": 70,
+    "description": "Controller",
+    "image": "https://picsum.photos/seed/75/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+
+  {
+    "id": 76,
+    "name": "Yoga Mat",
+    "price": 30,
+    "description": "Fitness mat",
+    "image": "https://picsum.photos/seed/76/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 77,
+    "name": "Dumbbells",
+    "price": 80,
+    "description": "Workout weights",
+    "image": "https://picsum.photos/seed/77/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 78,
+    "name": "Treadmill",
+    "price": 900,
+    "description": "Running machine",
+    "image": "https://picsum.photos/seed/78/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 79,
+    "name": "Water Bottle",
+    "price": 20,
+    "description": "Reusable bottle",
+    "image": "https://picsum.photos/seed/79/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 80,
+    "name": "Helmet",
+    "price": 75,
+    "description": "Bike helmet",
+    "image": "https://picsum.photos/seed/80/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+
+  {
+    "id": 81,
+    "name": "Fridge",
+    "price": 1200,
+    "description": "Refrigerator",
+    "image": "https://picsum.photos/seed/81/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 82,
+    "name": "Washing Machine",
+    "price": 950,
+    "description": "Laundry machine",
+    "image": "https://picsum.photos/seed/82/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 83,
+    "name": "Dryer",
+    "price": 850,
+    "description": "Clothes dryer",
+    "image": "https://picsum.photos/seed/83/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 84,
+    "name": "Vacuum",
+    "price": 300,
+    "description": "Vacuum cleaner",
+    "image": "https://picsum.photos/seed/84/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+  {
+    "id": 85,
+    "name": "Iron",
+    "price": 60,
+    "description": "Clothes iron",
+    "image": "https://picsum.photos/seed/85/400/300",
+    "isActive": true,
+    "categoryId": 3
+  },
+
+  {
+    "id": 86,
+    "name": "Perfume",
+    "price": 90,
+    "description": "Fragrance",
+    "image": "https://picsum.photos/seed/86/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 87,
+    "name": "Makeup Kit",
+    "price": 120,
+    "description": "Beauty kit",
+    "image": "https://picsum.photos/seed/87/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 88,
+    "name": "Hair Dryer",
+    "price": 80,
+    "description": "Hair styling",
+    "image": "https://picsum.photos/seed/88/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 89,
+    "name": "Shampoo",
+    "price": 18,
+    "description": "Hair care",
+    "image": "https://picsum.photos/seed/89/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 90,
+    "name": "Conditioner",
+    "price": 18,
+    "description": "Hair conditioner",
+    "image": "https://picsum.photos/seed/90/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+
+  {
+    "id": 91,
+    "name": "Smart Bulb",
+    "price": 35,
+    "description": "WiFi light",
+    "image": "https://picsum.photos/seed/91/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 92,
+    "name": "Smart Plug",
+    "price": 25,
+    "description": "Automation plug",
+    "image": "https://picsum.photos/seed/92/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 93,
+    "name": "Security Camera",
+    "price": 150,
+    "description": "Home security",
+    "image": "https://picsum.photos/seed/93/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 94,
+    "name": "Door Lock",
+    "price": 200,
+    "description": "Smart lock",
+    "image": "https://picsum.photos/seed/94/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 95,
+    "name": "Alarm System",
+    "price": 350,
+    "description": "Security alarm",
+    "image": "https://picsum.photos/seed/95/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+
+  {
+    "id": 96,
+    "name": "Printer",
+    "price": 220,
+    "description": "Color printer",
+    "image": "https://picsum.photos/seed/96/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 97,
+    "name": "Scanner",
+    "price": 180,
+    "description": "Document scanner",
+    "image": "https://picsum.photos/seed/97/400/300",
+    "isActive": true,
+    "categoryId": 1
+  },
+  {
+    "id": 98,
+    "name": "Paper Pack",
+    "price": 25,
+    "description": "Printer paper",
+    "image": "https://picsum.photos/seed/98/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 99,
+    "name": "Stapler",
+    "price": 15,
+    "description": "Office stapler",
+    "image": "https://picsum.photos/seed/99/400/300",
+    "isActive": true,
+    "categoryId": 2
+  },
+  {
+    "id": 100,
+    "name": "Folder Set",
+    "price": 20,
+    "description": "Document folders",
+    "image": "https://picsum.photos/seed/100/400/300",
+    "isActive": true,
+    "categoryId": 2
   }
 ]
