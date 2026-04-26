@@ -11,7 +11,7 @@ namespace GeorgeStore.Features.Orders;
 public class OrderController(IOrderService orderService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<dynamic>> Get([FromQuery] QueryParams Prms)
+    public async Task<ActionResult<PagedResult<OrderDto>>> Get([FromQuery] QueryParams Prms)
     {
         Guid UserId = HttpContext.User.GetUserId();
         var orders = await orderService.Get(UserId, Prms);
@@ -19,7 +19,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     [HttpGet("{OrderId:int}")]
-    public async Task<ActionResult<dynamic>> GetById([FromRoute] int OrderId)
+    public async Task<ActionResult<Result<OrderDto>>> GetById([FromRoute] int OrderId)
     {
         Guid UserId = HttpContext.User.GetUserId();
         var result = await orderService.GetById(UserId ,OrderId);

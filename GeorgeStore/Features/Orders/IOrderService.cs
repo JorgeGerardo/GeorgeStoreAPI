@@ -6,7 +6,7 @@ namespace GeorgeStore.Features.Orders;
 public interface IOrderService
 {
     Task<Result> Buy(Cart cart);
-    Task<IEnumerable<OrderDto>> Get(Guid UserId, QueryParams Prms);
+    Task<PagedResult<OrderDto>> Get(Guid UserId, QueryParams Prms);
     Task<Result<OrderDto>> GetById(Guid UserId, int OrderId);
 }
 
