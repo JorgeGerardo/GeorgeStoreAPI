@@ -22,7 +22,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         return Result.Success(cart);
     }
 
-    public async Task<Result> AddAsync(Guid UserId, int ProductId, uint Quantity, CancellationToken ct = default)
+    public async Task<Result> AddAsync(Guid UserId, int ProductId, int Quantity, CancellationToken ct = default)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10), ct);
         Cart? cart = await context.Carts

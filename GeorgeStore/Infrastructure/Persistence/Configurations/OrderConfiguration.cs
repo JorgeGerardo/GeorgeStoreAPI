@@ -12,6 +12,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(p => p.Total)
             .HasPrecision(18, 2);
 
+
         builder.SeedFromJson("Order.json");
 
     }

@@ -12,6 +12,17 @@ public class OrderDetail : Entity
     public decimal UnitPrice { get; set; }
     public decimal SubTotal { get; set; }
     public int Quantity { get; set; }
+
+    public static OrderDetail Create(int ProductId, decimal UnitPrice, decimal SubTotal, int Quantity)
+    {
+        return new OrderDetail
+        {
+            ProductId = ProductId,
+            UnitPrice = UnitPrice,
+            SubTotal = SubTotal,
+            Quantity = Quantity
+        };
+    }
 }
 
 

@@ -1,10 +1,12 @@
 ﻿using GeorgeStore.Common;
+using GeorgeStore.Features.Users;
 
 namespace GeorgeStore.Features.Addresses;
 
 public class Address : Entity
 {
     public required string Alias { get; set; }
+    public User User { get; set; } = default!;
     public required Guid UserId { get; set; }
     public required string Street { get; set; }
     public required string Neighborhood { get; set; }

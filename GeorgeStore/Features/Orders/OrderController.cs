@@ -27,4 +27,14 @@ public class OrderController(IOrderService orderService) : ControllerBase
             ? Ok(result.Value) 
             : NotFound(ProblemDetailFactory.FromError(result.Error));
     }
+
+    [HttpPost]
+    public async Task<ActionResult> Buy([FromBody] BuyRequest request)
+    {
+        Guid UserId = HttpContext.User.GetUserId();
+        var result = await orderService.Buy(UserId, request.CartId, request.AddressId);
+        return result.IsSuccess
+            ? Ok()
+            : StatusCode(500);
+    }
 }

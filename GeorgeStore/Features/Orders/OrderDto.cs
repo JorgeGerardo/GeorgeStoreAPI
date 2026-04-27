@@ -11,7 +11,7 @@ public sealed class OrderDto
     public List<OrderDetailDto> Details { get; set; } = [];
 }
 
-public record OrderDetailDto(int Id, int OrderId, int ProductId, decimal UnitPrice, decimal SubTotal, int Quantity, string Image);
+public record OrderDetailDto(int Id, int OrderId, int ProductId, decimal UnitPrice, decimal SubTotal, int Quantity, string Image, string Name);
 
-
+public sealed record BuyRequest(int CartId, int AddressId);
 

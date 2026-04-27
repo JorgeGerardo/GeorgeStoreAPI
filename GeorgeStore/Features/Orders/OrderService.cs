@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using GeorgeStore.Common;
+using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +8,32 @@ using System.Data;
 
 namespace GeorgeStore.Features.Orders;
 
-public class OrderService(IDbConnectionFactory connection, GeorgeStoreContext context) : IOrderService
+public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreContext context, KeyedAsyncLock locker) : IOrderService
 {
-    public Task<Result> Buy(Cart cart)
+    public async Task<Result> Buy(Guid UserId, int CartId, int AddressId)
     {
-        throw new NotImplementedException();
+        await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(30));
+        var cart = await context.Carts
+            .Include(c => c.Items)
+            .ThenInclude(c => c.Item)
+            .FirstOrDefaultAsync(c => c.UserId == UserId && c.Id == CartId && c.Status == CartStatus.Active);
+
+        var address = await context.Addresses
+            .FirstOrDefaultAsync(addr => addr.UserId == UserId && addr.Id == AddressId);
+
+        if (address is null)
+            return Result.Failure(OrderError.AddressNotFound);
+
+        if (cart is null)
+            return Result.Failure(OrderError.CartNotNotfound);
+
+        cart.Status = CartStatus.Converted;
+        Order newOrder = CreateOrder(cart, UserId, address);
+        context.Orders.Add(newOrder);
+
+        return await context.SaveChangesAsync() > 0
+            ? Result.Success()
+            : Result.Failure(OrderError.UnexpectedError);
     }
 
     public async Task<PagedResult<OrderDto>> Get(Guid UserId, QueryParams Prms)
@@ -40,7 +62,7 @@ public class OrderService(IDbConnectionFactory connection, GeorgeStoreContext co
                 SELECT
                     O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
                     OD.Id, OD.OrderId, OD.ProductId, OD.UnitPrice, OD.SubTotal, OD.Quantity,
-                    P.[Image]
+                    P.[Image], P.[Name]
                 FROM OrdersPaged AS O 
                     INNER JOIN OrderDetails AS OD ON O.Id = OD.OrderId
                     INNER JOIN Products AS P ON P.Id = OD.ProductId
@@ -81,7 +103,7 @@ public class OrderService(IDbConnectionFactory connection, GeorgeStoreContext co
                 SELECT
                     O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
                     OD.Id, OD.OrderId, OD.ProductId, OD.UnitPrice, OD.SubTotal, OD.Quantity,
-                    P.[Image]
+                    P.[Image], P.[Name]
                 FROM Orders AS O
                     INNER JOIN OrderDetails AS OD ON O.Id = OD.OrderId
                     INNER JOIN Products AS P ON P.Id = OD.ProductId
@@ -109,8 +131,8 @@ public class OrderService(IDbConnectionFactory connection, GeorgeStoreContext co
         );
 
         OrderDto? order = OrderDic.Values.FirstOrDefault();
-        return order is null 
-            ? Result.Failure<OrderDto>(OrderError.Notfound) 
+        return order is null
+            ? Result.Failure<OrderDto>(OrderError.Notfound)
             : Result.Success(order);
         throw new NotImplementedException();
     }
@@ -129,4 +151,24 @@ public class OrderService(IDbConnectionFactory connection, GeorgeStoreContext co
 
 }
 
+public partial class OrderService : IOrderService
+{
 
+    private Order CreateOrder(Cart cart, Guid UserId, Address Address)
+    {
+        List<OrderDetail> details = [];
+        foreach (var item in cart.Items)
+            details.Add(
+                OrderDetail.Create(
+                    item.ProductId,
+                    Convert.ToDecimal(item.Item.Price),
+                    Convert.ToDecimal(item.Item.Price * item.Quantity),
+                    item.Quantity
+                )
+            );
+
+        return Order.Create(UserId, details.Sum(v => v.SubTotal), Address, details);
+    }
+
+
+}

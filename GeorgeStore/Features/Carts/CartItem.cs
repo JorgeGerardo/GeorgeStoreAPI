@@ -9,17 +9,17 @@ public class CartItem : Entity
     public int CartId { get; set; }
     public Product Item { get; set; } = default!;
     public required int ProductId { get; set; }
-    public required uint Quantity { get; set; }
+    public required int Quantity { get; set; }
 
     public CartItemDto ToDto()
     {
         return new CartItemDto(
             Id, 
             ProductId,
-            Item.Name, 
-            Item.Price, 
-            Quantity, 
-            Item.Description, 
+            Item.Name,
+            Item.Price,
+            Quantity,
+            Item.Description,
             Item.Image
         );
     }
