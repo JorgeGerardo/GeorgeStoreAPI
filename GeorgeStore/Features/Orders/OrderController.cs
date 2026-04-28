@@ -33,7 +33,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     {
         Guid UserId = HttpContext.User.GetUserId();
         var result = await orderService.Buy(UserId, request.CartId, request.AddressId, request.PaymentMethodId);
-        return result.IsSuccess ? Ok(result.Value) : StatusCode(500);
+        return result.IsSuccess ? Ok(result.Value) : StatusCode(500, result.Error);
     }
 
     //TODO: Reorder endpoint missing...

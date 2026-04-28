@@ -3,7 +3,6 @@ using Dapper;
 using GeorgeStore.Common;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace GeorgeStore.Features.Carts;
 
@@ -15,10 +14,11 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
                                 .Include(c => c.Items)
                                 .ThenInclude(i => i.Item)
                                 .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
+        if (cart is not null)
+            return Result.Success(cart);
 
-        if (cart is null)
-            return Result.Failure<Cart>(CartError.Notfound);
-
+        cart = CreateDraft(UserId);
+        await context.SaveChangesAsync();
         return Result.Success(cart);
     }
 
@@ -42,9 +42,8 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
                 Quantity = Quantity
             });
 
-        return await context.SaveChangesAsync(ct) > 0
-            ? Result.Success()
-            : Result.Failure(CartError.UnexpectedError);
+        await context.SaveChangesAsync(ct);
+        return Result.Success();
     }
 
     public async Task<Result> RemoveAsync(Guid UserId, int ProductId, CancellationToken ct = default)
@@ -79,13 +78,13 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     public async Task<int> CountAsync(Guid UserId)
     {
         var connection = dbConnection.CreateConnection();
-        StringBuilder query = new("""
+        const string query = """
                 SELECT SUM(CI.Quantity) from Carts AS C
                     INNER JOIN CartItems as CI
                     ON CI.CartId = C.Id
                     WHERE UserId = @UserId AND C.[Status] = @Status
-            """);
-        return await connection.ExecuteScalarAsync<int>(query.ToString(), new { UserId, Status = CartStatus.Active });
+            """;
+        return await connection.ExecuteScalarAsync<int>(query, new { UserId, Status = CartStatus.Active });
     }
 
     public async Task<Result> DecreaseAsync(Guid UserId, int ProductId)
@@ -109,8 +108,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
             cartItem.Quantity--;
 
 
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(CartError.UnexpectedError);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 }

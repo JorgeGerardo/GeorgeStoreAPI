@@ -24,9 +24,8 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
             return Result.Failure(PaymentMethodError.PaymentMethodLimitReached);
 
         context.PaymentMethods.Add(result.Value);
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(PaymentMethodError.UnexpectedError);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     public async Task<IEnumerable<PaymentMethodDto>> GetAsync(Guid UserId)
@@ -59,9 +58,8 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
             return Result.Failure(PaymentMethodError.NotFound);
 
         context.PaymentMethods.Remove(method);
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(PaymentMethodError.UnexpectedError);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     public async Task<Result> SetAsDefault(Guid UserId, int PaymentMethodId)
@@ -72,9 +70,8 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
 
         userPaymentMethods.ForEach(p => p.IsDefault = p.Id == PaymentMethodId);
 
-        return await context.SaveChangesAsync() > 0 
-            ? Result.Success() 
-            : Result.Failure(PaymentMethodError.UnexpectedError);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 }
 

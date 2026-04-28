@@ -14,9 +14,8 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         Product newProdcut = Product.Create(request.Name, request.Description, request.CategoryId, request.Image, request.Price);
 
         context.Products.Add(newProdcut);
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(ProductError.Conflict);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     public async Task<Result> Delete(int id)
@@ -26,9 +25,8 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
             return Result.Failure(ProductError.Notfound);
 
         product.IsActive = false;
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(ProductError.Conflict);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     public async Task<bool> Exist(int id)
@@ -81,7 +79,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
 
     private async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
     {
-        string query = "SELECT COUNT(*) FROM Products WHERE IsActive = 1 AND [Name] like @Term";
+        const string query = "SELECT COUNT(*) FROM Products WHERE IsActive = 1 AND [Name] like @Term";
         return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
     }
 

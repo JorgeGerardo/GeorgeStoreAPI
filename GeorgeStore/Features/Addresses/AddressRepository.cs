@@ -10,7 +10,7 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
     public async Task<IEnumerable<AddressDto>> Get(Guid UserId)
     {
         var connection = dbConnection.CreateConnection();
-        string query = """
+        const string query = """
             SELECT Id, Alias, Street, Neighborhood, City, [State], PostalCode, ExternalNumber, InternalNumber, [References]
             FROM Addresses
             WHERE UserId = @UserId
@@ -28,9 +28,8 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
         Address newAddress = Address.Create(UserId, Dto.Alias, Dto.Street, Dto.Neighborhood, Dto.City, Dto.State, Dto.PostalCode, Dto.ExternalNumber, Dto.InternalNumber, Dto.References);
         context.Addresses.Add(newAddress);
 
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(AddressError.Conflict);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     public async Task<Result> Remove(Guid UserId, int AddressId)
