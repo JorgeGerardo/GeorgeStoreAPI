@@ -1,11 +1,13 @@
 ﻿using GeorgeStore.Common;
 using GeorgeStore.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Addresses;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class AddressController(IAddressRepository addressRepository) : ControllerBase
 {
     [HttpGet]

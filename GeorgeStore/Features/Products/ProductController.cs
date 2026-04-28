@@ -1,5 +1,6 @@
 ﻿using GeorgeStore.Common;
 using GeorgeStore.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Products;
@@ -24,6 +25,7 @@ public class ProductController(IProductRepository productRepository) : Controlle
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult> Create(ProductCreateDTO request)
     {
         Result result = await productRepository.Create(request);
@@ -31,6 +33,7 @@ public class ProductController(IProductRepository productRepository) : Controlle
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize]
     public async Task<ActionResult> Delete(int id)
     {
         var productExist = await productRepository.Exist(id);
