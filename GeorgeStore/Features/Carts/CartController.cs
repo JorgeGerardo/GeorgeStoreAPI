@@ -20,7 +20,7 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
 
         var itemsDto = result.Value.Items.Select(i => i.ToDto()).ToList();
 
-        return Ok(new CartDto(itemsDto, result.Value.Total));
+        return Ok(new CartDto(result.Value.Id, itemsDto, result.Value.Total));
     }
 
 
