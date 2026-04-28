@@ -29,12 +29,17 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Buy([FromBody] BuyRequest request)
+    public async Task<ActionResult<int>> Buy([FromBody] BuyRequest request)
     {
         Guid UserId = HttpContext.User.GetUserId();
-        var result = await orderService.Buy(UserId, request.CartId, request.AddressId);
-        return result.IsSuccess
-            ? Ok()
-            : StatusCode(500);
+        var result = await orderService.Buy(UserId, request.CartId, request.AddressId, request.PaymentMethodId);
+        return result.IsSuccess ? Ok(result.Value) : StatusCode(500);
+    }
+
+    //TODO: Reorder endpoint missing...
+    [HttpPost("{OrderId:int}")]
+    public Task<ActionResult<Result<OrderDto>>> Reorder([FromRoute] int OrderId)
+    {
+        throw new NotImplementedException();
     }
 }

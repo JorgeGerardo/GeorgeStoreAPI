@@ -16,6 +16,14 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Cont
         return Ok(await repository.GetAsync(UserId));
     }
 
+    [HttpGet("{PaymentMethodId:int}")]
+    public async Task<ActionResult<IEnumerable<PaymentMethodDto>>> Get([FromRoute] int PaymentMethodId)
+    {
+        Guid UserId = HttpContext.User.GetUserId();
+        var result = await repository.GetByIdAsync(UserId, PaymentMethodId);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Add([FromBody] PaymentMethodCreateDto request)
     {

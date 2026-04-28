@@ -8,5 +8,6 @@ public interface IPaymentMethodRepository
     Task<Result> Remove(Guid UserId, int PaymentMethodId);
     Task<Result> SetAsDefault(Guid UserId, int PaymentMethodId);
     Task<IEnumerable<PaymentMethodDto>> GetAsync(Guid UserId);
+    Task<Result<PaymentMethod>> GetByIdAsync(Guid UserId, int Id);
 }
 

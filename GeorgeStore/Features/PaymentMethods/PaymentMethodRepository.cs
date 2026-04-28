@@ -40,6 +40,16 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
         return await conn.QueryAsync<PaymentMethodDto>(query, new { UserId });
     }
 
+    public async Task<Result<PaymentMethod>> GetByIdAsync(Guid UserId, int Id)
+    {
+        PaymentMethod? paymentMethod = await context.PaymentMethods
+            .FirstOrDefaultAsync(pm => pm.UserId == UserId && pm.Id == Id);
+
+        return paymentMethod is not null
+            ? Result.Success(paymentMethod)
+            : Result.Failure<PaymentMethod>(PaymentMethodError.NotFound);
+    }
+
     public async Task<Result> Remove(Guid UserId, int PaymentMethodId)
     {
         PaymentMethod? method = await context.PaymentMethods

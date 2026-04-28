@@ -1,4 +1,5 @@
-﻿namespace GeorgeStore.Features.PaymentMethods;
+﻿
+namespace GeorgeStore.Features.PaymentMethods;
 
 public record PaymentMethodDto(
     int Id,
@@ -10,7 +11,12 @@ public record PaymentMethodDto(
     string CardHolderName,
     bool IsDefault,
     DateTime CreatedAt
-);
+)
+{
+    public static PaymentMethodDto FromEntity(PaymentMethod entity)
+        => new(entity.Id, entity.UserId, entity.LastDigits, entity.Brand, entity.ExpMonth, entity.ExpYear, entity.CardHolderName, entity.IsDefault, entity.CreatedAt);
+
+}
 
 
 public record PaymentMethodCreateDto(

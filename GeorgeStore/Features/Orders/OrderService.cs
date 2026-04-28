@@ -2,6 +2,7 @@
 using GeorgeStore.Common;
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
+using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -10,30 +11,39 @@ namespace GeorgeStore.Features.Orders;
 
 public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreContext context, KeyedAsyncLock locker) : IOrderService
 {
-    public async Task<Result> Buy(Guid UserId, int CartId, int AddressId)
+    public async Task<Result<int>> Buy(Guid UserId, int CartId, int AddressId, int PaymentMethodId)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(30));
-        var cart = await context.Carts
+
+        Cart? cart = await context.Carts
             .Include(c => c.Items)
             .ThenInclude(c => c.Item)
             .FirstOrDefaultAsync(c => c.UserId == UserId && c.Id == CartId && c.Status == CartStatus.Active);
 
-        var address = await context.Addresses
+        Address? address = await context.Addresses
             .FirstOrDefaultAsync(addr => addr.UserId == UserId && addr.Id == AddressId);
 
+        PaymentMethod? paymentMethod = await context.PaymentMethods
+            .FirstOrDefaultAsync(pm => pm.UserId == UserId && pm.Id == PaymentMethodId);
+
         if (address is null)
-            return Result.Failure(OrderError.AddressNotFound);
+            return Result.Failure<int>(OrderError.AddressNotFound);
 
         if (cart is null)
-            return Result.Failure(OrderError.CartNotNotfound);
+            return Result.Failure<int>(OrderError.CartNotNotfound);
+
+        if (paymentMethod is null)
+            return Result.Failure<int>(PaymentMethodError.NotFound);
+
 
         cart.Status = CartStatus.Converted;
-        Order newOrder = CreateOrder(cart, UserId, address);
+        Order newOrder = CreateOrder(cart, UserId, address, paymentMethod);
         context.Orders.Add(newOrder);
 
+        //var save = await context.SaveChangesAsync() > 0;
         return await context.SaveChangesAsync() > 0
-            ? Result.Success()
-            : Result.Failure(OrderError.UnexpectedError);
+            ? Result.Success(newOrder.Id)
+            : Result.Failure<int>(OrderError.UnexpectedError);
     }
 
     public async Task<PagedResult<OrderDto>> Get(Guid UserId, QueryParams Prms)
@@ -154,7 +164,7 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
 public partial class OrderService : IOrderService
 {
 
-    private Order CreateOrder(Cart cart, Guid UserId, Address Address)
+    private Order CreateOrder(Cart cart, Guid UserId, Address Address, PaymentMethod PaymentMethod)
     {
         List<OrderDetail> details = [];
         foreach (var item in cart.Items)
@@ -167,7 +177,7 @@ public partial class OrderService : IOrderService
                 )
             );
 
-        return Order.Create(UserId, details.Sum(v => v.SubTotal), Address, details);
+        return Order.Create(UserId, details.Sum(v => v.SubTotal), Address, PaymentMethod, details);
     }
 
 
