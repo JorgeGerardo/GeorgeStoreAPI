@@ -1,19 +1,16 @@
 ﻿using GeorgeStore.Common;
 using GeorgeStore.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Addresses;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
-public class AddressController(IAddressRepository addressRepository) : ControllerBase
+public class AddressController(IAddressRepository addressRepository) : AuthorizedController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AddressDto>>> Get()
     {
-        Guid UserId = HttpContext.User.GetUserId();
         var addresses = await addressRepository.Get(UserId);
         return Ok(addresses);
     }
@@ -21,7 +18,6 @@ public class AddressController(IAddressRepository addressRepository) : Controlle
     [HttpPost]
     public async Task<ActionResult> Add(AddressCreateDto request)
     {
-        Guid UserId = HttpContext.User.GetUserId();
         Result result = await addressRepository.Add(UserId, request);
         return result.IsSuccess
             ? Ok()
@@ -31,7 +27,6 @@ public class AddressController(IAddressRepository addressRepository) : Controlle
     [HttpDelete("{AddressId:int}")]
     public async Task<ActionResult> Delete([FromRoute] int AddressId)
     {
-        Guid UserId = HttpContext.User.GetUserId();
         Result result = await addressRepository.Remove(UserId, AddressId);
         return result.IsSuccess
             ? Ok()

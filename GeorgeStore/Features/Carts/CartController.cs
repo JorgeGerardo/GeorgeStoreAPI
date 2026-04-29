@@ -1,20 +1,17 @@
 ﻿using GeorgeStore.Common;
 using GeorgeStore.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Carts;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
-public class CartController(ICartRepository cartRepository) : ControllerBase
+public class CartController(ICartRepository cartRepository) : AuthorizedController
 {
     [HttpGet]
     public async Task<ActionResult<CartDto>> Get(CancellationToken ct = default)
     {
-        Guid userId = HttpContext.User.GetUserId();
-        var result = await cartRepository.GetAsync(userId, ct);
+        var result = await cartRepository.GetAsync(UserId, ct);
         if (!result.IsSuccess)
             return NotFound(ProblemDetailFactory.FromError(result.Error));
 
@@ -36,8 +33,7 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
     [HttpPut]
     public async Task<ActionResult> DecreaseQuantity([FromBody] DecreaseItemDto request)
     {
-        Guid userId = HttpContext.User.GetUserId();
-        Result result = await cartRepository.DecreaseAsync(userId, request.ProductId);
+        Result result = await cartRepository.DecreaseAsync(UserId, request.ProductId);
         return result.IsSuccess
             ? Ok()
             : BadRequest(ProblemDetailFactory.FromError(result.Error));
@@ -46,8 +42,7 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
     [HttpDelete("{ProductId}")]
     public async Task<ActionResult> Remove([FromRoute] int ProductId, CancellationToken ct = default)
     {
-        Guid userId = HttpContext.User.GetUserId();
-        Result result = await cartRepository.RemoveAsync(userId, ProductId, ct);
+        Result result = await cartRepository.RemoveAsync(UserId, ProductId, ct);
 
         return result.IsSuccess 
             ? Ok() 
@@ -57,8 +52,7 @@ public class CartController(ICartRepository cartRepository) : ControllerBase
     [HttpGet("count")]
     public async Task<ActionResult<int>> GetCount()
     {
-        Guid userId = HttpContext.User.GetUserId();
-        int count = await cartRepository.CountAsync(userId);
+        int count = await cartRepository.CountAsync(UserId);
         return Ok(count);
     }
 }
