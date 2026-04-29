@@ -11,6 +11,23 @@ public sealed class OrderDto
     public OrderStatus Status { get; set; }
 
     public List<OrderDetailDto> Details { get; set; } = [];
+
+
+    //Ship-Address Snapshot
+    public string Street { get; set; } = default!;
+    public string Neighborhood { get; set; } = default!;
+    public string City { get; set; } = default!;
+    public string State { get; set; } = default!;
+    public string PostalCode { get; set; } = default!;
+    public string? ExternalNumber { get; set; }
+    public string? InternalNumber { get; set; }
+    public string? References { get; set; }
+
+    //Payment Snapshot
+    public string CardHolderName { get; set; } = default!;
+    public string Last4 { get; set; } = default!;
+    public string Brand { get; set; } = default!;
+
 }
 
 public record OrderDetailDto(int Id, int OrderId, int ProductId, decimal UnitPrice, decimal SubTotal, int Quantity, string Image, string Name)

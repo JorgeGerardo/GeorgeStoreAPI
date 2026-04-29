@@ -112,7 +112,11 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         const string query = """
                 WITH OrdersPaged AS (
                     SELECT 
-                        O.Id, O.UserId, O.DateUtc, O.Total, O.Status 
+                        O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
+                        O.Street, O.Neighborhood, O.City, O.State, O.PostalCode,
+                        O.ExternalNumber, O.InternalNumber, O.[References],
+                        O.CardHolderName, O.Last4, O.Brand
+
                     FROM Orders AS O
                     WHERE O.UserId = @UserId
                       AND (
@@ -131,6 +135,9 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
                 )
                 SELECT
                     O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
+                    O.Street, O.Neighborhood, O.City, O.State, O.PostalCode,
+                    O.ExternalNumber, O.InternalNumber, O.[References],
+                    O.CardHolderName, O.Last4, O.Brand,
                     OD.Id, OD.OrderId, OD.ProductId, OD.UnitPrice, OD.SubTotal, OD.Quantity,
                     P.[Image], P.[Name]
                 FROM OrdersPaged AS O 
@@ -172,6 +179,9 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         const string query = """
                 SELECT
                     O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
+                    O.Street, O.Neighborhood, O.City, O.State, O.PostalCode,
+                    O.ExternalNumber, O.InternalNumber, O.[References],
+                    O.CardHolderName, O.Last4, O.Brand,
                     OD.Id, OD.OrderId, OD.ProductId, OD.UnitPrice, OD.SubTotal, OD.Quantity,
                     P.[Image], P.[Name]
                 FROM Orders AS O
