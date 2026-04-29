@@ -3,6 +3,7 @@ using GeorgeStore.Common;
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.PaymentMethods;
+using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -40,11 +41,70 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         Order newOrder = CreateOrder(cart, UserId, address, paymentMethod);
         context.Orders.Add(newOrder);
 
-        //var save = await context.SaveChangesAsync() > 0;
         return await context.SaveChangesAsync() > 0
             ? Result.Success(newOrder.Id)
             : Result.Failure<int>(OrderError.UnexpectedError);
     }
+
+    public async Task<Result<int>> ReorderAsync(Guid UserId, ReorderRequest request)
+    {
+        Order? order = await context.Orders
+            .Include(o => o.Details)
+            .FirstOrDefaultAsync(o => o.UserId == UserId && o.Id == request.OrderId);
+        if (order is null)
+            return Result.Failure<int>(OrderError.Notfound);
+
+        Address? address = await context.Addresses
+            .FirstOrDefaultAsync(addr => addr.UserId == UserId && addr.Id == request.AddressId);
+        if (address is null)
+            return Result.Failure<int>(OrderError.AddressNotFound);
+
+        PaymentMethod? paymentMethod = await context.PaymentMethods
+            .FirstOrDefaultAsync(pm => pm.UserId == UserId && pm.Id == request.PaymentMethodId);
+        if (paymentMethod is null)
+            return Result.Failure<int>(PaymentMethodError.NotFound);
+
+        var productIdList = order.Details.Select(d => d.ProductId).ToList();
+
+        var products = await context.Products
+            .Where(p => productIdList.Contains(p.Id) && p.IsActive)
+            .ToListAsync();
+
+        var validDetails = order.Details
+            .Where(d => d.Product != null && d.Product.IsActive)
+            .ToList();
+
+        Order orderClone = CreateReorder(order, address, paymentMethod);
+
+        context.Orders.Add(orderClone);
+        await context.SaveChangesAsync();
+        return Result.Success(orderClone.Id);
+    }
+
+    public async Task<Result<ReorderPreview>> PreviewReorder(Guid UserId, int OrderId)
+    {
+        Order? order = await context.Orders
+            .Include(o => o.Details)
+            .ThenInclude(d => d.Product)
+            .ThenInclude(p => p.Category)
+            .FirstOrDefaultAsync(o => o.UserId == UserId && o.Id == OrderId);
+
+        if (order is null)
+            return Result.Failure<ReorderPreview>(OrderError.Notfound);
+
+        var validDetails = order.Details
+            .Where(d => d.Product != null && d.Product.IsActive)
+            .ToList();
+
+        var invalidItems = order.Details
+            .Where(d => d.Product == null || !d.Product.IsActive)
+            .Select(i => ProductDto.FromEntity(i.Product));
+
+        var items = validDetails.Select(OrderDetailDto.FromEntity);
+
+        return Result.Success(new ReorderPreview(OrderId, items, items.Sum(i => i.SubTotal), invalidItems));
+    }
+
 
     public async Task<PagedResult<OrderDto>> Get(Guid UserId, QueryParams Prms)
     {
@@ -147,7 +207,7 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         throw new NotImplementedException();
     }
 
-    private async Task<int> GetTotal(QueryParams prms, Guid UserId, IDbConnection conn)
+    private static async Task<int> GetTotal(QueryParams prms, Guid UserId, IDbConnection conn)
     {
         string query = """
              SELECT COUNT(*) from Orders AS O
@@ -163,8 +223,51 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
 
 public partial class OrderService : IOrderService
 {
+    private static Order CreateReorder(Order oldOrder, Address address, PaymentMethod paymentMethod)
+    {
+        List<OrderDetail> details = [];
 
-    private Order CreateOrder(Cart cart, Guid UserId, Address Address, PaymentMethod PaymentMethod)
+        foreach (var detail in oldOrder.Details)
+        {
+            var product = detail.Product;
+
+            if (product is null || !product.IsActive)
+                continue;
+
+            details.Add(new OrderDetail
+            {
+                ProductId = product.Id,
+                Product = product,
+                Quantity = detail.Quantity,
+                UnitPrice = product.Price,
+                SubTotal = detail.Quantity * product.Price
+            });
+        }
+
+        return new Order
+        {
+            UserId = oldOrder.UserId,
+            Details = details,
+            Total = details.Sum(d => d.Quantity * d.UnitPrice),
+
+            // Address snapshot
+            Street = address.Street,
+            Neighborhood = address.Neighborhood,
+            City = address.City,
+            State = address.State,
+            PostalCode = address.PostalCode,
+            ExternalNumber = address.ExternalNumber,
+            InternalNumber = address.InternalNumber,
+            References = address.References,
+
+            // Payment snapshot
+            CardHolderName = paymentMethod.CardHolderName,
+            Last4 = paymentMethod.LastDigits,
+            Brand = paymentMethod.Brand,
+        };
+    }
+
+    private static Order CreateOrder(Cart cart, Guid UserId, Address Address, PaymentMethod PaymentMethod)
     {
         List<OrderDetail> details = [];
         foreach (var item in cart.Items)
@@ -179,6 +282,5 @@ public partial class OrderService : IOrderService
 
         return Order.Create(UserId, details.Sum(v => v.SubTotal), Address, PaymentMethod, details);
     }
-
 
 }

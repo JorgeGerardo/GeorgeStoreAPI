@@ -9,7 +9,7 @@ public class Cart : Entity
     public required Guid UserId { get; set; }
     public CartStatus Status { get; set; } = 0;
     public List<CartItem> Items { get; set; } = [];
-    public float Total => Items.Sum(x => x.Item.Price * x.Quantity);
+    public decimal Total => Items.Sum(x => x.Item.Price * x.Quantity);
     public static Cart Create(Guid UserId)
     {
         return new Cart

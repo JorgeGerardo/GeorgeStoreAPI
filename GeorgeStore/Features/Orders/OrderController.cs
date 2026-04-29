@@ -29,17 +29,28 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Buy([FromBody] BuyRequest request)
+    public async Task<ActionResult<int>> Purchase([FromBody] BuyRequest request)
     {
         Guid UserId = HttpContext.User.GetUserId();
         var result = await orderService.Buy(UserId, request.CartId, request.AddressId, request.PaymentMethodId);
         return result.IsSuccess ? Ok(result.Value) : StatusCode(500, result.Error);
     }
 
-    //TODO: Reorder endpoint missing...
-    [HttpPost("{OrderId:int}")]
-    public Task<ActionResult<Result<OrderDto>>> Reorder([FromRoute] int OrderId)
+    [HttpPost("reorder")]
+    public async Task<ActionResult<Result<int>>> Reorder([FromBody] ReorderRequest request)
     {
+        Guid UserId = HttpContext.User.GetUserId();
+        var result = await orderService.ReorderAsync(UserId, request);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest();
         throw new NotImplementedException();
     }
+
+    [HttpGet("reorder/{OrderId:int}")]
+    public async Task<ActionResult<ReorderPreview>> ReorderPreview([FromRoute] int OrderId)
+    {
+        Guid UserId = HttpContext.User.GetUserId();
+        var result = await orderService.PreviewReorder(UserId, OrderId);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest();
+    }
 }
+
