@@ -10,7 +10,8 @@
     "postalCode": "99999",
     "externalNumber": "66",
     "internalNumber": "04",
-    "references": "Behind an Oxxo"
+    "references": "Behind an Oxxo",
+    "isDefault": false
   },
   {
     "id": 2,
@@ -23,6 +24,7 @@
     "postalCode": "87392",
     "externalNumber": "77",
     "internalNumber": "02",
-    "references": "Next to an Oxxo"
+    "references": "Next to an Oxxo",
+    "isDefault": true
   }
 ]

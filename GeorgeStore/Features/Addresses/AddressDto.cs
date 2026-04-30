@@ -10,7 +10,8 @@ public record AddressDto(
     string PostalCode,
     string? ExternalNumber,
     string? InternalNumber,
-    string? References
+    string? References,
+    bool IsDefault
 );
 
 public record AddressCreateDto(
@@ -22,6 +23,7 @@ public record AddressCreateDto(
     string PostalCode,
     string? ExternalNumber,
     string? InternalNumber,
-    string? References
+    string? References,
+    bool IsDefault
 );
 

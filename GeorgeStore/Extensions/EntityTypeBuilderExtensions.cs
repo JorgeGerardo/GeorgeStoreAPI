@@ -1,5 +1,4 @@
-﻿using GeorgeStore.Common;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Text.Json;
 
 namespace GeorgeStore.Extensions;

@@ -32,4 +32,11 @@ public class AddressController(IAddressRepository addressRepository) : Authorize
             ? Ok()
             : NotFound(ProblemDetailFactory.FromError(result.Error));
     }
+
+    [HttpPut("{AddressId:int}")]
+    public async Task<ActionResult> SetAsDefault(int AddressId)
+    {
+        var result = await addressRepository.SetAsDefault(UserId, AddressId);
+        return result.IsSuccess ? Ok() : NotFound(result.Error);
+    }
 }

@@ -13,6 +13,7 @@ public class Address : Entity
     public required string City { get; set; }
     public required string State { get; set; }
     public required string PostalCode { get; set; }
+    public required bool IsDefault { get; set; }
 
     public string? ExternalNumber { get; set; }
     public string? InternalNumber { get; set; }
@@ -28,7 +29,8 @@ public class Address : Entity
         string postalCode,
         string? externalNumber,
         string? internalNumber,
-        string? references)
+        string? references,
+        bool isDefault)
     {
         return new Address()
         {
@@ -42,6 +44,7 @@ public class Address : Entity
             ExternalNumber = externalNumber,
             InternalNumber = internalNumber,
             References = references,
+            IsDefault = isDefault
         };
     }
 }

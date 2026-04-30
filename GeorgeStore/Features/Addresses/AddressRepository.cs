@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Azure.Core;
+using Dapper;
 using GeorgeStore.Common;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
     {
         var connection = dbConnection.CreateConnection();
         const string query = """
-            SELECT Id, Alias, Street, Neighborhood, City, [State], PostalCode, ExternalNumber, InternalNumber, [References]
+            SELECT Id, Alias, Street, Neighborhood, City, [State], PostalCode, ExternalNumber, InternalNumber, [References], IsDefault
             FROM Addresses
             WHERE UserId = @UserId
          """;
@@ -19,13 +20,20 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
         return await connection.QueryAsync<AddressDto>(query, new { UserId });
     }
 
-    public async Task<Result> Add(Guid UserId, AddressCreateDto Dto)
+    public async Task<Result> Add(Guid UserId, AddressCreateDto request)
     {
         int AddressesRegistered = await context.Addresses.CountAsync(a => a.UserId == UserId);
         if (AddressesRegistered >= AddressLimits.MaxAddressesPerUser)
             return Result.Failure(AddressError.LimitReached);
 
-        Address newAddress = Address.Create(UserId, Dto.Alias, Dto.Street, Dto.Neighborhood, Dto.City, Dto.State, Dto.PostalCode, Dto.ExternalNumber, Dto.InternalNumber, Dto.References);
+        if (request.IsDefault)
+        {
+            var userAddress = await context.Addresses.Where(a => a.UserId == UserId).ToListAsync();
+            userAddress.ForEach(a => a.IsDefault = false);
+        }
+
+
+        Address newAddress = Address.Create(UserId, request.Alias, request.Street, request.Neighborhood, request.City, request.State, request.PostalCode, request.ExternalNumber, request.InternalNumber, request.References, request.IsDefault);
         context.Addresses.Add(newAddress);
 
         await context.SaveChangesAsync();
@@ -43,4 +51,15 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
             : Result.Success();
     }
 
+    public async Task<Result> SetAsDefault(Guid UserId, int AddressId)
+    {
+        var userAddress = await context.Addresses.Where(a => a.UserId == UserId).ToListAsync();
+        if (!userAddress.Any(a => a.Id == AddressId))
+            return Result.Failure(AddressError.NotFound);
+
+        userAddress.ForEach(a => a.IsDefault = a.Id == AddressId);
+        await context.SaveChangesAsync();
+        return Result.Success();
+        
+    }
 }
