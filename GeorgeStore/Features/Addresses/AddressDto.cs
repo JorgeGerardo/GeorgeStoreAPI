@@ -1,6 +1,6 @@
 ﻿namespace GeorgeStore.Features.Addresses;
 
-public record AddressDto(
+public sealed record AddressDto(
     int Id,
     string Alias,
     string Street,
@@ -14,7 +14,7 @@ public record AddressDto(
     bool IsDefault
 );
 
-public record AddressCreateDto(
+public sealed record AddressCreateDto(
     string Alias,
     string Street,
     string Neighborhood,

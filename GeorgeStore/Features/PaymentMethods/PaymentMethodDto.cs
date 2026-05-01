@@ -1,7 +1,7 @@
 ﻿
 namespace GeorgeStore.Features.PaymentMethods;
 
-public record PaymentMethodDto(
+public sealed record PaymentMethodDto(
     int Id,
     Guid UserId,
     string LastDigits,
@@ -19,7 +19,7 @@ public record PaymentMethodDto(
 }
 
 
-public record PaymentMethodCreateDto(
+public sealed record PaymentMethodCreateDto(
     string CardNumber,
     string Brand,
     int ExpMonth,

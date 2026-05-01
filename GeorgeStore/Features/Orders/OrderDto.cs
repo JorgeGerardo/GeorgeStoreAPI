@@ -30,7 +30,7 @@ public sealed class OrderDto
 
 }
 
-public record OrderDetailDto(int Id, int OrderId, int ProductId, decimal UnitPrice, decimal SubTotal, int Quantity, string Image, string Name)
+public sealed record OrderDetailDto(int Id, int OrderId, int ProductId, decimal UnitPrice, decimal SubTotal, int Quantity, string Image, string Name)
 {
     public static OrderDetailDto FromEntity(OrderDetail entity)
     {

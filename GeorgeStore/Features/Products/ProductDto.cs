@@ -1,6 +1,6 @@
 ﻿namespace GeorgeStore.Features.Products;
 
-public record ProductDto(int Id, string Name, decimal Price, string Description, string Image, int CategoryId, string CategoryName)
+public sealed record ProductDto(int Id, string Name, decimal Price, string Description, string Image, int CategoryId, string CategoryName)
 {
     public static ProductDto FromEntity(Product entity)
     {
@@ -8,4 +8,4 @@ public record ProductDto(int Id, string Name, decimal Price, string Description,
     }
 }
 
-public record ProductCreateDTO(string Name, decimal Price, string Description, string Image, int CategoryId);
+public sealed record ProductCreateDTO(string Name, decimal Price, string Description, string Image, int CategoryId);
