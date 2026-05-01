@@ -34,8 +34,6 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         return await context.Products.AnyAsync(p => p.Id == id);
     }
 
-
-
     public async Task<Result<Product>> GetById(int id)
     {
         Product? product = await context.Products

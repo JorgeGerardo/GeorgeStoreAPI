@@ -63,9 +63,8 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
             return Result.Failure(CartError.ItemNotfound);
 
         cart.Items.Remove(cartItem);
-        return await context.SaveChangesAsync(ct) > 0 
-            ? Result.Success() 
-            : Result.Failure(CartError.UnexpectedError);
+        await context.SaveChangesAsync(ct);
+        return Result.Success();
     }
 
     private Cart CreateDraft(Guid UserId)

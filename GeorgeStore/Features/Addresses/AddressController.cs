@@ -1,5 +1,4 @@
 ﻿using GeorgeStore.Common;
-using GeorgeStore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Addresses;
@@ -21,7 +20,7 @@ public class AddressController(IAddressRepository addressRepository) : Authorize
         Result result = await addressRepository.Add(UserId, request);
         return result.IsSuccess
             ? Ok()
-            : BadRequest(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpDelete("{AddressId:int}")]
@@ -30,13 +29,13 @@ public class AddressController(IAddressRepository addressRepository) : Authorize
         Result result = await addressRepository.Remove(UserId, AddressId);
         return result.IsSuccess
             ? Ok()
-            : NotFound(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpPut("{AddressId:int}")]
     public async Task<ActionResult> SetAsDefault(int AddressId)
     {
         var result = await addressRepository.SetAsDefault(UserId, AddressId);
-        return result.IsSuccess ? Ok() : NotFound(result.Error);
+        return result.IsSuccess ? Ok() : HandleResult(result);
     }
 }

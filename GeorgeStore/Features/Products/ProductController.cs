@@ -1,5 +1,4 @@
 ﻿using GeorgeStore.Common;
-using GeorgeStore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +6,7 @@ namespace GeorgeStore.Features.Products;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProductController(IProductRepository productRepository) : ControllerBase
+public class ProductController(IProductRepository productRepository) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResult<ProductDto>>> Get([FromQuery] QueryParams prms)
@@ -21,7 +20,7 @@ public class ProductController(IProductRepository productRepository) : Controlle
         var result = await productRepository.GetById(id);
         return result.IsSuccess 
             ? Ok(ProductDto.FromEntity(result.Value))
-            : NotFound(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpPost]
@@ -29,7 +28,7 @@ public class ProductController(IProductRepository productRepository) : Controlle
     public async Task<ActionResult> Create(ProductCreateDTO request)
     {
         Result result = await productRepository.Create(request);
-        return result.IsSuccess ? Ok() : BadRequest();
+        return result.IsSuccess ? Ok() : HandleResult(result);
     }
 
     [HttpDelete("{id:int}")]
@@ -41,7 +40,7 @@ public class ProductController(IProductRepository productRepository) : Controlle
             return NotFound(ProductError.Notfound);
 
         var result = await productRepository.Delete(id);
-        return result.IsSuccess ? Ok() : StatusCode(500);
+        return result.IsSuccess ? Ok() : HandleResult(result);
     }
 
 }

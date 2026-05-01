@@ -1,11 +1,10 @@
 ﻿using GeorgeStore.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Common;
 
 [Authorize]
-public abstract class AuthorizedController : ControllerBase
+public abstract class AuthorizedController : ApiControllerBase
 {
     protected Guid UserId => User.GetUserId();
 }

@@ -13,7 +13,7 @@ public class CartController(ICartRepository cartRepository) : AuthorizedControll
     {
         var result = await cartRepository.GetAsync(UserId, ct);
         if (!result.IsSuccess)
-            return NotFound(ProblemDetailFactory.FromError(result.Error));
+            return HandleResult(result);
 
         var itemsDto = result.Value.Items.Select(CartItemDto.FromEntity).ToList();
         return Ok(new CartDto(result.Value.Id, itemsDto, result.Value.Total));
@@ -27,7 +27,7 @@ public class CartController(ICartRepository cartRepository) : AuthorizedControll
         Result result = await cartRepository.AddAsync(userId, request.ProductId, request.Quantity, ct);
         return result.IsSuccess
             ? Ok()
-            : BadRequest(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpPut]
@@ -36,7 +36,7 @@ public class CartController(ICartRepository cartRepository) : AuthorizedControll
         Result result = await cartRepository.DecreaseAsync(UserId, request.ProductId);
         return result.IsSuccess
             ? Ok()
-            : BadRequest(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpDelete("{ProductId}")]
@@ -46,7 +46,7 @@ public class CartController(ICartRepository cartRepository) : AuthorizedControll
 
         return result.IsSuccess 
             ? Ok() 
-            : BadRequest(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpGet("count")]

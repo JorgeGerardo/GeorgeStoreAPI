@@ -38,9 +38,19 @@ public class UserService(UserManager<User> manager) : IUserService
         User newUser = new(userName, email);
         var result = await manager.CreateAsync(newUser, password);
         
-        if (!result.Succeeded)
-            return Result.Failure<bool>(new Error("Register error", result.Errors.First().Description, result.Errors.First().Code));
+        if (result.Succeeded)
+            return Result.Success();
 
-        return Result.Success();
+
+        var errors = result.Errors
+            .Select(e => $"{e.Description}")
+            .ToArray();
+
+        return Result.Failure(new Error(
+            "Register error",
+            string.Join(", ", errors),
+            "User.InvalidData",
+            ErrorType.Validation
+        ));
     }
 }

@@ -1,5 +1,4 @@
 ﻿using GeorgeStore.Common;
-using GeorgeStore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Orders;
@@ -21,29 +20,28 @@ public class OrderController(IOrderService orderService) : AuthorizedController
         var result = await orderService.GetById(UserId, OrderId);
         return result.IsSuccess 
             ? Ok(result.Value) 
-            : NotFound(ProblemDetailFactory.FromError(result.Error));
+            : HandleResult(result);
     }
 
     [HttpPost]
     public async Task<ActionResult<int>> Purchase([FromBody] BuyRequest request)
     {
         var result = await orderService.Buy(UserId, request.CartId, request.AddressId, request.PaymentMethodId);
-        return result.IsSuccess ? Ok(result.Value) : StatusCode(500, result.Error);
+        return result.IsSuccess ? Ok(result.Value) : HandleResult(result);
     }
 
     [HttpPost("reorder")]
     public async Task<ActionResult<Result<int>>> Reorder([FromBody] ReorderRequest request)
     {
         var result = await orderService.ReorderAsync(UserId, request);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest();
-        throw new NotImplementedException();
+        return result.IsSuccess ? Ok(result.Value) : HandleResult(result);
     }
 
     [HttpGet("reorder/{OrderId:int}")]
     public async Task<ActionResult<ReorderPreview>> ReorderPreview([FromRoute] int OrderId)
     {
         var result = await orderService.PreviewReorder(UserId, OrderId);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest();
+        return result.IsSuccess ? Ok(result.Value) : HandleResult(result);
     }
 }
 

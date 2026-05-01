@@ -41,9 +41,8 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         Order newOrder = CreateOrder(cart, UserId, address, paymentMethod);
         context.Orders.Add(newOrder);
 
-        return await context.SaveChangesAsync() > 0
-            ? Result.Success(newOrder.Id)
-            : Result.Failure<int>(OrderError.UnexpectedError);
+        await context.SaveChangesAsync();
+        return Result.Success(newOrder.Id);
     }
 
     public async Task<Result<int>> ReorderAsync(Guid UserId, ReorderRequest request)
@@ -214,7 +213,6 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         return order is null
             ? Result.Failure<OrderDto>(OrderError.Notfound)
             : Result.Success(order);
-        throw new NotImplementedException();
     }
 
     private static async Task<int> GetTotal(QueryParams prms, Guid UserId, IDbConnection conn)

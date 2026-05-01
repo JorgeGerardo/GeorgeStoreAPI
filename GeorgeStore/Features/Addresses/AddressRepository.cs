@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Dapper;
+﻿using Dapper;
 using GeorgeStore.Common;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

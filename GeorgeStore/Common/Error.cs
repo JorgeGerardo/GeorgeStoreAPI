@@ -1,11 +1,16 @@
 ﻿namespace GeorgeStore.Common;
 
-public class Error(string Tittle, string Message, string Code)
+public sealed record Error(string Title, string Message, string Code, ErrorType Type)
 {
-    public string Tittle { get; } = Tittle;
-    public string Message { get; } = Message;
-    public string Code { get; } = Code;
+    public static readonly Error None = new(string.Empty, string.Empty, string.Empty, ErrorType.None);
+};
 
-    public static readonly Error None = new(string.Empty, string.Empty, string.Empty);
+public enum ErrorType
+{
+    None,
+    NotFound,
+    Conflict,
+    Validation,
+    Unauthorized,
+    Forbidden,
 }
-

@@ -1,5 +1,4 @@
 ﻿using GeorgeStore.Common;
-using GeorgeStore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.PaymentMethods;
@@ -18,7 +17,9 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
     public async Task<ActionResult<IEnumerable<PaymentMethodDto>>> Get([FromRoute] int PaymentMethodId)
     {
         var result = await repository.GetByIdAsync(UserId, PaymentMethodId);
-        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+        return result.IsSuccess 
+            ? Ok(PaymentMethodDto.FromEntity(result.Value)) 
+            : HandleResult(result);
     }
 
     [HttpPost]
@@ -27,20 +28,20 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
         var result = await repository.Add(UserId, request);
         return result.IsSuccess
             ? Ok()
-            : BadRequest(result.Error);
+            : HandleResult(result);
     }
 
     [HttpDelete("{paymentMethodId:int}")]
     public async Task<ActionResult> Remove([FromRoute] int paymentMethodId)
     {
         var result = await repository.Remove(UserId, paymentMethodId);
-        return result.IsSuccess ? Ok() : NotFound(result.Error);
+        return result.IsSuccess ? Ok() : HandleResult(result);
     }
 
     [HttpPut("{paymentMethodId:int}")]
     public async Task<ActionResult> UpdateDefaultPaymentMethod(int paymentMethodId)
     {
         var result = await repository.SetAsDefault(UserId, paymentMethodId);
-        return result.IsSuccess ? Ok() : Conflict(result.Error);
+        return result.IsSuccess ? Ok() : HandleResult(result);
     }
 }
