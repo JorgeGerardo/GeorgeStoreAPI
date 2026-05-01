@@ -20,7 +20,6 @@ public record PaymentMethodDto(
 
 
 public record PaymentMethodCreateDto(
-    Guid UserId, //TODO: Remove that
     string CardNumber,
     string Brand,
     int ExpMonth,
