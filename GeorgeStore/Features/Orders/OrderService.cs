@@ -12,7 +12,7 @@ namespace GeorgeStore.Features.Orders;
 
 public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreContext context, KeyedAsyncLock locker) : IOrderService
 {
-    public async Task<Result<int>> Buy(Guid UserId, int CartId, int AddressId, int PaymentMethodId)
+    public async Task<Result<int>> Purchase(Guid UserId, int CartId, int AddressId, int PaymentMethodId)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(30));
 

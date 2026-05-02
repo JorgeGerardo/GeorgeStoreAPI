@@ -9,7 +9,7 @@ namespace GeorgeStore.Features.Products;
 
 public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreContext context) : IProductRepository
 {
-    public async Task<Result> Create(ProductCreateDTO request)
+    public async Task<Result> CreateAsync(ProductCreateDTO request)
     {
         Product newProdcut = Product.Create(request.Name, request.Description, request.CategoryId, request.Image, request.Price);
 
@@ -18,7 +18,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         return Result.Success();
     }
 
-    public async Task<Result> Delete(int id)
+    public async Task<Result> RemoveAsync(int id)
     {
         var product = await context.Products.FirstOrDefaultAsync(p => p.Id == id);
         if (product is null)
@@ -29,12 +29,12 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         return Result.Success();
     }
 
-    public async Task<bool> Exist(int id)
+    public async Task<bool> ExistAsync(int id)
     {
         return await context.Products.AnyAsync(p => p.Id == id);
     }
 
-    public async Task<Result<Product>> GetById(int id)
+    public async Task<Result<Product>> GetByIdAsync(int id)
     {
         Product? product = await context.Products
             .Include(p => p.Category)
@@ -48,7 +48,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         return Result.Success(product);
     }
 
-    public async Task<PagedResult<ProductDto>> GetProducts(QueryParams prms)
+    public async Task<PagedResult<ProductDto>> GetProductsAsync(QueryParams prms)
     {
         using var conn = dbConnection.CreateConnection();
         StringBuilder query = new("""

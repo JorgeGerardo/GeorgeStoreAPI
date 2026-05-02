@@ -7,7 +7,7 @@ namespace GeorgeStore.Features.Addresses;
 
 public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory dbConnection) : IAddressRepository
 {
-    public async Task<IEnumerable<AddressDto>> Get(Guid UserId)
+    public async Task<IEnumerable<AddressDto>> GetAsync(Guid UserId)
     {
         var connection = dbConnection.CreateConnection();
         const string query = """
@@ -19,7 +19,7 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
         return await connection.QueryAsync<AddressDto>(query, new { UserId });
     }
 
-    public async Task<Result> Add(Guid UserId, AddressCreateDto request)
+    public async Task<Result> AddAsync(Guid UserId, AddressCreateDto request)
     {
         int AddressesRegistered = await context.Addresses.CountAsync(a => a.UserId == UserId);
         if (AddressesRegistered >= AddressLimits.MaxAddressesPerUser)
@@ -39,7 +39,7 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
         return Result.Success();
     }
 
-    public async Task<Result> Remove(Guid UserId, int AddressId)
+    public async Task<Result> RemoveAsync(Guid UserId, int AddressId)
     {
         int rows = await context.Addresses
             .Where(a => a.UserId == UserId && a.Id == AddressId)
@@ -50,7 +50,7 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
             : Result.Success();
     }
 
-    public async Task<Result> SetAsDefault(Guid UserId, int AddressId)
+    public async Task<Result> SetAsDefaultAsync(Guid UserId, int AddressId)
     {
         var userAddress = await context.Addresses.Where(a => a.UserId == UserId).ToListAsync();
         if (!userAddress.Any(a => a.Id == AddressId))

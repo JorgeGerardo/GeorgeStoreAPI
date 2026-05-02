@@ -11,13 +11,13 @@ public class ProductController(IProductRepository productRepository) : ApiContro
     [HttpGet]
     public async Task<ActionResult<PagedResult<ProductDto>>> Get([FromQuery] QueryParams prms)
     {
-        return Ok(await productRepository.GetProducts(prms));
+        return Ok(await productRepository.GetProductsAsync(prms));
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<ProductDto>> GetById(int id)
     {
-        var result = await productRepository.GetById(id);
+        var result = await productRepository.GetByIdAsync(id);
         return result.IsSuccess 
             ? Ok(ProductDto.FromEntity(result.Value))
             : HandleResult(result);
@@ -27,19 +27,19 @@ public class ProductController(IProductRepository productRepository) : ApiContro
     [Authorize]
     public async Task<ActionResult> Create(ProductCreateDTO request)
     {
-        Result result = await productRepository.Create(request);
+        Result result = await productRepository.CreateAsync(request);
         return result.IsSuccess ? Ok() : HandleResult(result);
     }
 
     [HttpDelete("{id:int}")]
     [Authorize]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Remove(int id)
     {
-        var productExist = await productRepository.Exist(id);
+        var productExist = await productRepository.ExistAsync(id);
         if (!productExist)
             return NotFound(ProductError.Notfound);
 
-        var result = await productRepository.Delete(id);
+        var result = await productRepository.RemoveAsync(id);
         return result.IsSuccess ? Ok() : HandleResult(result);
     }
 

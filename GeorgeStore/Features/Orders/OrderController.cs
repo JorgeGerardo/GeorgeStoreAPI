@@ -26,7 +26,7 @@ public class OrderController(IOrderService orderService) : AuthorizedController
     [HttpPost]
     public async Task<ActionResult<int>> Purchase([FromBody] BuyRequest request)
     {
-        var result = await orderService.Buy(UserId, request.CartId, request.AddressId, request.PaymentMethodId);
+        var result = await orderService.Purchase(UserId, request.CartId, request.AddressId, request.PaymentMethodId);
         return result.IsSuccess ? Ok(result.Value) : HandleResult(result);
     }
 

@@ -25,7 +25,7 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
     [HttpPost]
     public async Task<ActionResult> Add([FromBody] PaymentMethodCreateDto request)
     {
-        var result = await repository.Add(UserId, request);
+        var result = await repository.AddAsync(UserId, request);
         return result.IsSuccess
             ? Ok()
             : HandleResult(result);
@@ -34,14 +34,14 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
     [HttpDelete("{paymentMethodId:int}")]
     public async Task<ActionResult> Remove([FromRoute] int paymentMethodId)
     {
-        var result = await repository.Remove(UserId, paymentMethodId);
+        var result = await repository.RemoveAsync(UserId, paymentMethodId);
         return result.IsSuccess ? Ok() : HandleResult(result);
     }
 
     [HttpPut("{paymentMethodId:int}")]
-    public async Task<ActionResult> UpdateDefaultPaymentMethod(int paymentMethodId)
+    public async Task<ActionResult> UpdateDefault(int paymentMethodId)
     {
-        var result = await repository.SetAsDefault(UserId, paymentMethodId);
+        var result = await repository.SetAsDefaultAsync(UserId, paymentMethodId);
         return result.IsSuccess ? Ok() : HandleResult(result);
     }
 }

@@ -10,23 +10,23 @@ public class AddressController(IAddressRepository addressRepository) : Authorize
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AddressDto>>> Get()
     {
-        var addresses = await addressRepository.Get(UserId);
+        var addresses = await addressRepository.GetAsync(UserId);
         return Ok(addresses);
     }
 
     [HttpPost]
     public async Task<ActionResult> Add(AddressCreateDto request)
     {
-        Result result = await addressRepository.Add(UserId, request);
+        Result result = await addressRepository.AddAsync(UserId, request);
         return result.IsSuccess
             ? Ok()
             : HandleResult(result);
     }
 
     [HttpDelete("{AddressId:int}")]
-    public async Task<ActionResult> Delete([FromRoute] int AddressId)
+    public async Task<ActionResult> Remove([FromRoute] int AddressId)
     {
-        Result result = await addressRepository.Remove(UserId, AddressId);
+        Result result = await addressRepository.RemoveAsync(UserId, AddressId);
         return result.IsSuccess
             ? Ok()
             : HandleResult(result);
@@ -35,7 +35,7 @@ public class AddressController(IAddressRepository addressRepository) : Authorize
     [HttpPut("{AddressId:int}")]
     public async Task<ActionResult> SetAsDefault(int AddressId)
     {
-        var result = await addressRepository.SetAsDefault(UserId, AddressId);
+        var result = await addressRepository.SetAsDefaultAsync(UserId, AddressId);
         return result.IsSuccess ? Ok() : HandleResult(result);
     }
 }

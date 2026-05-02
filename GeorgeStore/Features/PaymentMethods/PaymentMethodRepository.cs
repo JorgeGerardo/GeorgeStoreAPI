@@ -7,7 +7,7 @@ namespace GeorgeStore.Features.PaymentMethods;
 
 public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFactory connection) : IPaymentMethodRepository
 {
-    public async Task<Result> Add(Guid UserId, PaymentMethodCreateDto Dto)
+    public async Task<Result> AddAsync(Guid UserId, PaymentMethodCreateDto Dto)
     {
         var result = PaymentMethod.Create(UserId, Dto.CardNumber, Dto.Brand, Dto.ExpMonth, Dto.ExpYear, Dto.CardHolderName, Dto.IsDefault);
         if (Dto.IsDefault)
@@ -49,7 +49,7 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
             : Result.Failure<PaymentMethod>(PaymentMethodError.NotFound);
     }
 
-    public async Task<Result> Remove(Guid UserId, int PaymentMethodId)
+    public async Task<Result> RemoveAsync(Guid UserId, int PaymentMethodId)
     {
         PaymentMethod? method = await context.PaymentMethods
             .FirstOrDefaultAsync(p => p.UserId == UserId && p.Id == PaymentMethodId);
@@ -62,7 +62,7 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
         return Result.Success();
     }
 
-    public async Task<Result> SetAsDefault(Guid UserId, int PaymentMethodId)
+    public async Task<Result> SetAsDefaultAsync(Guid UserId, int PaymentMethodId)
     {
         var userPaymentMethods = await context.PaymentMethods.Where(p => p.UserId == UserId).ToListAsync();
         if (!userPaymentMethods.Any(p => p.Id == PaymentMethodId))
