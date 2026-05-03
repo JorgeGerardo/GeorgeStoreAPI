@@ -2,11 +2,12 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace GeorgeStore.Features.Users;
 
-public record LoginResponse(string Token);
+public record LoginResponse(string Token, string RefreshToken);
 public record JWTConfig
 {
     public string Key { get; init; } = string.Empty;
@@ -17,9 +18,9 @@ public record JWTConfig
 public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
 {
     private static int durationDays = 100;
-    public LoginResponse GenerateToken(User user)
+    public LoginResponse GenerateToken(Guid UserId)
     {
-        List<Claim> claims = GetDefaultClaims(user.Id);
+        List<Claim> claims = GetDefaultClaims(UserId);
 
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Value.Key));
         SigningCredentials signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
@@ -31,7 +32,18 @@ public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
                 expires: DateTime.UtcNow.AddDays(durationDays),
                 signingCredentials: signIn
         );
-        return new LoginResponse(new JwtSecurityTokenHandler().WriteToken(Token));
+
+        var refreshToken = GenerateRefreshToken();
+        return new LoginResponse(new JwtSecurityTokenHandler().WriteToken(Token), refreshToken);
+    }
+
+    private string GenerateRefreshToken()
+    {
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+
+        return Convert.ToBase64String(randomBytes);
     }
 
     private List<Claim> GetDefaultClaims(Guid userId)
@@ -45,4 +57,3 @@ public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
     }
 
 }
-

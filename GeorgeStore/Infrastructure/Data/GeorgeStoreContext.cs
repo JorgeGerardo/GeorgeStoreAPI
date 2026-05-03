@@ -24,6 +24,7 @@ public class GeorgeStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Gu
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

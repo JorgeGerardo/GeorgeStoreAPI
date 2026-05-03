@@ -52,6 +52,7 @@ public static class ServiceCollectionExtension
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
         collection.AddScoped<TokenService>();
+        collection.AddScoped<AuthService>();
 
 
         return collection;

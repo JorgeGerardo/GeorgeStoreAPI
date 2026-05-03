@@ -7,7 +7,7 @@ namespace GeorgeStore.Features.Users;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(IUserService userService, TokenService tokenService) : ApiControllerBase
+public class UserController(IUserService userService, AuthService authService) : ApiControllerBase
 {
     [HttpGet("profile")]
     [Authorize]
@@ -24,7 +24,7 @@ public class UserController(IUserService userService, TokenService tokenService)
     {
         Result<User> result = await userService.Login(credentials.Email, credentials.Password);
         return result.IsSuccess
-            ? Ok(tokenService.GenerateToken(result.Value))
+            ? Ok(await authService.Login(result.Value.Id))
             : HandleResult(result);
     }
 
@@ -32,7 +32,21 @@ public class UserController(IUserService userService, TokenService tokenService)
     public async Task<ActionResult> Create(CreateUserRequest credentials)
     {
         Result result = await userService.Register(credentials.UserName, credentials.Email, credentials.Password);
-        return result.IsSuccess ? Ok() : HandleResult(result);
+        return HandleResult(result);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshRequest request)
+    {
+        var result = await authService.Refresh(request.RefreshToken);
+        return HandleResult(result); 
+    }
+
+    [HttpPost("logout")]
+    public async Task<ActionResult<LoginResponse>> Logout([FromBody] RefreshRequest request)
+    {
+        var result = await authService.Logout(request.RefreshToken);
+        return HandleResult(result); 
     }
 
 }
