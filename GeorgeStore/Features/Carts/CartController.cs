@@ -25,28 +25,21 @@ public class CartController(ICartRepository cartRepository) : AuthorizedControll
     {
         Guid userId = HttpContext.User.GetUserId();
         Result result = await cartRepository.AddAsync(userId, request.ProductId, request.Quantity, ct);
-        return result.IsSuccess
-            ? Ok()
-            : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpPut]
     public async Task<ActionResult> DecreaseQuantity([FromBody] DecreaseItemDto request)
     {
         Result result = await cartRepository.DecreaseAsync(UserId, request.ProductId);
-        return result.IsSuccess
-            ? Ok()
-            : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpDelete("{ProductId}")]
     public async Task<ActionResult> Remove([FromRoute] int ProductId, CancellationToken ct = default)
     {
         Result result = await cartRepository.RemoveAsync(UserId, ProductId, ct);
-
-        return result.IsSuccess 
-            ? Ok() 
-            : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpGet("count")]

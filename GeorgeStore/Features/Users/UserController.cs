@@ -15,7 +15,7 @@ public class UserController(IUserService userService, AuthService authService) :
     {
         Guid userId = HttpContext.User.GetUserId();
         var result = await userService.GetProfile(userId);
-        return result.IsSuccess ? Ok(result.Value) : HandleResult(result);
+        return HandleResult(result);
 
     }
 

@@ -18,24 +18,20 @@ public class AddressController(IAddressRepository addressRepository) : Authorize
     public async Task<ActionResult> Add(AddressCreateDto request)
     {
         Result result = await addressRepository.AddAsync(UserId, request);
-        return result.IsSuccess
-            ? Ok()
-            : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpDelete("{AddressId:int}")]
     public async Task<ActionResult> Remove([FromRoute] int AddressId)
     {
         Result result = await addressRepository.RemoveAsync(UserId, AddressId);
-        return result.IsSuccess
-            ? Ok()
-            : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpPut("{AddressId:int}")]
     public async Task<ActionResult> SetAsDefault(int AddressId)
     {
         var result = await addressRepository.SetAsDefaultAsync(UserId, AddressId);
-        return result.IsSuccess ? Ok() : HandleResult(result);
+        return HandleResult(result);
     }
 }

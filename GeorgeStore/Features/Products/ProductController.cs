@@ -28,7 +28,7 @@ public class ProductController(IProductRepository productRepository) : ApiContro
     public async Task<ActionResult> Create(ProductCreateDTO request)
     {
         Result result = await productRepository.CreateAsync(request);
-        return result.IsSuccess ? Ok() : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpDelete("{id:int}")]
@@ -40,7 +40,7 @@ public class ProductController(IProductRepository productRepository) : ApiContro
             return NotFound(ProductError.Notfound);
 
         var result = await productRepository.RemoveAsync(id);
-        return result.IsSuccess ? Ok() : HandleResult(result);
+        return HandleResult(result);
     }
 
 }

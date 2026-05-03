@@ -26,22 +26,20 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
     public async Task<ActionResult> Add([FromBody] PaymentMethodCreateDto request)
     {
         var result = await repository.AddAsync(UserId, request);
-        return result.IsSuccess
-            ? Ok()
-            : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpDelete("{paymentMethodId:int}")]
     public async Task<ActionResult> Remove([FromRoute] int paymentMethodId)
     {
         var result = await repository.RemoveAsync(UserId, paymentMethodId);
-        return result.IsSuccess ? Ok() : HandleResult(result);
+        return HandleResult(result);
     }
 
     [HttpPut("{paymentMethodId:int}")]
     public async Task<ActionResult> UpdateDefault(int paymentMethodId)
     {
         var result = await repository.SetAsDefaultAsync(UserId, paymentMethodId);
-        return result.IsSuccess ? Ok() : HandleResult(result);
+        return HandleResult(result);
     }
 }
