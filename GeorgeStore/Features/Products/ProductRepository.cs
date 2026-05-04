@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using GeorgeStore.Common;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;

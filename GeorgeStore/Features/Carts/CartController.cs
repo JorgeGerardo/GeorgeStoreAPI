@@ -1,5 +1,6 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Extensions;
+using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Carts;

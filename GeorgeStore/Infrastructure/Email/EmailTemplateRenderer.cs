@@ -1,4 +1,4 @@
-﻿namespace GeorgeStore.Common;
+﻿namespace GeorgeStore.Infrastructure.Email;
 
 public static class EmailTemplateRenderer
 {

@@ -1,8 +1,9 @@
 ﻿using GeorgeStore.Features.Addresses;
+using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Orders;
-using GeorgeStore.Features.PasswordResetTokens;
+using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
@@ -26,7 +27,7 @@ public class GeorgeStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Gu
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+    public DbSet<PasswordRecoverToken> PasswordResetTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

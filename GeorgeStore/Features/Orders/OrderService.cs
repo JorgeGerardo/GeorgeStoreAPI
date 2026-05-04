@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using GeorgeStore.Common;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.PaymentMethods;

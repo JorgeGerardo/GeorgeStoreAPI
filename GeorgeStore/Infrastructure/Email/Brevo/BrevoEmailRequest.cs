@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GeorgeStore.Features.Brevo;
+namespace GeorgeStore.Infrastructure.Email.Brevo;
 
 public sealed class BrevoEmailRequest
 {

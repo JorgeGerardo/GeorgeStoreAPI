@@ -1,4 +1,4 @@
-﻿namespace GeorgeStore.Common;
+﻿namespace GeorgeStore.Common.Core.Interfaces;
 
 public interface IEmailSender
 {

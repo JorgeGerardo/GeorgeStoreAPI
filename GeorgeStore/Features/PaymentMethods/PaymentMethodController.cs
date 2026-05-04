@@ -1,4 +1,4 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.PaymentMethods;

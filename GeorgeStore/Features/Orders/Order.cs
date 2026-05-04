@@ -1,4 +1,4 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Core;
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Users;

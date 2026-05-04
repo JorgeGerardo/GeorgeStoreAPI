@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using GeorgeStore.Common;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 
 namespace GeorgeStore.Features.Categories;

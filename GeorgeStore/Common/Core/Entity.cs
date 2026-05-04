@@ -1,4 +1,4 @@
-﻿namespace GeorgeStore.Common;
+﻿namespace GeorgeStore.Common.Core;
 
 public abstract class Entity
 {

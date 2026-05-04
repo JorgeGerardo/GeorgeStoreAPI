@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace GeorgeStore.Features.Users;
+namespace GeorgeStore.Features.Auth;
 
 public record LoginResponse(string Token, string RefreshToken);
 public record JWTConfig

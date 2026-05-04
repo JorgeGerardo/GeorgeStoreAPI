@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GeorgeStore.Common.Shared;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GeorgeStore.Common;
+namespace GeorgeStore.Features.Shared.Base;
 
 public abstract class ApiControllerBase : ControllerBase
 {

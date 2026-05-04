@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace GeorgeStore.Common;
+namespace GeorgeStore.Common.Core;
 
 public static class CryptographyGeneratorExtensions
 {

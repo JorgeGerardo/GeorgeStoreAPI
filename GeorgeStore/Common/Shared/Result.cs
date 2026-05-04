@@ -1,4 +1,4 @@
-﻿namespace GeorgeStore.Common;
+﻿namespace GeorgeStore.Common.Shared;
 
 
 public class Result(bool IsSuccess, Error Error)

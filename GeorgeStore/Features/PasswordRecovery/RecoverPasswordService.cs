@@ -1,12 +1,15 @@
-﻿using GeorgeStore.Common;
-using GeorgeStore.Features.Brevo;
+﻿using GeorgeStore.Common.Core;
+using GeorgeStore.Common.Core.Interfaces;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
+using GeorgeStore.Infrastructure.Email;
+using GeorgeStore.Infrastructure.Email.Brevo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace GeorgeStore.Features.PasswordResetTokens;
+namespace GeorgeStore.Features.PasswordRecovery;
 
 public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContext context, IEmailSender emailSender, IOptionsSnapshot<BrevoOptions> opts)
 {
@@ -18,7 +21,7 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
 
         var token = Guid.NewGuid().ToString();
         var tokenHasthString = token.GetHash().GetHashString();
-        PasswordResetToken newResetToken = PasswordResetToken.Create(user.Id, tokenHasthString, IpAddress, Agent);
+        PasswordRecoverToken newResetToken = PasswordRecoverToken.Create(user.Id, tokenHasthString, IpAddress, Agent);
         context.PasswordResetTokens.Add(newResetToken);
 
         await emailSender.Send(
@@ -46,18 +49,18 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
         var tokenHash = PasswordResetToken.GetHash().GetHashString();
         var token = await context.PasswordResetTokens.FirstOrDefaultAsync(tk => tk.TokenHash == tokenHash);
         if(token is null)
-            return Result.Failure(PasswordResetTokenError.NotFound);
+            return Result.Failure(PasswordRecoverTokenError.NotFound);
 
         if (token.ExpiresAt < DateTime.UtcNow)
-            return Result.Failure(PasswordResetTokenError.TokenExpired);
+            return Result.Failure(PasswordRecoverTokenError.TokenExpired);
 
         if(token.IsUsed)
-            return Result.Failure(PasswordResetTokenError.TokenUsed);
+            return Result.Failure(PasswordRecoverTokenError.TokenUsed);
 
         var user = await manager.FindByIdAsync(token.UserId.ToString());
 
         if (user is null)
-            return Result.Failure(PasswordResetTokenError.TokenUsed);
+            return Result.Failure(PasswordRecoverTokenError.TokenUsed);
 
 
         user.PasswordHash = manager.PasswordHasher.HashPassword(user, NewPassword);

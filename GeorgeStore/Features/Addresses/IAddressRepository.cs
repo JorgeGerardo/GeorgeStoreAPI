@@ -1,4 +1,4 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
 
 namespace GeorgeStore.Features.Addresses;
 

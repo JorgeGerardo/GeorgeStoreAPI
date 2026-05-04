@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
+using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Orders;

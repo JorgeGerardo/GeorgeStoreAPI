@@ -1,8 +1,8 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Core;
 
-namespace GeorgeStore.Features.PasswordResetTokens;
+namespace GeorgeStore.Features.PasswordRecovery;
 
-public class PasswordResetToken : Entity
+public class PasswordRecoverToken : Entity
 {
     public Guid UserId { get; set; }
     public string TokenHash { get; set; } = default!;
@@ -12,7 +12,7 @@ public class PasswordResetToken : Entity
     public string? IpAddress { get; set; }
     public string? UserAgent { get; set; }
 
-    public static PasswordResetToken Create(Guid UserId, string TokenHash, string? IpAddress, string? UserAgent)
+    public static PasswordRecoverToken Create(Guid UserId, string TokenHash, string? IpAddress, string? UserAgent)
     {
         return new()
         {

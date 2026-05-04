@@ -1,6 +1,6 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Core;
 
-namespace GeorgeStore.Features.Users;
+namespace GeorgeStore.Features.Auth;
 
 public sealed class RefreshToken : Entity
 {

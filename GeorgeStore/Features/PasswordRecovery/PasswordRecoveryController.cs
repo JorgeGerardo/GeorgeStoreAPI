@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using GeorgeStore.Common;
+using GeorgeStore.Features.Shared.Base;
 
-namespace GeorgeStore.Features.PasswordResetTokens;
+namespace GeorgeStore.Features.PasswordRecovery;
 
-[Route("api/[controller]")]
+[Route("api/password-recovery")]
 [ApiController]
-public class PasswordResetController(RecoverPasswordService recoverPasswordService) : ApiControllerBase
+public class PasswordRecoveryController(RecoverPasswordService recoverPasswordService) : ApiControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<dynamic>> ForgotPassword(RecoverPassowrdDto request)

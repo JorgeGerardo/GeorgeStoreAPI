@@ -1,6 +1,6 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
 
-namespace GeorgeStore.Features.Users;
+namespace GeorgeStore.Features.Auth;
 
 public static class RefreshTokenErrors
 {

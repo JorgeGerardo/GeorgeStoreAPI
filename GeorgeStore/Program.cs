@@ -1,6 +1,6 @@
 using GeorgeStore.Extensions;
-using GeorgeStore.Features.Brevo;
-using GeorgeStore.Features.Users;
+using GeorgeStore.Features.Auth;
+using GeorgeStore.Infrastructure.Email.Brevo;
 
 var builder = WebApplication.CreateBuilder(args);
 

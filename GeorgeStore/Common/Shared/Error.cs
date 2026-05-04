@@ -1,4 +1,4 @@
-﻿namespace GeorgeStore.Common;
+﻿namespace GeorgeStore.Common.Shared;
 
 public sealed record Error(string Title, string Message, string Code, ErrorType Type)
 {

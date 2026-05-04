@@ -1,8 +1,8 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
 
-namespace GeorgeStore.Features.PasswordResetTokens;
+namespace GeorgeStore.Features.PasswordRecovery;
 
-public static class PasswordResetTokenError
+public static class PasswordRecoverTokenError
 {
     public static readonly Error TokenExpired =
         new("Token has expired", "This token has expired, try again", "PasswordResetError.TokenExpired", ErrorType.Validation);

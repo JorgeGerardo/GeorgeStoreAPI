@@ -1,10 +1,11 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Core;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace GeorgeStore.Features.Users;
+namespace GeorgeStore.Features.Auth;
 
 public class AuthService(GeorgeStoreContext context, TokenService tokenService)
 {

@@ -1,14 +1,15 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Core.Interfaces;
 using GeorgeStore.Features.Addresses;
-using GeorgeStore.Features.Brevo;
+using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Orders;
-using GeorgeStore.Features.PasswordResetTokens;
+using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
+using GeorgeStore.Infrastructure.Email.Brevo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

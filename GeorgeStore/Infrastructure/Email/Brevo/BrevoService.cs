@@ -1,6 +1,6 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Core.Interfaces;
 
-namespace GeorgeStore.Features.Brevo;
+namespace GeorgeStore.Infrastructure.Email.Brevo;
 
 public class BrevoService(HttpClient http) : IEmailSender
 {

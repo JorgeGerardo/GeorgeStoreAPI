@@ -1,4 +1,4 @@
-﻿namespace GeorgeStore.Features.Brevo;
+﻿namespace GeorgeStore.Infrastructure.Email.Brevo;
 
 public class BrevoOptions
 {

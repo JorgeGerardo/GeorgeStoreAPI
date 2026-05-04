@@ -1,4 +1,4 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.Categories;

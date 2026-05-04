@@ -1,4 +1,4 @@
-﻿using GeorgeStore.Common;
+﻿using GeorgeStore.Common.Shared;
 using Microsoft.AspNetCore.Identity;
 
 namespace GeorgeStore.Features.Users;
