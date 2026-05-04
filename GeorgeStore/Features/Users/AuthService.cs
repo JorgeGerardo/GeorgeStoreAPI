@@ -11,9 +11,8 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
     public async Task<LoginResponse> Login(Guid UserId)
     {
         var tokens = tokenService.GenerateToken(UserId);
-
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(tokens.RefreshToken));
-        string hashString = Convert.ToBase64String(hash);
+        byte[] hash = tokens.RefreshToken.GetHash();
+        string hashString = hash.GetHashString();
 
         RefreshToken newRefreshToken = RefreshToken.Create(UserId, hashString);
 
@@ -24,8 +23,8 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
 
     public async Task<Result<LoginResponse>> Refresh(string refreshToken)
     {
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
-        string hashString = Convert.ToBase64String(hash);
+        byte[] hash = refreshToken.GetHash();
+        string hashString = hash.GetHashString();
 
         var token = await context.RefreshTokens.FirstOrDefaultAsync(rf => rf.Token == hashString);
         if (token is null)
@@ -55,8 +54,8 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
         if (string.IsNullOrWhiteSpace(refreshToken))
             return Result.Success();
 
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
-        string hashString = Convert.ToBase64String(hash);
+        byte[] hash = refreshToken.GetHash();
+        string hashString = hash.GetHashString();
         var token = await context.RefreshTokens.FirstOrDefaultAsync(rf => rf.Token == hashString && !rf.IsRevoked);
 
         if (token is null)

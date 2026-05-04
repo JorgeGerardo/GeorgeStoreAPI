@@ -1,7 +1,10 @@
-﻿using GeorgeStore.Features.Addresses;
+﻿using GeorgeStore.Common;
+using GeorgeStore.Features.Addresses;
+using GeorgeStore.Features.Brevo;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Orders;
+using GeorgeStore.Features.PasswordResetTokens;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
@@ -51,9 +54,22 @@ public static class ServiceCollectionExtension
         collection.AddScoped<ICartRepository, CartRepository>();
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
+        collection.AddScoped<IEmailSender, BrevoService>();
+        collection.AddScoped<RecoverPasswordService>();
         collection.AddScoped<TokenService>();
         collection.AddScoped<AuthService>();
 
+
+        return collection;
+    }
+
+    public static IServiceCollection AddExternalHttpClients(this IServiceCollection collection, IConfiguration config)
+    {
+        collection.AddHttpClient<IEmailSender, BrevoService>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.brevo.com/v3/");
+            client.DefaultRequestHeaders.Add("api-key", config["Brevo:ApiKey"]);
+        });
 
         return collection;
     }
