@@ -14,7 +14,7 @@ namespace GeorgeStore.Features.PasswordRecovery;
 
 public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContext context, IEmailSender emailSender, IOptionsSnapshot<BrevoOptions> opts, IOptionsSnapshot<JWTConfig> jwt)
 {
-    public async Task<Result> SendRecoverEmail(RecoverPassowrdDto request, string? IpAddress, string? Agent)
+    public async Task<Result> SendRecoverEmailAsync(RecoverPassowrdDto request, string? IpAddress, string? Agent)
     {
         User? user = await manager.FindByEmailAsync(request.Email);
         if (user is null)
@@ -45,7 +45,7 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
         return Result.Success();
     }
 
-    public async Task<Result> Recover(string PasswordResetToken, string NewPassword)
+    public async Task<Result> RecoverAsync(string PasswordResetToken, string NewPassword)
     {
         var tokenHash = PasswordResetToken.GetHash().GetHashString();
         var token = await context.PasswordResetTokens.FirstOrDefaultAsync(tk => tk.TokenHash == tokenHash);

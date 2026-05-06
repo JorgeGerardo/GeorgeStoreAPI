@@ -7,9 +7,7 @@ public static class EmailTemplateRenderer
         var html = File.ReadAllText(path);
 
         foreach (var item in values)
-        {
             html = html.Replace($"{{{{{item.Key}}}}}", item.Value);
-        }
 
         return html;
     }

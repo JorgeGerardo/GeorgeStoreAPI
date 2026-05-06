@@ -23,10 +23,10 @@ public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
     {
         List<Claim> claims = GetDefaultClaims(UserId);
 
-        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Value.Key));
-        SigningCredentials signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+        SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(jwt.Value.Key));
+        SigningCredentials signIn = new(key, SecurityAlgorithms.HmacSha256Signature);
 
-        JwtSecurityToken Token = new JwtSecurityToken(
+        JwtSecurityToken Token = new(
                 jwt.Value.Issuer,
                 jwt.Value.Audience,
                 claims,
@@ -38,7 +38,7 @@ public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
         return new LoginResponse(new JwtSecurityTokenHandler().WriteToken(Token), refreshToken);
     }
 
-    private string GenerateRefreshToken()
+    private static string GenerateRefreshToken()
     {
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();
@@ -47,14 +47,14 @@ public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
         return Convert.ToBase64String(randomBytes);
     }
 
-    private List<Claim> GetDefaultClaims(Guid userId)
+    private static List<Claim> GetDefaultClaims(Guid userId)
     {
-        return new List<Claim>()
-            {
-                new Claim("UserId", userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()),
-            };
+        return
+            [
+                new("UserId", userId.ToString()),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()),
+            ];
     }
 
 }

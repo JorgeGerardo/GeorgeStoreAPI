@@ -15,14 +15,14 @@ public class PasswordRecoveryController(RecoverPasswordService recoverPasswordSe
             ip = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = HttpContext.Request.Headers.UserAgent.ToString();
 
-        await recoverPasswordService.SendRecoverEmail(request, ip, userAgent);
+        await recoverPasswordService.SendRecoverEmailAsync(request, ip, userAgent);
         return Ok();
     }
 
     [HttpPost("recover")]
     public async Task<ActionResult> Recover(RecoverPassowordInfoRequest request)
     {
-        var result = await recoverPasswordService.Recover(request.Token, request.NewPassowrd);
+        var result = await recoverPasswordService.RecoverAsync(request.Token, request.NewPassowrd);
         return HandleResult(result);
     }
 }
