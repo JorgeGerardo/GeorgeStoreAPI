@@ -61,7 +61,7 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
         var user = await manager.FindByIdAsync(token.UserId.ToString());
 
         if (user is null)
-            return Result.Failure(PasswordRecoverTokenError.TokenUsed);
+            return Result.Failure(PasswordRecoverTokenError.UserNotFound);
 
 
         user.PasswordHash = manager.PasswordHasher.HashPassword(user, NewPassword);
