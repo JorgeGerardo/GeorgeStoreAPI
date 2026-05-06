@@ -12,7 +12,7 @@ public class Product : Entity
     public bool IsActive { get; set; }
     public int CategoryId { get; set; }
     public Category Category { get; set; } = default!;
-    public static Product Create( string name, string description, int categoryId, string image, decimal price)
+    public static Product Create(string name, string description, int categoryId, string image, decimal price, bool isActive = true)
     {
         return new Product
         {
@@ -21,6 +21,7 @@ public class Product : Entity
             CategoryId = categoryId,
             Image = image,
             Price = price,
+            IsActive = isActive,
         };
     }
 }

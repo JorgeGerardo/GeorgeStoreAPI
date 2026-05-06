@@ -8,7 +8,7 @@ public interface IOrderService
     Task<Result<int>> ReorderAsync(Guid UserId, ReorderRequest request);
     Task<Result<ReorderPreview>> PreviewReorder(Guid UserId, int OrderId);
     Task<PagedResult<OrderDto>> Get(Guid UserId, QueryParams Prms);
-    Task<Result<OrderDto>> GetById(Guid UserId, int OrderId);
+    Task<Result<OrderDto>> GetByIdAsync(Guid UserId, int OrderId);
 }
 
 

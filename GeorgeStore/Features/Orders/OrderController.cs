@@ -18,7 +18,7 @@ public class OrderController(IOrderService orderService) : AuthorizedController
     [HttpGet("{OrderId:int}")]
     public async Task<ActionResult<Result<OrderDto>>> GetById([FromRoute] int OrderId)
     {
-        var result = await orderService.GetById(UserId, OrderId);
+        var result = await orderService.GetByIdAsync(UserId, OrderId);
         return HandleResult(result);
     }
 

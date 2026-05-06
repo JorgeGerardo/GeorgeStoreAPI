@@ -34,7 +34,7 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
             return Result.Failure<int>(OrderError.CartNotNotfound);
 
         if (paymentMethod is null)
-            return Result.Failure<int>(PaymentMethodError.NotFound);
+            return Result.Failure<int>(OrderError.PaymentMethodNotFound);
 
 
         cart.Status = CartStatus.Converted;
@@ -73,6 +73,10 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
             .Where(d => d.Product != null && d.Product.IsActive)
             .ToList();
 
+        if (validDetails.Count == 0)
+            return Result.Failure<int>(OrderError.NoValidItems);
+
+
         Order orderClone = CreateReorder(order, address, paymentMethod);
 
         context.Orders.Add(orderClone);
@@ -92,16 +96,28 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
             return Result.Failure<ReorderPreview>(OrderError.Notfound);
 
         var validDetails = order.Details
-            .Where(d => d.Product != null && d.Product.IsActive)
+            .Where(d => d.Product.IsActive)
+            .Select(d =>
+            {//Update price if was changed (Not saved, just preview)
+                d.UnitPrice = d.Product.Price;
+                d.SubTotal = d.Product.Price * d.Quantity;
+                return d;
+            })
             .ToList();
+
+        if (validDetails.Count == 0)
+            return Result.Failure<ReorderPreview>(OrderError.NoValidItems);
 
         var invalidItems = order.Details
             .Where(d => d.Product == null || !d.Product.IsActive)
             .Select(i => ProductDto.FromEntity(i.Product));
 
+        var total = validDetails
+            .Sum(d => d.Product.Price * d.Quantity);
+
         var items = validDetails.Select(OrderDetailDto.FromEntity);
 
-        return Result.Success(new ReorderPreview(OrderId, items, items.Sum(i => i.SubTotal), invalidItems));
+        return Result.Success(new ReorderPreview(OrderId, items, total, invalidItems));
     }
 
 
@@ -171,7 +187,7 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         return new PagedResult<OrderDto>(dic.Values, total);
     }
 
-    public async Task<Result<OrderDto>> GetById(Guid UserId, int OrderId)
+    public async Task<Result<OrderDto>> GetByIdAsync(Guid UserId, int OrderId)
     {
         var conn = connection.CreateConnection();
         Dictionary<int, OrderDto> OrderDic = [];
