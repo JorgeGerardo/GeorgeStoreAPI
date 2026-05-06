@@ -10,14 +10,15 @@ namespace GeorgeStore.Features.Auth;
 public record LoginResponse(string Token, string RefreshToken);
 public record JWTConfig
 {
-    public string Key { get; init; } = string.Empty;
-    public string Issuer { get; init; } = string.Empty;
-    public string Audience { get; init; } = string.Empty;
+    public required string Key { get; init; }
+    public required string Issuer { get; init; }
+    public required string Audience { get; init; }
+    public required int DurationMinutes { get; init; }
+    public required int RefreshTokenDurationMinutes { get; init; }
 }
 
 public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
 {
-    private static int durationDays = 100;
     public LoginResponse GenerateToken(Guid UserId)
     {
         List<Claim> claims = GetDefaultClaims(UserId);
@@ -29,7 +30,7 @@ public class TokenService(IOptionsSnapshot<JWTConfig> jwt)
                 jwt.Value.Issuer,
                 jwt.Value.Audience,
                 claims,
-                expires: DateTime.UtcNow.AddDays(durationDays),
+                expires: DateTime.UtcNow.AddMinutes(jwt.Value.DurationMinutes),
                 signingCredentials: signIn
         );
 

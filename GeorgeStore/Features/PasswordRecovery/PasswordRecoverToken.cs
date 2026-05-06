@@ -12,13 +12,13 @@ public class PasswordRecoverToken : Entity
     public string? IpAddress { get; set; }
     public string? UserAgent { get; set; }
 
-    public static PasswordRecoverToken Create(Guid UserId, string TokenHash, string? IpAddress, string? UserAgent)
+    public static PasswordRecoverToken Create(Guid UserId, string TokenHash, string? IpAddress, string? UserAgent, int DurationMinutes)
     {
         return new()
         {
             UserId = UserId,
             TokenHash = TokenHash,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ExpiresAt = DateTime.UtcNow.AddMinutes(DurationMinutes),
             IsUsed = false,
             CreatedAt = DateTime.UtcNow,
             IpAddress = IpAddress,

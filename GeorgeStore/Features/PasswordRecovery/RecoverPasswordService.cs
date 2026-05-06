@@ -1,6 +1,7 @@
 ﻿using GeorgeStore.Common.Core;
 using GeorgeStore.Common.Core.Interfaces;
 using GeorgeStore.Common.Shared;
+using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Infrastructure.Email;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace GeorgeStore.Features.PasswordRecovery;
 
-public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContext context, IEmailSender emailSender, IOptionsSnapshot<BrevoOptions> opts)
+public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContext context, IEmailSender emailSender, IOptionsSnapshot<BrevoOptions> opts, IOptionsSnapshot<JWTConfig> jwt)
 {
     public async Task<Result> SendRecoverEmail(RecoverPassowrdDto request, string? IpAddress, string? Agent)
     {
@@ -21,7 +22,7 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
 
         var token = Guid.NewGuid().ToString();
         var tokenHasthString = token.GetHash().GetHashString();
-        PasswordRecoverToken newResetToken = PasswordRecoverToken.Create(user.Id, tokenHasthString, IpAddress, Agent);
+        PasswordRecoverToken newResetToken = PasswordRecoverToken.Create(user.Id, tokenHasthString, IpAddress, Agent, jwt.Value.RefreshTokenDurationMinutes);
         context.PasswordResetTokens.Add(newResetToken);
 
         await emailSender.Send(
