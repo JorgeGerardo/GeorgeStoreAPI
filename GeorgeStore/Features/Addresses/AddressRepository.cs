@@ -41,13 +41,17 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
 
     public async Task<Result> RemoveAsync(Guid UserId, int AddressId)
     {
-        int rows = await context.Addresses
-            .Where(a => a.UserId == UserId && a.Id == AddressId)
-            .ExecuteDeleteAsync();
+        var address = await context.Addresses
+            .FirstOrDefaultAsync(a => a.UserId == UserId && a.Id == AddressId);
 
-        return rows == 0
-            ? Result.Failure(AddressError.NotFound)
-            : Result.Success();
+        if (address is null)
+            return Result.Failure(AddressError.NotFound);
+
+        context.Addresses.Remove(address);
+
+        await context.SaveChangesAsync();
+
+        return Result.Success();
     }
 
     public async Task<Result> SetAsDefaultAsync(Guid UserId, int AddressId)
