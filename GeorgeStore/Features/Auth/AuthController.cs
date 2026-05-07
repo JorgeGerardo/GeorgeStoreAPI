@@ -14,7 +14,7 @@ public class AuthController(IUserService userService, AuthService authService) :
     {
         Result<User> result = await userService.Login(credentials.Email, credentials.Password);
         return result.IsSuccess
-            ? Ok(await authService.Login(result.Value.Id))
+            ? Ok(await authService.GenerateTokensAsync(result.Value.Id))
             : HandleResult(result);
     }
 
@@ -28,14 +28,14 @@ public class AuthController(IUserService userService, AuthService authService) :
     [HttpPost("refresh")]
     public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshRequest request)
     {
-        var result = await authService.Refresh(request.RefreshToken);
+        var result = await authService.RefreshTokensAsync(request.RefreshToken);
         return HandleResult(result);
     }
 
     [HttpPost("logout")]
     public async Task<ActionResult<LoginResponse>> Logout([FromBody] RefreshRequest request)
     {
-        var result = await authService.Logout(request.RefreshToken);
+        var result = await authService.LogoutAsync(request.RefreshToken);
         return HandleResult(result);
     }
 

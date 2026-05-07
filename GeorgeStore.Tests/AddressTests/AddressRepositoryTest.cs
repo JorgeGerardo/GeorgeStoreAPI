@@ -11,7 +11,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task SetAsDefaultTest()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);
@@ -38,7 +38,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task SetAsDefaultTest_AddressNotFound()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);
@@ -64,7 +64,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task RemoveTest()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);
@@ -88,7 +88,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task Remove_AddressNotFound()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);
@@ -113,7 +113,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task Add()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);
@@ -137,7 +137,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task Add_WithoutDefaultAddress()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);
@@ -159,7 +159,7 @@ public class AddressRepositoryTest
     [Fact]
     public async Task Add_LimitedReached()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var dbConnection = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
         AddressRepository addressRepository = new(context, dbConnection.Object);

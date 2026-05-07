@@ -5,7 +5,7 @@ namespace GeorgeStore.Tests.Common;
 
 public static class ContextHelper
 {
-    public static GeorgeStoreContext CreateContext()
+    public static GeorgeStoreContext Create()
     {
         var options = new DbContextOptionsBuilder<GeorgeStoreContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())

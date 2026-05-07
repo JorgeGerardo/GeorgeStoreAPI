@@ -72,7 +72,7 @@ public class OrderServiceTest
         // Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         var locker = new KeyedAsyncLock();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         var userId = Guid.NewGuid();
         var product1 = CreateProduct("Laptop", Product1Price, isActive: true);
@@ -112,7 +112,7 @@ public class OrderServiceTest
         // Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         var locker = new KeyedAsyncLock();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         var userId = Guid.NewGuid();
         var product1 = CreateProduct("Laptop",      1321m,  isActive: false);
@@ -147,7 +147,7 @@ public class OrderServiceTest
     {
         //Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         var subP1 = Product1Price * QtyP1;
         var subP2 = Product2Price * QtyP2;
@@ -202,7 +202,7 @@ public class OrderServiceTest
     {
         //Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         var subP1 = Product1Price * QtyP1;
         var subP2 = Product2Price * QtyP2;
@@ -266,7 +266,7 @@ public class OrderServiceTest
     {
         //Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         Guid userId = Guid.NewGuid();
 
         var pmResult = PaymentMethod.Create(userId, "1234123412341234", "", 1, 2030, "");
@@ -308,7 +308,7 @@ public class OrderServiceTest
     {
         //Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         Guid userId = Guid.NewGuid();
         Address address = CreateAddress(userId, "Work", false);
         context.Addresses.Add(address);
@@ -347,7 +347,7 @@ public class OrderServiceTest
     public async Task Reorder_Failure_AddressNotFound()
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         Guid userId = Guid.NewGuid();
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var product1 = CreateProduct("Laptop", 30123m, isActive: true);
@@ -376,7 +376,7 @@ public class OrderServiceTest
     public async Task Reorder_Failure_PaymentMethodNotFound()
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         Guid userId = Guid.NewGuid();
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var product1 = CreateProduct("Laptop", 30123m, isActive: true);
@@ -407,7 +407,7 @@ public class OrderServiceTest
     public async Task Reorder_Failure_OrderNotFound()
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         Guid userId = Guid.NewGuid();
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         ReorderRequest request = new(1, 1, 1);

@@ -9,7 +9,7 @@ namespace GeorgeStore.Features.Auth;
 
 public class AuthService(GeorgeStoreContext context, TokenService tokenService)
 {
-    public async Task<LoginResponse> Login(Guid UserId)
+    public async Task<LoginResponse> GenerateTokensAsync(Guid UserId)
     {
         var tokens = tokenService.GenerateToken(UserId);
         byte[] hash = tokens.RefreshToken.GetHash();
@@ -22,7 +22,7 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
         return tokens;
     }
 
-    public async Task<Result<LoginResponse>> Refresh(string refreshToken)
+    public async Task<Result<LoginResponse>> RefreshTokensAsync(string refreshToken)
     {
         byte[] hash = refreshToken.GetHash();
         string hashString = hash.GetHashString();
@@ -50,7 +50,7 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
         return Result.Success(newTokens);
     }
 
-    public async Task<Result> Logout(string refreshToken)
+    public async Task<Result> LogoutAsync(string refreshToken)
     {
         if (string.IsNullOrWhiteSpace(refreshToken))
             return Result.Success();

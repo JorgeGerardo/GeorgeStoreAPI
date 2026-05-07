@@ -18,7 +18,7 @@ public class RecoverPasswordServiceTest
     {
         Guid userId = Guid.NewGuid();
         const string email = "jorguito@gmail.com";
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var emailSender = CreateEmailSender();
 
         var userManager = CreateUserManager(userId, email, null);
@@ -39,7 +39,7 @@ public class RecoverPasswordServiceTest
     [Fact]
     public async Task RecoverTest()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         Guid userId = Guid.NewGuid();
         const string newPassword = "NewPassword123";
@@ -90,7 +90,7 @@ public class RecoverPasswordServiceTest
     [Fact]
     public async Task Recover_Failure_TokenNotFound()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         Guid userId = Guid.NewGuid();
         const string email = "jorguito@gmail.com";
@@ -113,7 +113,7 @@ public class RecoverPasswordServiceTest
     [Fact]
     public async Task Recover_Failure_TokenExpired()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         Guid userId = Guid.NewGuid();
         const string email = "jorguito@gmail.com";
@@ -146,7 +146,7 @@ public class RecoverPasswordServiceTest
     [Fact]
     public async Task Recover_Failure_TokenUsed()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
 
         Guid userId = Guid.NewGuid();
         const string email = "jorguito@gmail.com";
@@ -180,7 +180,7 @@ public class RecoverPasswordServiceTest
     [Fact]
     public async Task Recover_Failure_UserNotFound()
     {
-        var context = ContextHelper.CreateContext();
+        using var context = ContextHelper.Create();
         var store = new Mock<IUserStore<User>>();
         var passwordHasher = new PasswordHasher<User>();
         var userManager = new Mock<UserManager<User>>(store.Object, null!, passwordHasher, null!, null!, null!, null!, null!, null!);
