@@ -3,15 +3,67 @@ using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
 using Moq;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GeorgeStore.Tests.PaymentMethodTests;
 
 public class PaymentMethodRepositoryTest
 {
+    [Fact]
+    public async Task AddTest()
+    {
+        using var context = ContextHelper.Create();
+        var conn = new Mock<IDbConnectionFactory>();
+
+
+        User user = CreateUser(context);
+
+        PaymentMethodRepository paymentRep = new(context, conn.Object);
+        PaymentMethodCreateDto request1 = new("1234123412341234", "Visa", 1, 2030, "J Lopez");
+        PaymentMethodCreateDto request2 = new("1234123412341234", "Visa", 1, 2030, "J Lopez", true);
+
+        //Act
+        var result = await paymentRep.AddAsync(user.Id, request1);
+        Assert.True(result.IsSuccess);
+        var result2 = await paymentRep.AddAsync(user.Id, request2);
+        Assert.True(result2.IsSuccess);
+        Assert.Single(user.PaymentMethods, p => p.IsDefault);
+    }
+
+    [Fact]
+    public async Task Add_LimitedRegisterReached()
+    {
+        using var context = ContextHelper.Create();
+        var conn = new Mock<IDbConnectionFactory>();
+
+
+        User user = CreateUser(context);
+        for (int i = 0; i < PaymentMethodLimits.MaxRegisterPerUser; i++)
+        {
+            var newPaymentMethod = new PaymentMethod
+            {
+                User = user,
+                Brand = "Visa",
+                Token = Guid.NewGuid().ToString(),
+                LastDigits = "1234",
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
+                ExpYear = 2039,
+                ExpMonth = 1,
+                CardHolderName = "Jorguito Lopez",
+                IsDefault = true,
+            };
+            context.PaymentMethods.Add(newPaymentMethod);
+        }
+        context.SaveChanges();
+
+        PaymentMethodRepository paymentRep = new(context, conn.Object);
+        PaymentMethodCreateDto request = new("1234123412341234", "Visa", 1, 2030, "J Lopez");
+        //Act
+        var result = await paymentRep.AddAsync(user.Id, request);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(PaymentMethodError.PaymentMethodLimitReached, result.Error);
+    }
+
     [Fact]
     public async Task RemoveTest()
     {

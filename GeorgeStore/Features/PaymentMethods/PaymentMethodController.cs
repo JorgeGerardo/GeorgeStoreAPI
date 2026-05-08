@@ -14,7 +14,7 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
     }
 
     [HttpGet("{PaymentMethodId:int}")]
-    public async Task<ActionResult<IEnumerable<PaymentMethodDto>>> Get([FromRoute] int PaymentMethodId)
+    public async Task<ActionResult<IEnumerable<PaymentMethodDto>>> GetById([FromRoute] int PaymentMethodId)
     {
         var result = await repository.GetByIdAsync(UserId, PaymentMethodId);
         return result.IsSuccess 
@@ -37,7 +37,7 @@ public class PaymentMethodController(IPaymentMethodRepository repository) : Auth
     }
 
     [HttpPut("{paymentMethodId:int}")]
-    public async Task<ActionResult> UpdateDefault(int paymentMethodId)
+    public async Task<ActionResult> UpdateDefaultAsync(int paymentMethodId)
     {
         var result = await repository.SetAsDefaultAsync(UserId, paymentMethodId);
         return HandleResult(result);

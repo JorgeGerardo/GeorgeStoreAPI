@@ -20,7 +20,7 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
             return Result.Failure(result.Error);
 
         var methodsRegister = await context.PaymentMethods.CountAsync(p => p.UserId == UserId);
-        if (methodsRegister >= 10)
+        if (methodsRegister >= PaymentMethodLimits.MaxRegisterPerUser)
             return Result.Failure(PaymentMethodError.PaymentMethodLimitReached);
 
         context.PaymentMethods.Add(result.Value);
