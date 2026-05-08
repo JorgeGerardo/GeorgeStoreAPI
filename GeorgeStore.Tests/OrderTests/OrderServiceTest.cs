@@ -224,8 +224,8 @@ public class OrderServiceTest
         context.SaveChanges();
 
 
-        var newCart = Cart.Create(userId);
-        newCart.Items = [
+        var activeCart = Cart.Create(userId);
+        activeCart.Items = [
             new CartItem{
                 ProductId = product1.Id,
                 Quantity = QtyP1
@@ -235,12 +235,12 @@ public class OrderServiceTest
                 Quantity = QtyP2
             },
         ];
-        context.Carts.Add(newCart);
+        context.Carts.Add(activeCart);
         context.SaveChanges();
 
         //Act
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var result = await orderSvc.Purchase(userId, newCart.Id, address.Id, paymentM.Id);
+        var result = await orderSvc.Purchase(userId, activeCart.Id, address.Id, paymentM.Id);
         int orderId = result.Value;
 
         //Assert
@@ -256,7 +256,7 @@ public class OrderServiceTest
         var detailProduct2 = order.Details.FirstOrDefault(o => o.ProductId == product2.Id);
         Assert.NotNull(detailProduct2);
         Assert.Equal(subP2, detailProduct2.SubTotal);
-
+        Assert.Equal(CartStatus.Converted, activeCart.Status);
 
     }
 
@@ -421,14 +421,6 @@ public class OrderServiceTest
 
 
 
-
-
-
-
-
-
-
-
     //Common Arranges:
     private static Product CreateProduct(string name, decimal price, bool isActive = true)
     {
@@ -448,7 +440,7 @@ public class OrderServiceTest
         return new Order
         {
             UserId = userId,
-            Details = details.ToList(),
+            Details = [.. details],
             Total = details.Sum(d => d.SubTotal),
             Brand = "Visa",
             Last4 = "4030",
@@ -480,4 +472,3 @@ public class OrderServiceTest
         };
     }
 }
-
