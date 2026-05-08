@@ -9,10 +9,8 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 {
     public async Task<Result<Cart>> GetAsync(Guid UserId, CancellationToken ct = default)
     {
-        Cart? cart = await context.Carts
-                                .Include(c => c.Items)
-                                .ThenInclude(i => i.Item)
-                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
+        Cart? cart = await GetActiveCart(UserId, ct);
+
         if (cart is not null)
             return Result.Success(cart);
 
@@ -24,13 +22,15 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     public async Task<Result> AddAsync(Guid UserId, int ProductId, int Quantity, CancellationToken ct = default)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10), ct);
-        Cart? cart = await context.Carts
-                                .Include(p => p.Items)
-                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
+        Cart? cart = await GetActiveCart(UserId, ct);
 
         cart ??= CreateDraft(UserId);
 
         CartItem? cartItem = cart.Items.FirstOrDefault(p => p.ProductId == ProductId);
+
+        bool existProduct = await context.Products.AnyAsync(p => p.Id == ProductId && p.IsActive);
+        if (!existProduct)
+            return Result.Failure(CartError.ProductNotfound);
 
         if (cartItem is not null)
             cartItem.Quantity += Quantity;
@@ -49,9 +49,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10), ct);
 
-        Cart? cart = await context.Carts
-                .Include(p => p.Items)
-                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
+        Cart? cart = await GetActiveCart(UserId, ct);
 
         if (cart is null)
             return Result.Failure(CartError.Notfound);
@@ -88,9 +86,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     public async Task<Result> DecreaseAsync(Guid UserId, int ProductId)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10));
-        Cart? cart = await context.Carts
-                                .Include(p => p.Items)
-                                .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active);
+        Cart? cart = await GetActiveCart(UserId, CancellationToken.None);
 
         if (cart is null)
             return Result.Failure(CartError.Notfound);
@@ -108,5 +104,13 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 
         await context.SaveChangesAsync();
         return Result.Success();
+    }
+
+    private async Task<Cart?> GetActiveCart(Guid UserId, CancellationToken ct)
+    {
+        return await context.Carts
+            .Include(c => c.Items)
+            .ThenInclude(i => i.Item)
+            .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
     }
 }
