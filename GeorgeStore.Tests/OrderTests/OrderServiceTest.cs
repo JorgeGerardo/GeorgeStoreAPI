@@ -24,11 +24,7 @@ public class OrderServiceTest
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         var locker = new KeyedAsyncLock();
 
-        var options = new DbContextOptionsBuilder<GeorgeStoreContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-
-        using var context = new GeorgeStoreContext(options);
+        using var context = ContextHelper.Create();
 
         var userId = Guid.NewGuid();
         var product1 = CreateProduct("Laptop", Product1Price, isActive: true);
