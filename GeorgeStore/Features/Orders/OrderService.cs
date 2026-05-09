@@ -17,7 +17,7 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(30));
 
         Cart? cart = await context.Carts
-            .Include(c => c.Items)
+            .Include(c => c.Items.Where(i => i.Item.IsActive))
             .ThenInclude(c => c.Item)
             .FirstOrDefaultAsync(c => c.UserId == UserId && c.Id == CartId && c.Status == CartStatus.Active);
 
@@ -294,7 +294,7 @@ public partial class OrderService : IOrderService
     private static Order CreateOrder(Cart cart, Guid UserId, Address Address, PaymentMethod PaymentMethod)
     {
         List<OrderDetail> details = [];
-        foreach (var item in cart.Items)
+        foreach (var item in cart.Items.Where(i => i.Item.IsActive))
             details.Add(
                 OrderDetail.Create(
                     item.ProductId,

@@ -262,6 +262,73 @@ public class OrderServiceTest
     }
 
 
+    [Theory]  //P1 $,    Qty,P2 $, Qty Total
+    [InlineData(10_000.0, 2, 500.0, 5, 20_000.0)]
+    [InlineData(6_000.0,  5, 500.0, 5, 30_000.0)]
+    public async Task Purchase_WithProductsInactive(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
+    {
+        //Arrange
+        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
+        using var context = ContextHelper.Create();
+
+        var subP1 = Product1Price * QtyP1;
+        var subP2 = Product2Price * QtyP2;
+        var user = ContextHelper.CreateUser(context);
+        Address address = CreateAddress(user.Id, "Work", false);
+
+        var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
+        Assert.True(pmResult.IsSuccess);
+        PaymentMethod paymentM = pmResult.Value;
+
+        context.Addresses.Add(address);
+        context.PaymentMethods.Add(paymentM);
+        context.SaveChanges();
+
+
+        var product1 = CreateProduct("Laptop Asus", Product1Price);
+        var product2 = CreateProduct("Smarthphone", Product2Price, isActive: false);
+        context.Products.AddRange(product1, product2);
+        context.SaveChanges();
+
+
+        var activeCart = Cart.Create(user.Id);
+        activeCart.Items = [
+            new CartItem{
+                ProductId = product1.Id,
+                Quantity = QtyP1,
+                Item = product1,
+            },
+            new CartItem{
+                ProductId = product2.Id,
+                Quantity = QtyP2,
+                Item = product2,
+            },
+        ];
+        context.Carts.Add(activeCart);
+        context.SaveChanges();
+
+        //Act
+        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
+        var result = await orderSvc.Purchase(user.Id, activeCart.Id, address.Id, paymentM.Id);
+        int orderId = result.Value;
+
+        //Assert
+        Assert.True(result.IsSuccess);
+        var order = context.Orders.Include(o => o.Details).FirstOrDefault(o => o.Id == orderId);
+        Assert.NotNull(order);
+        Assert.Equal(Total, order.Total);
+
+        var detailProduct1 = order.Details.FirstOrDefault(o => o.ProductId == product1.Id);
+        Assert.NotNull(detailProduct1);
+        Assert.Equal(subP1, detailProduct1.SubTotal);
+        
+        var detailProduct2 = order.Details.FirstOrDefault(o => o.ProductId == product2.Id);
+        Assert.Null(detailProduct2);
+        Assert.Equal(CartStatus.Converted, activeCart.Status);
+
+    }
+
+
     [Fact]
     public async Task Purchase_Failure_AddressNotFound()
     {

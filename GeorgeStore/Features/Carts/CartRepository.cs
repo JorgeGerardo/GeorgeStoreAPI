@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using GeorgeStore.Common.Shared;
+using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,13 +10,14 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 {
     public async Task<Result<Cart>> GetAsync(Guid UserId, CancellationToken ct = default)
     {
-        Cart? cart = await GetActiveCart(UserId, ct);
+        Cart? cart = await GetActiveCart(UserId, ct, true);
 
         if (cart is not null)
             return Result.Success(cart);
 
         cart = CreateDraft(UserId);
         await context.SaveChangesAsync(ct);
+        cart.Items = [.. cart.Items.Where(i => i.Item.IsActive)];
         return Result.Success(cart);
     }
 
@@ -106,11 +108,18 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         return Result.Success();
     }
 
-    private async Task<Cart?> GetActiveCart(Guid UserId, CancellationToken ct)
+    private async Task<Cart?> GetActiveCart(Guid UserId, CancellationToken ct, bool onlyActiveProducts = false)
     {
-        return await context.Carts
-            .Include(c => c.Items)
-            .ThenInclude(i => i.Item)
-            .FirstOrDefaultAsync(c => c.UserId == UserId && c.Status == CartStatus.Active, ct);
+        IQueryable<Cart> query = context.Carts;
+
+        if (onlyActiveProducts)
+            query = query
+                .Include(c => c.Items.Where(i => i.Item.IsActive)).ThenInclude(i => i.Item);
+        else
+            query = query.Include(c => c.Items).ThenInclude(i => i.Item);
+
+        return await query.FirstOrDefaultAsync(
+            c => c.UserId == UserId && c.Status == CartStatus.Active, ct
+        );
     }
 }

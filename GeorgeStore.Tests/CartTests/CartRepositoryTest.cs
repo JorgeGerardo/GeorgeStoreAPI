@@ -15,7 +15,7 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
 
         CartRepository cartRep = new(context, connFactory.Object, new KeyedAsyncLock());
@@ -38,7 +38,7 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         Category category1 = new() { Name = "Electronic", Image = "" };
         context.Add(category1);
@@ -62,11 +62,7 @@ public class CartRepositoryTest
             ]
         };
 
-        Cart newCart = new()
-        {
-            UserId = user.Id,
-            Status = CartStatus.Active,
-        };
+        Cart newCart = Cart.Create(user.Id);
 
         context.AddRange([newCart, oldCart]);
         context.SaveChanges();
@@ -104,7 +100,7 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         Category newCategory = new() { Name = "Electronic", Image = "" };
         context.Add(newCategory);
@@ -115,12 +111,7 @@ public class CartRepositoryTest
         Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price, true);
         context.AddRange([product1, product2, product3, product4]);
 
-        Cart newCart = new()
-        {
-            UserId = user.Id,
-            Status = CartStatus.Active,
-        };
-
+        Cart newCart = Cart.Create(user.Id);
         context.Add(newCart);
         context.SaveChanges();
 
@@ -156,7 +147,7 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         Category newCategory = new() { Name = "Electronic", Image = "" };
         context.Add(newCategory);
@@ -165,11 +156,7 @@ public class CartRepositoryTest
         Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
         context.AddRange([product1, product2]);
         
-        Cart newCart = new()
-        {
-            UserId = user.Id,
-            Status = CartStatus.Active,
-        };
+        Cart newCart = Cart.Create(user.Id);
 
         context.Add(newCart);
         context.SaveChanges();
@@ -191,7 +178,7 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         CartRepository cartRep = new(context, connFactory.Object, new KeyedAsyncLock());
 
         //Act
@@ -203,7 +190,7 @@ public class CartRepositoryTest
 
 
     [Theory]
-    [MemberData(nameof(ProductsInCartCases))]
+    [MemberData(nameof(ProductsInCartCasesForDecreaseTest))]
     public async Task DecreaseTest(decimal Product1Price, int QtyP1, int DecreaseQtyP1, decimal Product4Price, int QtyP4, int DecreaseQtyP4, decimal Total)
     {
         if (DecreaseQtyP1 >= QtyP1 || DecreaseQtyP4 >= QtyP4)
@@ -220,7 +207,7 @@ public class CartRepositoryTest
 
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         Category newCategory = new() { Name = "Electronic", Image = "" };
         context.Add(newCategory);
@@ -244,11 +231,7 @@ public class CartRepositoryTest
             ]
         };
 
-        Cart activeCart = new()
-        {
-            UserId = user.Id,
-            Status = CartStatus.Active,
-        };
+        Cart activeCart = Cart.Create(user.Id);
 
         context.AddRange([activeCart, oldCart]);
         context.SaveChanges();
@@ -301,13 +284,9 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
-        Cart newCart = new()
-        {
-            UserId = user.Id,
-            Status = CartStatus.Active,
-        };
+        Cart newCart = Cart.Create(user.Id);
 
         context.Add(newCart);
         context.SaveChanges();
@@ -325,7 +304,7 @@ public class CartRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         Category newCategory = new() { Name = "Electronic", Image = "" };
         context.Add(newCategory);
@@ -357,24 +336,86 @@ public class CartRepositoryTest
         Assert.Equal(CartError.DecreaseLimit, result.Error);
     }
 
-    //Common arranges
-    private static User CreateUser(GeorgeStoreContext context)
+
+
+    [Theory]
+    [InlineData(10_000.0, 2, 500.0, 6, 20_000.0)]
+    [InlineData(10.0, 10, 5.0, 10, 100.0)]
+    [InlineData(25_000.0, 2, 10_000.0, 6, 50_000.0)]
+    public async Task GetCart_WhenSomeProductInCartIsInactive(decimal Product1Price, int QtyP1, decimal Product4Price, int QtyP4, decimal Total)
     {
-        User user = new($"{Guid.NewGuid()}_TestUser", $"{Guid.NewGuid()}@gmail.com");
-        context.Add(user);
+        using var context = ContextHelper.Create();
+        var connFactory = new Mock<IDbConnectionFactory>();
+        User user = ContextHelper.CreateUser(context);
+
+        Category category1 = new() { Name = "Electronic", Image = "" };
+        context.Add(category1);
         context.SaveChanges();
-        return user;
+        Product product1 = Product.Create("LaptopAsus", "description", category1.Id, "", Product1Price, true);
+        Product product2 = Product.Create("Galaxy S26", "description", category1.Id, "", 3000, true);
+        Product product3 = Product.Create("Pixel 10XL", "description", category1.Id, "", 7000, true);
+        Product product4 = Product.Create("Huawei p60", "description", category1.Id, "", Product4Price);
+        context.AddRange([product1, product2, product3, product4]);
+        context.SaveChanges();
+
+        Cart oldCart = new()
+        {
+            UserId = user.Id,
+            Status = CartStatus.Converted,
+            Items = [
+                new CartItem {
+                    ProductId = product1.Id,
+                    Quantity = 383,
+                }
+            ]
+        };
+
+        Cart newCart = Cart.Create(user.Id);
+
+        context.AddRange([newCart, oldCart]);
+        context.SaveChanges();
+
+
+
+        CartRepository cartRep = new(context, connFactory.Object, new KeyedAsyncLock());
+        //Act
+        var result1 = await cartRep.AddAsync(user.Id, product1.Id, QtyP1, CancellationToken.None);
+        Assert.True(result1.IsSuccess);
+        var result2 = await cartRep.AddAsync(user.Id, product4.Id, QtyP4, CancellationToken.None);
+        Assert.True(result2.IsSuccess);
+        //Inactive product behind Get-cart operation
+        product4.IsActive = false;
+        context.Update(product4);
+        context.SaveChanges();
+        context.ChangeTracker.Clear();
+
+        var result = await cartRep.GetAsync(user.Id, CancellationToken.None);
+        Cart? userCart = result.Value;
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(userCart);
+        Assert.Single(userCart.Items);
+        int totalProducts = QtyP1;
+        Assert.Equal(totalProducts, userCart.Items.Sum(i => i.Quantity));
+        Assert.Contains(userCart.Items, i => i.ProductId == product1.Id);
+        Assert.DoesNotContain(userCart.Items, i => i.ProductId == product4.Id);
+        Assert.Equal(Total, userCart.Total);
+
+
     }
 
 
 
+    //Common arranges
 
-    public static IEnumerable<object[]> ProductsInCartCases =>
-    [
+    public static TheoryData<decimal, int, int, decimal, int, int, decimal>
+    ProductsInCartCasesForDecreaseTest =>
+    new()
+    {
         //P1 price   Qty    DecQty   P2 Price   Qty   DecQty   Total
-        [10_000.0m,    2,   1,         500.0m,    6,     1,    12_500.0m],
-        [10.0m,       10,   3,          50.0m,   10,     5,       320.0m],
-        [25_000.0m,    4,   3,      10_000.0m,    6,     1,    75_000.0m],
-        [5_000.0m,     4,   3,      10_000.0m,    6,     1,    55_000.0m],
-    ];
+        {10_000.0m,    2,   1,         500.0m,    6,     1,    12_500.0m},
+        {10.0m,       10,   3,          50.0m,   10,     5,       320.0m},
+        {25_000.0m,    4,   3,      10_000.0m,    6,     1,    75_000.0m},
+        {5_000.0m,     4,   3,      10_000.0m,    6,     1,    55_000.0m},
+    };
+
 }

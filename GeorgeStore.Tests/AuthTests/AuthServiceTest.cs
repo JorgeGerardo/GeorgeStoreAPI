@@ -12,8 +12,8 @@ public class AuthServiceTest
     public async Task LoginTest()
     {
         using var context = ContextHelper.Create();
-        Guid userId = new Guid();
-        var optionsJwtConfig = CreateJwtConfigOptions(CreateJwtConfig());
+        Guid userId = new();
+        var optionsJwtConfig =CreateJwtConfigOptions();
         AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         
         //Act
@@ -30,7 +30,7 @@ public class AuthServiceTest
     public async Task RefreshTest()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig = CreateJwtConfigOptions(CreateJwtConfig());
+        var optionsJwtConfig =CreateJwtConfigOptions();
         AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
@@ -57,7 +57,7 @@ public class AuthServiceTest
     public async Task Refresh_Revoked_Test()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig = CreateJwtConfigOptions(CreateJwtConfig());
+        var optionsJwtConfig =CreateJwtConfigOptions();
         AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
@@ -79,14 +79,14 @@ public class AuthServiceTest
 
         Assert.False(result.IsSuccess);
         Assert.Equal(RefreshTokenErrors.Revoked, result.Error);
-
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
     [Fact]
     public async Task Refresh_Expired_Test()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig = CreateJwtConfigOptions(CreateJwtConfig());
+        var optionsJwtConfig =CreateJwtConfigOptions();
         AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
@@ -116,7 +116,7 @@ public class AuthServiceTest
     public async Task Refresh_NotFound_Test()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig = CreateJwtConfigOptions(CreateJwtConfig());
+        var optionsJwtConfig =CreateJwtConfigOptions();
         AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         string randomString = Guid.NewGuid().ToString();
 
@@ -132,7 +132,7 @@ public class AuthServiceTest
     public async Task LogoutTest()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig = CreateJwtConfigOptions(CreateJwtConfig());
+        var optionsJwtConfig =CreateJwtConfigOptions();
         AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
@@ -160,7 +160,7 @@ public class AuthServiceTest
 
 
     //Common arranges
-    private static IOptionsSnapshot<JWTConfig> CreateJwtConfigOptions(JWTConfig config)
+    private static IOptionsSnapshot<JWTConfig> CreateJwtConfigOptions()
     {
         var jwtConfig = CreateJwtConfig();
         var jwtOptionsMock = new Mock<IOptionsSnapshot<JWTConfig>>();
