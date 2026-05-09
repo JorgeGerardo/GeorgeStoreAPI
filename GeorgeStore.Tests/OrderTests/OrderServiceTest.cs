@@ -74,13 +74,13 @@ public class OrderServiceTest
         var locker = new KeyedAsyncLock();
         using var context = ContextHelper.Create();
 
-        var userId = Guid.NewGuid();
+        var user = ContextHelper.CreateUser(context);
         var product1 = CreateProduct("Laptop", Product1Price, isActive: true);
         var product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
         var product3 = CreateProduct("Fridge", 1000m, isActive: false);
 
         var order = CreateOrder(
-            userId,
+            user.Id,
             new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
             new OrderDetail { Product = product3, Quantity = 3, UnitPrice = 900m, SubTotal = 2700m }
@@ -93,7 +93,7 @@ public class OrderServiceTest
         var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
         //Act
-        var result = await orderService.PreviewReorder(userId, order.Id);
+        var result = await orderService.PreviewReorder(user.Id, order.Id);
 
         //Assert
         Assert.True(result.IsSuccess);
@@ -114,13 +114,15 @@ public class OrderServiceTest
         var locker = new KeyedAsyncLock();
         using var context = ContextHelper.Create();
 
-        var userId = Guid.NewGuid();
+        var user = ContextHelper.CreateUser(context);
         var product1 = CreateProduct("Laptop",      1321m,  isActive: false);
         var product2 = CreateProduct("Smarthphone", 31232m, isActive: false);
         var product3 = CreateProduct("Fridge",      1000m,  isActive: false);
+        context.AddRange([product1, product2, product3]);
+        context.SaveChanges();
 
         var order = CreateOrder(
-            userId,
+            user.Id,
             new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = 1, UnitPrice = 4500m, SubTotal = 4500m },
             new OrderDetail { Product = product3, Quantity = 3, UnitPrice = 900m, SubTotal = 2700m }
@@ -132,7 +134,7 @@ public class OrderServiceTest
         var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
         //Act
-        var result = await orderService.PreviewReorder(userId, order.Id);
+        var result = await orderService.PreviewReorder(user.Id, order.Id);
 
         //Assert
         Assert.False(result.IsSuccess);
@@ -151,10 +153,10 @@ public class OrderServiceTest
 
         var subP1 = Product1Price * QtyP1;
         var subP2 = Product2Price * QtyP2;
-        Guid userId = Guid.NewGuid();
-        Address address = CreateAddress(userId, "Work", false);
+        var user = ContextHelper.CreateUser(context);
+        Address address = CreateAddress(user.Id, "Work", false);
 
-        var result = PaymentMethod.Create(userId, "1234123412341234", "", 1, 2030, "");
+        var result = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(result.IsSuccess);
         PaymentMethod paymentM = result.Value;
 
@@ -164,7 +166,7 @@ public class OrderServiceTest
         var product3 = CreateProduct("Fridge", 1000m, isActive: false);
 
         var order = CreateOrder(
-            userId,
+            user.Id,
             new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
             new OrderDetail { Product = product3, Quantity = 3,     UnitPrice = 900m,  SubTotal = 2700m }
@@ -175,10 +177,12 @@ public class OrderServiceTest
         context.Addresses.Add(address);
         context.PaymentMethods.Add(paymentM);
         context.SaveChanges();
+
         //Act
+        context.ChangeTracker.Clear();
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var request = new ReorderRequest(order.Id, address.Id, paymentM.Id);
-        var orderResult = await orderSvc.ReorderAsync(userId, request);
+        var orderResult = await orderSvc.ReorderAsync(user.Id, request);
         var orderCreated = context.Orders.Include(p => p.Details)
                                          .ThenInclude(d => d.Product)
                                          .FirstOrDefault(o => o.Id == orderResult.Value);
@@ -206,10 +210,10 @@ public class OrderServiceTest
 
         var subP1 = Product1Price * QtyP1;
         var subP2 = Product2Price * QtyP2;
-        Guid userId = Guid.NewGuid();
-        Address address = CreateAddress(userId, "Work", false);
+        var user = ContextHelper.CreateUser(context);
+        Address address = CreateAddress(user.Id, "Work", false);
 
-        var pmResult = PaymentMethod.Create(userId, "1234123412341234", "", 1, 2030, "");
+        var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         PaymentMethod paymentM = pmResult.Value;
 
@@ -224,7 +228,7 @@ public class OrderServiceTest
         context.SaveChanges();
 
 
-        var activeCart = Cart.Create(userId);
+        var activeCart = Cart.Create(user.Id);
         activeCart.Items = [
             new CartItem{
                 ProductId = product1.Id,
@@ -240,7 +244,7 @@ public class OrderServiceTest
 
         //Act
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var result = await orderSvc.Purchase(userId, activeCart.Id, address.Id, paymentM.Id);
+        var result = await orderSvc.Purchase(user.Id, activeCart.Id, address.Id, paymentM.Id);
         int orderId = result.Value;
 
         //Assert
@@ -267,9 +271,9 @@ public class OrderServiceTest
         //Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        Guid userId = Guid.NewGuid();
+        var user = ContextHelper.CreateUser(context);
 
-        var pmResult = PaymentMethod.Create(userId, "1234123412341234", "", 1, 2030, "");
+        var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         PaymentMethod paymentM = pmResult.Value;
 
@@ -283,7 +287,7 @@ public class OrderServiceTest
         context.SaveChanges();
 
 
-        var newCart = Cart.Create(userId);
+        var newCart = Cart.Create(user.Id);
         newCart.Items = [
             new CartItem{
                 ProductId = product1.Id,
@@ -295,7 +299,7 @@ public class OrderServiceTest
 
         //Act
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var result = await orderSvc.Purchase(userId, newCart.Id, 2, paymentM.Id);
+        var result = await orderSvc.Purchase(user.Id, newCart.Id, 2, paymentM.Id);
 
         //Assert
         Assert.False(result.IsSuccess);
@@ -309,8 +313,8 @@ public class OrderServiceTest
         //Arrange
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        Guid userId = Guid.NewGuid();
-        Address address = CreateAddress(userId, "Work", false);
+        var user = ContextHelper.CreateUser(context);
+        Address address = CreateAddress(user.Id, "Work", false);
         context.Addresses.Add(address);
         context.SaveChanges();
 
@@ -322,7 +326,7 @@ public class OrderServiceTest
         context.SaveChanges();
 
 
-        var newCart = Cart.Create(userId);
+        var newCart = Cart.Create(user.Id);
         newCart.Items = [
             new CartItem{
                 ProductId = product1.Id,
@@ -334,7 +338,7 @@ public class OrderServiceTest
 
         //Act
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var result = await orderSvc.Purchase(userId, newCart.Id, address.Id, 1);
+        var result = await orderSvc.Purchase(user.Id, newCart.Id, address.Id, 1);
 
         //Assert
         Assert.False(result.IsSuccess);
@@ -348,12 +352,12 @@ public class OrderServiceTest
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        Guid userId = Guid.NewGuid();
+        var user = ContextHelper.CreateUser(context);
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var product1 = CreateProduct("Laptop", 30123m, isActive: true);
 
         var order = CreateOrder(
-            userId,
+            user.Id,
             new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
 
@@ -364,7 +368,7 @@ public class OrderServiceTest
         ReorderRequest request = new(order.Id, 1, 1);
 
         //act
-        var result = await orderSvc.ReorderAsync(userId, request);
+        var result = await orderSvc.ReorderAsync(user.Id, request);
 
 
         Assert.False(result.IsSuccess);
@@ -377,25 +381,24 @@ public class OrderServiceTest
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        Guid userId = Guid.NewGuid();
+        var user = ContextHelper.CreateUser(context);
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var product1 = CreateProduct("Laptop", 30123m, isActive: true);
+        var newProduct = CreateProduct("Laptop", 30123m, isActive: true);
 
         var order = CreateOrder(
-            userId,
-            new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
+            user.Id,
+            new OrderDetail { Product = newProduct, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
 
-        Address address = CreateAddress(userId, "Work", false);
-        context.Addresses.Add(address);
-        context.Orders.Add(order); 
+        Address address = CreateAddress(user.Id, "Work", false);
+        context.AddRange(address, order);
         context.SaveChanges();
 
 
-        ReorderRequest request = new(order.Id, 1, 1);
+        ReorderRequest request = new(order.Id, address.Id, 1);
 
         //act
-        var result = await orderSvc.ReorderAsync(userId, request);
+        var result = await orderSvc.ReorderAsync(user.Id, request);
 
 
         Assert.False(result.IsSuccess);

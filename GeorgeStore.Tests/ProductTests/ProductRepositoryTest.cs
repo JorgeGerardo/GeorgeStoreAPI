@@ -127,7 +127,7 @@ public class ProductRepositoryTest
 
         //Act
         ProductRepository productRep = new(connFactory.Object, context);
-        var result = await productRep.RemoveAsync(1);
+        var result = await productRep.RemoveAsync(int.MaxValue);
 
         Assert.False(result.IsSuccess);
         Assert.Equal(ProductError.Notfound, result.Error);

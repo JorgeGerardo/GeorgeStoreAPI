@@ -15,7 +15,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
             return Result.Success(cart);
 
         cart = CreateDraft(UserId);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(ct);
         return Result.Success(cart);
     }
 
@@ -28,7 +28,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 
         CartItem? cartItem = cart.Items.FirstOrDefault(p => p.ProductId == ProductId);
 
-        bool existProduct = await context.Products.AnyAsync(p => p.Id == ProductId && p.IsActive);
+        bool existProduct = await context.Products.AnyAsync(p => p.Id == ProductId && p.IsActive, ct);
         if (!existProduct)
             return Result.Failure(CartError.ProductNotfound);
 

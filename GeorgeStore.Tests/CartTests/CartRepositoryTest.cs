@@ -40,13 +40,15 @@ public class CartRepositoryTest
         var connFactory = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
 
-        Category category1 = new() { Id = 1, Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", 1, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", 1, "", Product4Price, true);
+        Category category1 = new() { Name = "Electronic", Image = "" };
         context.Add(category1);
+        context.SaveChanges();
+        Product product1 = Product.Create("LaptopAsus", "description", category1.Id, "", Product1Price, true);
+        Product product2 = Product.Create("Galaxy S26", "description", category1.Id, "", 3000, true);
+        Product product3 = Product.Create("Pixel 10XL", "description", category1.Id, "", 7000, true);
+        Product product4 = Product.Create("Huawei p60", "description", category1.Id, "", Product4Price, true);
         context.AddRange([product1, product2, product3, product4]);
+        context.SaveChanges();
 
         Cart oldCart = new()
         {
@@ -78,6 +80,7 @@ public class CartRepositoryTest
         var result2 = await cartRep.AddAsync(user.Id, product4.Id, QtyP4, CancellationToken.None);
         Assert.True(result2.IsSuccess);
 
+        context.ChangeTracker.Clear();
         var result = await cartRep.GetAsync(user.Id, CancellationToken.None);
         Cart? userCart = result.Value;
         Assert.True(result.IsSuccess);
@@ -103,12 +106,13 @@ public class CartRepositoryTest
         var connFactory = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
 
-        Category category1 = new() { Id = 1, Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", 1, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", 1, "", Product4Price, true);
-        context.Add(category1);
+        Category newCategory = new() { Name = "Electronic", Image = "" };
+        context.Add(newCategory);
+        context.SaveChanges();
+        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
+        Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
+        Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
+        Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price, true);
         context.AddRange([product1, product2, product3, product4]);
 
         Cart newCart = new()
@@ -129,6 +133,7 @@ public class CartRepositoryTest
         Assert.True(result2.IsSuccess);
 
         //Act
+        context.ChangeTracker.Clear();
         var removeResult = await cartRep.RemoveAsync(user.Id, product4.Id, CancellationToken.None);
         Assert.True(removeResult.IsSuccess);
 
@@ -153,12 +158,13 @@ public class CartRepositoryTest
         var connFactory = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
 
-        Category category1 = new() { Id = 1, Name = "Electronic", Image = "" };
+        Category newCategory = new() { Name = "Electronic", Image = "" };
+        context.Add(newCategory);
+        context.SaveChanges();
         Product product1 = Product.Create("LaptopAsus", "description", 1, "", 5500, true);
         Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-        context.Add(category1);
         context.AddRange([product1, product2]);
-
+        
         Cart newCart = new()
         {
             UserId = user.Id,
@@ -216,14 +222,15 @@ public class CartRepositoryTest
         var connFactory = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
 
-        Category category1 = new() { Id = 1, Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", 1, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", 1, "", Product4Price, true);
-        context.Add(category1);
+        Category newCategory = new() { Name = "Electronic", Image = "" };
+        context.Add(newCategory);
+        context.SaveChanges();
+        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
+        Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
+        Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
+        Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price, true);
         context.AddRange([product1, product2, product3, product4]);
-
+        context.SaveChanges();
         Cart oldCart = new()
         {
             UserId = user.Id,
@@ -232,20 +239,22 @@ public class CartRepositoryTest
                 new CartItem {
                     ProductId = product1.Id,
                     Quantity = 383,
+                    Item = product1,
                 }
             ]
         };
 
-        Cart currentCart = new()
+        Cart activeCart = new()
         {
             UserId = user.Id,
             Status = CartStatus.Active,
         };
 
-        context.AddRange([currentCart, oldCart]);
+        context.AddRange([activeCart, oldCart]);
         context.SaveChanges();
-
-
+        
+        //Act
+        context.ChangeTracker.Clear();
         CartRepository cartRep = new(context, connFactory.Object, new KeyedAsyncLock());
         var result1 = await cartRep.AddAsync(user.Id, product1.Id, QtyP1, CancellationToken.None);
         Assert.True(result1.IsSuccess);
@@ -268,7 +277,9 @@ public class CartRepositoryTest
 
 
 
-
+        var getCartResult = await cartRep.GetAsync(user.Id, CancellationToken.None);
+        Assert.True(getCartResult.IsSuccess);
+        var currentCart = getCartResult.Value;
 
         Assert.Equal(Total, currentCart.Total);
         var item1 = currentCart.Items.FirstOrDefault(i => i.ProductId == product1.Id);
@@ -304,12 +315,11 @@ public class CartRepositoryTest
 
         CartRepository cartRep = new(context, connFactory.Object, new KeyedAsyncLock());
         //Act
-        var result = await cartRep.AddAsync(user.Id, 1, 1, CancellationToken.None);
+        var result = await cartRep.AddAsync(user.Id, int.MaxValue, 1, CancellationToken.None);
         Assert.False(result.IsSuccess);
         Assert.Equal(CartError.ProductNotfound, result.Error);
     }
 
-    //Falta decrease limit
     [Fact]
     public async Task DecreaseDecreaseLimit()
     {
@@ -317,9 +327,10 @@ public class CartRepositoryTest
         var connFactory = new Mock<IDbConnectionFactory>();
         User user = CreateUser(context);
 
-        Category category1 = new() { Id = 1, Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", 1000, true);
-        context.Add(category1);
+        Category newCategory = new() { Name = "Electronic", Image = "" };
+        context.Add(newCategory);
+        context.SaveChanges();
+        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", 1000, true);
         context.Add(product1);
 
         Cart currentCart = new()
@@ -330,6 +341,7 @@ public class CartRepositoryTest
                 new CartItem{
                     ProductId = product1.Id,
                     Quantity = 1,
+                    Item = product1
                 }
             ]
         };
@@ -339,6 +351,7 @@ public class CartRepositoryTest
 
 
         CartRepository cartRep = new(context, connFactory.Object, new KeyedAsyncLock());
+        context.ChangeTracker.Clear();
         var result = await cartRep.DecreaseAsync(user.Id, product1.Id);
         Assert.False(result.IsSuccess);
         Assert.Equal(CartError.DecreaseLimit, result.Error);
@@ -347,7 +360,7 @@ public class CartRepositoryTest
     //Common arranges
     private static User CreateUser(GeorgeStoreContext context)
     {
-        User user = new("Jorguito", "jorguito@gmail.com");
+        User user = new($"{Guid.NewGuid()}_TestUser", $"{Guid.NewGuid()}@gmail.com");
         context.Add(user);
         context.SaveChanges();
         return user;
