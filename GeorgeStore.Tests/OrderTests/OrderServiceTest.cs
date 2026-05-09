@@ -26,26 +26,27 @@ public class OrderServiceTest
 
         using var context = ContextHelper.Create();
 
-        var userId = Guid.NewGuid();
+        var user = ContextHelper.CreateUser(context);
+
         var product1 = CreateProduct("Laptop", Product1Price, isActive: true);
         var product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
         var product3 = CreateProduct("Fridge", 1000m, isActive: false);
 
         var order = CreateOrder(
-            userId,
+            user.Id,
             new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
             new OrderDetail { Product = product3, Quantity = 3, UnitPrice = 900m, SubTotal = 2700m }
         );
 
         context.Orders.Add(order);
-        await context.SaveChangesAsync();
+        context.SaveChanges();
 
 
         var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
         //Act
-        var result = await orderService.PreviewReorder(userId, order.Id);
+        var result = await orderService.PreviewReorder(user.Id, order.Id);
 
         //Assert
         Assert.True(result.IsSuccess);
@@ -83,7 +84,7 @@ public class OrderServiceTest
         );
 
         context.Orders.Add(order);
-        await context.SaveChangesAsync();
+        context.SaveChanges();
 
 
         var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
@@ -125,7 +126,7 @@ public class OrderServiceTest
         );
 
         context.Orders.Add(order);
-        await context.SaveChangesAsync();
+        context.SaveChanges();
 
         var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
