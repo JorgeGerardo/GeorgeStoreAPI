@@ -1,6 +1,7 @@
 ﻿using GeorgeStore.Common.Core;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Tests.Common;
+using GeorgeStore.Common.Shared;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -151,7 +152,7 @@ public class AuthServiceTest
 
 
         //Act
-        var result = await authSrv.LogoutAsync(refreshTokenValue);
+        Result result = await authSrv.LogoutAsync(refreshTokenValue);
 
         Assert.True(result.IsSuccess);
         Assert.True(refreshToken.IsRevoked);

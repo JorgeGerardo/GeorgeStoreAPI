@@ -23,12 +23,12 @@ public class TokenServiceTest
         var options = new Mock<IOptionsSnapshot<JWTConfig>>();
         options.Setup(o => o.Value).Returns(config);
 
-        var service = new TokenService(options.Object);
+        TokenService service = new(options.Object);
 
         var userId = Guid.NewGuid();
 
         // Act
-        var result = service.GenerateToken(userId);
+        LoginResponse result = service.GenerateToken(userId);
 
         // Assert
         var handler = new JwtSecurityTokenHandler();

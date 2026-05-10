@@ -2,6 +2,7 @@
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
+using GeorgeStore.Common.Shared;
 using Moq;
 
 namespace GeorgeStore.Tests.PaymentMethodTests;
@@ -15,7 +16,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         PaymentMethodRepository paymentRep = new(context, conn.Object);
         PaymentMethodCreateDto request1 = new("1234123412341234", "Visa", 1, 2030, "J Lopez");
@@ -36,7 +37,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         for (int i = 0; i < PaymentMethodLimits.MaxRegisterPerUser; i++)
         {
             var newPaymentMethod = new PaymentMethod
@@ -58,7 +59,7 @@ public class PaymentMethodRepositoryTest
         PaymentMethodRepository paymentRep = new(context, conn.Object);
         PaymentMethodCreateDto request = new("1234123412341234", "Visa", 1, 2030, "J Lopez");
         //Act
-        var result = await paymentRep.AddAsync(user.Id, request);
+        Result result = await paymentRep.AddAsync(user.Id, request);
 
         Assert.False(result.IsSuccess);
         Assert.Equal(PaymentMethodError.PaymentMethodLimitReached, result.Error);
@@ -71,7 +72,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         var paymentMethod1 = new PaymentMethod
         {
             User = user,
@@ -120,7 +121,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         var paymentMethod1 = new PaymentMethod
         {
             User = user,
@@ -144,7 +145,7 @@ public class PaymentMethodRepositoryTest
         var result = await paymentRep.RemoveAsync(user.Id, paymentMethod1.Id);
         Assert.True(result.IsSuccess);
         Assert.Empty(user.PaymentMethods);
-        var resultInvalidExpected = await paymentRep.RemoveAsync(user.Id, paymentMethod1.Id);
+        Result resultInvalidExpected = await paymentRep.RemoveAsync(user.Id, paymentMethod1.Id);
 
         Assert.False(resultInvalidExpected.IsSuccess);
         Assert.Equal(PaymentMethodError.NotFound, resultInvalidExpected.Error);
@@ -159,7 +160,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         var paymentMethod1 = new PaymentMethod
         {
             User = user,
@@ -221,7 +222,7 @@ public class PaymentMethodRepositoryTest
         using var context = ContextHelper.Create();
         var conn = new Mock<IDbConnectionFactory>();
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
 
         User user2 = new("Carlita", "carlita@gmail.com");
         var paymentMethod1 = new PaymentMethod
@@ -258,7 +259,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         var paymentMethod1 = new PaymentMethod
         {
             User = user,
@@ -319,7 +320,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User user = CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         var paymentMethod1 = new PaymentMethod
         {
             User = user,
@@ -384,7 +385,7 @@ public class PaymentMethodRepositoryTest
         var conn = new Mock<IDbConnectionFactory>();
 
 
-        User userWithoutPM = CreateUser(context);
+        User userWithoutPM = ContextHelper.CreateUser(context);
         User userWithPM = new("Carlita", "carlita@gmail.com");
         var paymentMethod1 = new PaymentMethod
         {
@@ -407,18 +408,9 @@ public class PaymentMethodRepositoryTest
         PaymentMethodRepository paymentRep = new(context, conn.Object);
 
         //Act
-        var result = await paymentRep.SetAsDefaultAsync(userWithoutPM.Id, paymentMethod1.Id);
+        Result result = await paymentRep.SetAsDefaultAsync(userWithoutPM.Id, paymentMethod1.Id);
         Assert.False(result.IsSuccess);
         Assert.Equal(PaymentMethodError.NotFound, result.Error);
-    }
-
-    //Common arranges
-    private static User CreateUser(GeorgeStoreContext context)
-    {
-        User user = new("Jorguito", "jorguito@gmail.com");
-        context.Add(user);
-        context.SaveChanges();
-        return user;
     }
 
 }

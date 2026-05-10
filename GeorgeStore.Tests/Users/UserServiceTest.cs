@@ -22,6 +22,7 @@ public class UserServiceTest
 
         Assert.False(result.IsSuccess);
         Assert.Equal(UserError.Notfound, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
     [Fact]
@@ -37,6 +38,7 @@ public class UserServiceTest
 
         Assert.False(result.IsSuccess);
         Assert.Equal(UserError.Notfound, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
     [Fact]

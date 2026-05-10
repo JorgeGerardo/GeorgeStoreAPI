@@ -1,8 +1,10 @@
 ﻿using GeorgeStore.Common.Core;
 using GeorgeStore.Common.Core.Interfaces;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.Users;
+using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Infrastructure.Email.Brevo;
 using GeorgeStore.Tests.Common;
 using Microsoft.AspNetCore.Identity;
@@ -13,52 +15,48 @@ namespace GeorgeStore.Tests.PasswordRecoveryTests;
 
 public class RecoverPasswordServiceTest
 {
+    private RecoverPasswordService CreateRecoverPasswordService(GeorgeStoreContext context, User user)
+    {
+        UserManager<User> userManager = CreateUserManager(user.Id, user.Email!, user);
+        IOptionsSnapshot<BrevoOptions> brevoOptionsMock = CreateBrevoOptionsMock();
+        IOptionsSnapshot<JWTConfig> iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
+        IEmailSender emailSender = CreateEmailSender();
+        return new(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
+
+    }
     [Fact]
     public async Task SendRecoverEmailTest()
     {
-        Guid userId = Guid.NewGuid();
-        const string email = "jorguito@gmail.com";
         using var context = ContextHelper.Create();
-        var emailSender = CreateEmailSender();
-
-        var userManager = CreateUserManager(userId, email, null);
-        var brevoOptionsMock = CreateBrevoOptionsMock();
-        var iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
-
-        var recoverPasswordSvc = new RecoverPasswordService(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
-        var request = new RecoverPassowrdDto(email);
+        User user = ContextHelper.CreateUser(context);
+        RecoverPasswordService recoverPasswordSvc = CreateRecoverPasswordService(context, user);
+        RecoverPassowrdDto request = new(user.Email!);
 
         //Act
         await recoverPasswordSvc.SendRecoverEmailAsync(request, null, null);
-        var tokenEntity = context.PasswordResetTokens.FirstOrDefault();
+        PasswordRecoverToken? tokenEntity = context.PasswordResetTokens.FirstOrDefault(t => t.UserId == user.Id);
+
 
         Assert.NotNull(tokenEntity);
-        Assert.Equal(userId, tokenEntity.UserId);
+        Assert.Equal(user.Id, tokenEntity.UserId);
     }
 
     [Fact]
     public async Task RecoverTest()
     {
         using var context = ContextHelper.Create();
-
-        Guid userId = Guid.NewGuid();
         const string newPassword = "NewPassword123";
         string newPasswordHash = newPassword.GetHash().GetHashString();
         const string oldPassword = "Password329%923&";
         const string email = "jorguito@gmail.com";
 
-        User user = new User("Jorguito88", email);
-        user.PasswordHash = oldPassword.GetHash().GetHashString();
+        User user = new User("Jorguito88", email) 
+            { PasswordHash = oldPassword.GetHash().GetHashString() };
         context.Users.Add(user);
         context.SaveChanges();
 
 
-        var userManager = CreateUserManager(userId, email, user);
-        var brevoOptionsMock = CreateBrevoOptionsMock();
-        var iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
-        var emailSender = CreateEmailSender();
-
-        var recoverPasswordSvc = new RecoverPasswordService(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
+        RecoverPasswordService recoverPasswordSvc = CreateRecoverPasswordService(context, user);
 
 
 
@@ -68,7 +66,7 @@ public class RecoverPasswordServiceTest
         {
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddMinutes(10),
-            UserId = userId,
+            UserId = user.Id,
             TokenHash = recoverToken.GetHash().GetHashString()
         };
         context.PasswordResetTokens.Add(tokenRecoverToken);
@@ -77,7 +75,7 @@ public class RecoverPasswordServiceTest
         var tokenEntity = context.PasswordResetTokens.FirstOrDefault();
 
         Assert.NotNull(tokenEntity);
-        Assert.Equal(userId, tokenEntity.UserId);
+        Assert.Equal(user.Id, tokenEntity.UserId);
         var result = await recoverPasswordSvc.RecoverAsync(recoverToken, newPassword);
         Assert.True(result.IsSuccess);
 
@@ -92,20 +90,11 @@ public class RecoverPasswordServiceTest
     {
         using var context = ContextHelper.Create();
 
-        Guid userId = Guid.NewGuid();
-        const string email = "jorguito@gmail.com";
-
-        var userManager = CreateUserManager(userId, email, null);
-        var brevoOptionsMock = CreateBrevoOptionsMock();
-        var iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
-        var emailSender = CreateEmailSender();
-
-        var recoverPasswordSvc = new RecoverPasswordService(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
-
-
+        User user = ContextHelper.CreateUser(context);
+        RecoverPasswordService recoverPasswordSvc = CreateRecoverPasswordService(context, user);
 
         //Act
-        var result = await recoverPasswordSvc.RecoverAsync("FakeRefreshToken", "new password123");
+        Result result = await recoverPasswordSvc.RecoverAsync("FakeRefreshToken", "new password123");
         Assert.False(result.IsSuccess);
         Assert.Equal(PasswordRecoverTokenError.NotFound, result.Error);
     }
@@ -114,22 +103,15 @@ public class RecoverPasswordServiceTest
     public async Task Recover_Failure_TokenExpired()
     {
         using var context = ContextHelper.Create();
+        User user = ContextHelper.CreateUser(context);
+        RecoverPasswordService recoverPasswordSvc = CreateRecoverPasswordService(context, user);
 
-        Guid userId = Guid.NewGuid();
-        const string email = "jorguito@gmail.com";
-
-        var userManager = CreateUserManager(userId, email, null);
-        var brevoOptionsMock = CreateBrevoOptionsMock();
-        var iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
-        var emailSender = CreateEmailSender();
-
-        var recoverPasswordSvc = new RecoverPasswordService(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
         string recoverToken = Guid.NewGuid().ToString();
         PasswordRecoverToken tokenRecoverToken = new()
         {
             CreatedAt = DateTime.UtcNow.AddMinutes(-20),
             ExpiresAt = DateTime.UtcNow.AddMinutes(-15),
-            UserId = userId,
+            UserId = user.Id,
             TokenHash = recoverToken.GetHash().GetHashString()
         };
         context.PasswordResetTokens.Add(tokenRecoverToken);
@@ -138,7 +120,9 @@ public class RecoverPasswordServiceTest
 
 
         //Act
-        var result = await recoverPasswordSvc.RecoverAsync(recoverToken, "new password123");
+        Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, "new password123");
+
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(PasswordRecoverTokenError.TokenExpired, result.Error);
     }
@@ -147,22 +131,15 @@ public class RecoverPasswordServiceTest
     public async Task Recover_Failure_TokenUsed()
     {
         using var context = ContextHelper.Create();
+        User user = ContextHelper.CreateUser(context);
 
-        Guid userId = Guid.NewGuid();
-        const string email = "jorguito@gmail.com";
-
-        var userManager = CreateUserManager(userId, email, null);
-        var brevoOptionsMock = CreateBrevoOptionsMock();
-        var iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
-        var emailSender = CreateEmailSender();
-
-        var recoverPasswordSvc = new RecoverPasswordService(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
+        RecoverPasswordService recoverPasswordSvc = CreateRecoverPasswordService(context, user);
         string recoverToken = Guid.NewGuid().ToString();
         PasswordRecoverToken tokenRecoverToken = new()
         {
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddMinutes(10),
-            UserId = userId,
+            UserId = user.Id,
             TokenHash = recoverToken.GetHash().GetHashString(),
             IsUsed = true
         };
@@ -172,12 +149,14 @@ public class RecoverPasswordServiceTest
 
 
         //Act
-        var result = await recoverPasswordSvc.RecoverAsync(recoverToken, "new password123");
+        Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, "new password123");
+
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(PasswordRecoverTokenError.TokenUsed, result.Error);
     }
 
-    [Fact]
+    [Fact] //TODO: Pending
     public async Task Recover_Failure_UserNotFound()
     {
         using var context = ContextHelper.Create();
@@ -223,13 +202,11 @@ public class RecoverPasswordServiceTest
         context.SaveChanges();
 
         //Act
-        var result = await recoverPasswordSvc.RecoverAsync(recoverToken, newPassword);
+        Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, newPassword);
         Assert.False(result.IsSuccess);
         Assert.Equal(PasswordRecoverTokenError.UserNotFound, result.Error);
     }
 
-
-    //Common-arranges
     private static IEmailSender CreateEmailSender()
     {
         var emailSender = new Mock<IEmailSender>();

@@ -4,6 +4,7 @@ using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
+using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
 using Microsoft.EntityFrameworkCore;
@@ -13,37 +14,35 @@ namespace GeorgeStore.Tests.OrderTests;
 
 public class OrderServiceTest
 {
+
     [Theory]  //P1 $,    Qty,P2 $, Qty Total
     [InlineData(10_000.0, 2, 500.0, 5, 22_500.0)]
     [InlineData(6_000.0,  5, 500.0, 5, 32_500.0)]
     public async Task PreviewReorder_Success(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
     {
-        var subP1 = Product1Price * QtyP1;
-        var subP2 = Product2Price * QtyP2;
+        decimal subP1 = Product1Price * QtyP1;
+        decimal subP2 = Product2Price * QtyP2;
+
         // Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        var locker = new KeyedAsyncLock();
-
         using var context = ContextHelper.Create();
+        OrderService orderService = CreateOrderService(context);
+        User user = ContextHelper.CreateUser(context);
 
-        var user = ContextHelper.CreateUser(context);
+        Product product1 = CreateProduct("Laptop", Product1Price, isActive: true);
+        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
+        Product product3 = CreateProduct("Fridge", 1000m, isActive: false);
 
-        var product1 = CreateProduct("Laptop", Product1Price, isActive: true);
-        var product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
-        var product3 = CreateProduct("Fridge", 1000m, isActive: false);
-
-        var order = CreateOrder(
+        Order order = CreateOrder(
             user.Id,
-            new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
-            new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
-            new OrderDetail { Product = product3, Quantity = 3, UnitPrice = 900m, SubTotal = 2700m }
+            CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
+            CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
+            CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
         context.Orders.Add(order);
         context.SaveChanges();
 
 
-        var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
         //Act
         var result = await orderService.PreviewReorder(user.Id, order.Id);
@@ -67,27 +66,25 @@ public class OrderServiceTest
     public async Task PreviewReorder_Success_When_InvalidProducts_Are_In(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
     {
         // Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        var locker = new KeyedAsyncLock();
         using var context = ContextHelper.Create();
+        OrderService orderService = CreateOrderService(context);
 
         var user = ContextHelper.CreateUser(context);
-        var product1 = CreateProduct("Laptop", Product1Price, isActive: true);
-        var product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
-        var product3 = CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1 = CreateProduct("Laptop", Product1Price, isActive: true);
+        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
+        Product product3 = CreateProduct("Fridge", 1000m, isActive: false);
 
         var order = CreateOrder(
             user.Id,
-            new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
-            new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
-            new OrderDetail { Product = product3, Quantity = 3, UnitPrice = 900m, SubTotal = 2700m }
+            CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
+            CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
+            CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
         context.Orders.Add(order);
         context.SaveChanges();
 
 
-        var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
         //Act
         var result = await orderService.PreviewReorder(user.Id, order.Id);
@@ -107,28 +104,24 @@ public class OrderServiceTest
     public async Task PreviewReorder_Failure_When_Order_HasNotHaveActiveProducts()
     {
         // Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        var locker = new KeyedAsyncLock();
         using var context = ContextHelper.Create();
+        OrderService orderService = CreateOrderService(context);
 
-        var user = ContextHelper.CreateUser(context);
-        var product1 = CreateProduct("Laptop",      1321m,  isActive: false);
-        var product2 = CreateProduct("Smarthphone", 31232m, isActive: false);
-        var product3 = CreateProduct("Fridge",      1000m,  isActive: false);
-        context.AddRange([product1, product2, product3]);
-        context.SaveChanges();
+        User user = ContextHelper.CreateUser(context);
+        Product product1 = CreateProduct("Laptop",      1321m,  isActive: false);
+        Product product2 = CreateProduct("Smarthphone", 31232m, isActive: false);
+        Product product3 = CreateProduct("Fridge",      1000m,  isActive: false);
 
         var order = CreateOrder(
             user.Id,
-            new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m },
-            new OrderDetail { Product = product2, Quantity = 1, UnitPrice = 4500m, SubTotal = 4500m },
-            new OrderDetail { Product = product3, Quantity = 3, UnitPrice = 900m, SubTotal = 2700m }
+            CreateOrderDetail(product1, 1, 8000m, 16_000m),
+            CreateOrderDetail(product2, 1, 4500m, 4500m),
+            CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
-        context.Orders.Add(order);
+        context.AddRange([order, product1, product2, product3]);
         context.SaveChanges();
 
-        var orderService = new OrderService(connectionFactoryMock.Object, context, locker);
 
         //Act
         var result = await orderService.PreviewReorder(user.Id, order.Id);
@@ -136,6 +129,7 @@ public class OrderServiceTest
         //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(OrderError.NoValidItems, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
 
@@ -145,12 +139,12 @@ public class OrderServiceTest
     public async Task Reorder_WithOneInvalidProduct(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
     {
         //Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
+        OrderService orderSvc = CreateOrderService(context);
 
-        var subP1 = Product1Price * QtyP1;
-        var subP2 = Product2Price * QtyP2;
-        var user = ContextHelper.CreateUser(context);
+        decimal subP1 = Product1Price * QtyP1;
+        decimal subP2 = Product2Price * QtyP2;
+        User user = ContextHelper.CreateUser(context);
         Address address = CreateAddress(user.Id, "Work", false);
 
         var result = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
@@ -158,11 +152,11 @@ public class OrderServiceTest
         PaymentMethod paymentM = result.Value;
 
 
-        var product1  = CreateProduct("Laptop", Product1Price, isActive: true);
-        var product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
-        var product3 = CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1  = CreateProduct("Laptop", Product1Price, isActive: true);
+        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
+        Product product3 = CreateProduct("Fridge", 1000m, isActive: false);
 
-        var order = CreateOrder(
+        Order order = CreateOrder(
             user.Id,
             new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
@@ -177,10 +171,9 @@ public class OrderServiceTest
 
         //Act
         context.ChangeTracker.Clear();
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var request = new ReorderRequest(order.Id, address.Id, paymentM.Id);
+        ReorderRequest request = new(order.Id, address.Id, paymentM.Id);
         var orderResult = await orderSvc.ReorderAsync(user.Id, request);
-        var orderCreated = context.Orders.Include(p => p.Details)
+        Order? orderCreated = context.Orders.Include(p => p.Details)
                                          .ThenInclude(d => d.Product)
                                          .FirstOrDefault(o => o.Id == orderResult.Value);
 
@@ -189,8 +182,8 @@ public class OrderServiceTest
         Assert.Equal(Total, orderCreated.Total);
         Assert.Equal(2, orderCreated.Details.Count);
 
-        var subtotal1 = orderCreated.Details.First(i => i.ProductId == product1.Id).SubTotal;
-        var subtotal2 = orderCreated.Details.First(i => i.ProductId == product2.Id).SubTotal;
+        decimal subtotal1 = orderCreated.Details.First(i => i.ProductId == product1.Id).SubTotal;
+        decimal subtotal2 = orderCreated.Details.First(i => i.ProductId == product2.Id).SubTotal;
         Assert.Equal(subP1, subtotal1);
         Assert.Equal(subP2, subtotal2);
 
@@ -202,91 +195,21 @@ public class OrderServiceTest
     public async Task Purchase(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
     {
         //Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
+        OrderService orderSvc = CreateOrderService(context);
 
-        var subP1 = Product1Price * QtyP1;
-        var subP2 = Product2Price * QtyP2;
-        var user = ContextHelper.CreateUser(context);
+        decimal subP1 = Product1Price * QtyP1;
+        decimal subP2 = Product2Price * QtyP2;
+        User user = ContextHelper.CreateUser(context);
         Address address = CreateAddress(user.Id, "Work", false);
 
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         PaymentMethod paymentM = pmResult.Value;
 
-        context.Addresses.Add(address);
-        context.PaymentMethods.Add(paymentM);
-        context.SaveChanges();
 
-
-        var product1 = CreateProduct("Laptop Asus", Product1Price);
-        var product2 = CreateProduct("Smarthphone", Product2Price);
-        context.Products.AddRange(product1, product2);
-        context.SaveChanges();
-
-
-        var activeCart = Cart.Create(user.Id);
-        activeCart.Items = [
-            new CartItem{
-                ProductId = product1.Id,
-                Quantity = QtyP1
-            },
-            new CartItem{
-                ProductId = product2.Id,
-                Quantity = QtyP2
-            },
-        ];
-        context.Carts.Add(activeCart);
-        context.SaveChanges();
-
-        //Act
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var result = await orderSvc.Purchase(user.Id, activeCart.Id, address.Id, paymentM.Id);
-        int orderId = result.Value;
-
-        //Assert
-        Assert.True(result.IsSuccess);
-        var order = context.Orders.Include(o => o.Details).FirstOrDefault(o => o.Id == orderId);
-        Assert.NotNull(order);
-        Assert.Equal(Total, order.Total);
-
-        var detailProduct1 = order.Details.FirstOrDefault(o => o.ProductId == product1.Id);
-        Assert.NotNull(detailProduct1);
-        Assert.Equal(subP1, detailProduct1.SubTotal);
-        
-        var detailProduct2 = order.Details.FirstOrDefault(o => o.ProductId == product2.Id);
-        Assert.NotNull(detailProduct2);
-        Assert.Equal(subP2, detailProduct2.SubTotal);
-        Assert.Equal(CartStatus.Converted, activeCart.Status);
-
-    }
-
-
-    [Theory]  //P1 $,    Qty,P2 $, Qty Total
-    [InlineData(10_000.0, 2, 500.0, 5, 20_000.0)]
-    [InlineData(6_000.0,  5, 500.0, 5, 30_000.0)]
-    public async Task Purchase_WithProductsInactive(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
-    {
-        //Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        using var context = ContextHelper.Create();
-
-        var subP1 = Product1Price * QtyP1;
-        var subP2 = Product2Price * QtyP2;
-        var user = ContextHelper.CreateUser(context);
-        Address address = CreateAddress(user.Id, "Work", false);
-
-        var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
-        Assert.True(pmResult.IsSuccess);
-        PaymentMethod paymentM = pmResult.Value;
-
-        context.Addresses.Add(address);
-        context.PaymentMethods.Add(paymentM);
-        context.SaveChanges();
-
-
-        var product1 = CreateProduct("Laptop Asus", Product1Price);
-        var product2 = CreateProduct("Smarthphone", Product2Price, isActive: false);
+        Product product1 = CreateProduct("Laptop Asus", Product1Price);
+        Product product2 = CreateProduct("Smarthphone", Product2Price);
         context.Products.AddRange(product1, product2);
         context.SaveChanges();
 
@@ -301,29 +224,87 @@ public class OrderServiceTest
             new CartItem{
                 ProductId = product2.Id,
                 Quantity = QtyP2,
-                Item = product2,
+                Item = product2
             },
         ];
-        context.Carts.Add(activeCart);
+        context.AddRange([activeCart, address, paymentM]);
         context.SaveChanges();
 
         //Act
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var result = await orderSvc.Purchase(user.Id, activeCart.Id, address.Id, paymentM.Id);
         int orderId = result.Value;
 
         //Assert
         Assert.True(result.IsSuccess);
-        var order = context.Orders.Include(o => o.Details).FirstOrDefault(o => o.Id == orderId);
+        Order? order = context.Orders.Include(o => o.Details).FirstOrDefault(o => o.Id == orderId);
         Assert.NotNull(order);
         Assert.Equal(Total, order.Total);
 
-        var detailProduct1 = order.Details.FirstOrDefault(o => o.ProductId == product1.Id);
-        Assert.NotNull(detailProduct1);
-        Assert.Equal(subP1, detailProduct1.SubTotal);
+        var orderDetailP1 = order.Details.FirstOrDefault(o => o.ProductId == product1.Id);
+        Assert.NotNull(orderDetailP1);
+        Assert.Equal(subP1, orderDetailP1.SubTotal);
         
-        var detailProduct2 = order.Details.FirstOrDefault(o => o.ProductId == product2.Id);
-        Assert.Null(detailProduct2);
+        var orderDetailP2 = order.Details.FirstOrDefault(o => o.ProductId == product2.Id);
+        Assert.NotNull(orderDetailP2);
+        Assert.Equal(subP2, orderDetailP2.SubTotal);
+        Assert.Equal(CartStatus.Converted, activeCart.Status);
+
+    }
+
+
+    [Theory]  //P1 $,    Qty,P2 $, Qty Total
+    [InlineData(10_000.0, 2, 500.0, 5, 20_000.0)]
+    [InlineData(6_000.0,  5, 500.0, 5, 30_000.0)]
+    public async Task Purchase_WithProductsInactive(decimal Product1Price, int QtyP1, decimal Product2Price, int QtyP2, decimal Total)
+    {
+        //Arrange
+        using var context = ContextHelper.Create();
+        OrderService orderSvc = CreateOrderService(context);
+
+        decimal subP1 = Product1Price * QtyP1;
+        decimal subP2 = Product2Price * QtyP2;
+        User user = ContextHelper.CreateUser(context);
+
+        var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "Visa", 1, 2030, "Sofia L.");
+        Assert.True(pmResult.IsSuccess);
+
+        Address address = CreateAddress(user.Id, "Work", false);
+        PaymentMethod paymentM = pmResult.Value;
+        Product product1 = CreateProduct("Laptop Asus", Product1Price);
+        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: false);
+
+        Cart activeCart = Cart.Create(user.Id);
+        activeCart.Items = [
+            new CartItem{
+                ProductId = product1.Id,
+                Quantity = QtyP1,
+                Item = product1,
+            },
+            new CartItem{
+                ProductId = product2.Id,
+                Quantity = QtyP2,
+                Item = product2,
+            },
+        ];
+        context.AddRange([activeCart, product1, product2, address, paymentM]);
+        context.SaveChanges();
+
+        //Act
+        var result = await orderSvc.Purchase(user.Id, activeCart.Id, address.Id, paymentM.Id);
+        int orderId = result.Value;
+
+        //Assert
+        Assert.True(result.IsSuccess);
+        Order? order = context.Orders.Include(o => o.Details).FirstOrDefault(o => o.Id == orderId);
+        Assert.NotNull(order);
+        Assert.Equal(Total, order.Total);
+
+        OrderDetail? orderDetailP1 = order.Details.FirstOrDefault(o => o.ProductId == product1.Id);
+        Assert.NotNull(orderDetailP1);
+        Assert.Equal(subP1, orderDetailP1.SubTotal);
+
+        OrderDetail? orderDetailP2 = order.Details.FirstOrDefault(o => o.ProductId == product2.Id);
+        Assert.Null(orderDetailP2);
         Assert.Equal(CartStatus.Converted, activeCart.Status);
 
     }
@@ -333,41 +314,36 @@ public class OrderServiceTest
     public async Task Purchase_Failure_AddressNotFound()
     {
         //Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        var user = ContextHelper.CreateUser(context);
+        OrderService orderSvc = CreateOrderService(context);
+        User user = ContextHelper.CreateUser(context);
 
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
+        
         PaymentMethod paymentM = pmResult.Value;
-
-        context.PaymentMethods.Add(paymentM);
-        context.SaveChanges();
-
-
-        var product1 = CreateProduct("Laptop Asus", 1000m);
-        var product2 = CreateProduct("Smarthphone", 2000m);
-        context.Products.AddRange(product1, product2);
-        context.SaveChanges();
+        Product product1 = CreateProduct("Laptop Asus", 1000m);
+        Product product2 = CreateProduct("Smarthphone", 2000m);
 
 
-        var newCart = Cart.Create(user.Id);
+        Cart newCart = Cart.Create(user.Id);
         newCart.Items = [
             new CartItem{
                 ProductId = product1.Id,
-                Quantity = 1
+                Quantity = 1,
+                Item = product1,
             },
         ];
-        context.Carts.Add(newCart);
+        context.AddRange([newCart, product1, product2, paymentM]);
         context.SaveChanges();
 
         //Act
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var result = await orderSvc.Purchase(user.Id, newCart.Id, 2, paymentM.Id);
 
         //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(OrderError.AddressNotFound, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
 
@@ -375,38 +351,31 @@ public class OrderServiceTest
     public async Task Purchase_Failure_PaymentMethodNotFound()
     {
         //Arrange
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        var user = ContextHelper.CreateUser(context);
+        User user = ContextHelper.CreateUser(context);
         Address address = CreateAddress(user.Id, "Work", false);
-        context.Addresses.Add(address);
-        context.SaveChanges();
+        OrderService orderSvc = CreateOrderService(context);
+        Product product1 = CreateProduct("Laptop Asus", 1000m);
+        Product product2 = CreateProduct("Smarthphone", 2000m);
 
-
-
-        var product1 = CreateProduct("Laptop Asus", 1000m);
-        var product2 = CreateProduct("Smarthphone", 2000m);
-        context.Products.AddRange(product1, product2);
-        context.SaveChanges();
-
-
-        var newCart = Cart.Create(user.Id);
+        Cart newCart = Cart.Create(user.Id);
         newCart.Items = [
             new CartItem{
                 ProductId = product1.Id,
-                Quantity = 1
+                Quantity = 1,
+                Item = product1,
             },
         ];
-        context.Carts.Add(newCart);
+        context.AddRange([newCart, product1, product2, address]);
         context.SaveChanges();
 
         //Act
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         var result = await orderSvc.Purchase(user.Id, newCart.Id, address.Id, 1);
 
         //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(OrderError.PaymentMethodNotFound, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
 
@@ -414,18 +383,18 @@ public class OrderServiceTest
     [Fact]
     public async Task Reorder_Failure_AddressNotFound()
     {
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
+        //var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        var user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var product1 = CreateProduct("Laptop", 30123m, isActive: true);
+        User user = ContextHelper.CreateUser(context);
+        OrderService orderSvc = CreateOrderService(context);
+        Product product1 = CreateProduct("Laptop", 30123m, isActive: true);
 
-        var order = CreateOrder(
+        Order order = CreateOrder(
             user.Id,
             new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
 
-        context.Orders.Add(order); 
+        context.Add(order); 
         context.SaveChanges();
 
 
@@ -433,23 +402,20 @@ public class OrderServiceTest
 
         //act
         var result = await orderSvc.ReorderAsync(user.Id, request);
-
-
         Assert.False(result.IsSuccess);
         Assert.Equal(OrderError.AddressNotFound, result.Error);
-
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
     [Fact]
     public async Task Reorder_Failure_PaymentMethodNotFound()
     {
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        var user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-        var newProduct = CreateProduct("Laptop", 30123m, isActive: true);
+        User user = ContextHelper.CreateUser(context);
+        OrderService orderSvc = CreateOrderService(context);
+        Product newProduct = CreateProduct("Laptop", 30123m, isActive: true);
 
-        var order = CreateOrder(
+        Order order = CreateOrder(
             user.Id,
             new OrderDetail { Product = newProduct, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
@@ -457,17 +423,14 @@ public class OrderServiceTest
         Address address = CreateAddress(user.Id, "Work", false);
         context.AddRange(address, order);
         context.SaveChanges();
-
-
         ReorderRequest request = new(order.Id, address.Id, 1);
+
 
         //act
         var result = await orderSvc.ReorderAsync(user.Id, request);
-
-
         Assert.False(result.IsSuccess);
         Assert.Equal(PaymentMethodError.NotFound, result.Error);
-
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
     [Fact]
@@ -475,20 +438,39 @@ public class OrderServiceTest
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
-        Guid userId = Guid.NewGuid();
+        User user = ContextHelper.CreateUser(context);
         OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
         ReorderRequest request = new(1, 1, 1);
 
         //act
-        var result = await orderSvc.ReorderAsync(userId, request);
+        var result = await orderSvc.ReorderAsync(user.Id, request);
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OrderError.Notfound, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
 
 
     //Common Arranges:
+    private OrderService CreateOrderService(GeorgeStoreContext context)
+    {
+        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
+        return new OrderService(connectionFactoryMock.Object, context, new KeyedAsyncLock());
+
+    }
+
+    private OrderDetail CreateOrderDetail(Product product, int qty, decimal unitPrice, decimal subTotal)
+    {
+        return new OrderDetail
+        {
+            Product = product,
+            Quantity = qty,
+            UnitPrice = unitPrice,
+            SubTotal = subTotal
+        };
+    }
+
     private static Product CreateProduct(string name, decimal price, bool isActive = true)
     {
         return new Product

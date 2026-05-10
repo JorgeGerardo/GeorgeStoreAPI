@@ -2,6 +2,7 @@
 using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
+using GeorgeStore.Common.Shared;
 using Moq;
 
 namespace GeorgeStore.Tests.ProductTests;
@@ -63,6 +64,8 @@ public class ProductRepositoryTest
         var result = await productRep.GetByIdAsync(product1.Id);
         Assert.False(result.IsSuccess);
         Assert.Equal(ProductError.Notfound, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
+
     }
 
     [Fact]
@@ -81,8 +84,8 @@ public class ProductRepositoryTest
 
         //Act
         ProductRepository productRep = new(connFactory.Object, context);
-        var result1 = await productRep.ExistAsync(product1.Id);
-        var result2 = await productRep.ExistAsync(product2.Id);
+        bool result1 = await productRep.ExistAsync(product1.Id);
+        bool result2 = await productRep.ExistAsync(product2.Id);
         Assert.True(result1);
         Assert.False(result2);
     }
@@ -127,7 +130,7 @@ public class ProductRepositoryTest
 
         //Act
         ProductRepository productRep = new(connFactory.Object, context);
-        var result = await productRep.RemoveAsync(int.MaxValue);
+        Result result = await productRep.RemoveAsync(int.MaxValue);
 
         Assert.False(result.IsSuccess);
         Assert.Equal(ProductError.Notfound, result.Error);

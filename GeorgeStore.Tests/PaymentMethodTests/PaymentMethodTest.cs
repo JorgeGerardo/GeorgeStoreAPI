@@ -24,7 +24,7 @@ public class PaymentMethodTest
         // Assert
         Assert.True(result.IsSuccess);
 
-        var method = result.Value;
+        PaymentMethod? method = result.Value;
 
         Assert.Equal(userId, method.UserId);
         Assert.Equal("5678", method.LastDigits);
@@ -51,7 +51,7 @@ public class PaymentMethodTest
         Assert.False(result.IsSuccess);
         Assert.IsType<Error>(result.Error);
         Assert.Equal(PaymentMethodError.InvalidExpYear, result.Error);
-
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
     [Fact]
@@ -73,6 +73,7 @@ public class PaymentMethodTest
         Assert.False(result.IsSuccess);
         Assert.IsType<Error>(result.Error);
         Assert.Equal(PaymentMethodError.InvalidCardNumber, result.Error);
+        Assert.Throws<InvalidOperationException>(() => _ = result.Value);
 
     }
 
