@@ -6,7 +6,7 @@ using Moq;
 
 namespace GeorgeStore.Tests.Users;
 
-public class UserServiceTest
+public class UserServiceTests
 {
     [Fact]
     public async Task Login_Failure_UserNotFound()
@@ -24,7 +24,7 @@ public class UserServiceTest
         Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
-    [Fact]//TODO: Pending
+    [Fact]
     public async Task Login_Failure_InvalidCredentials()
     {
         using var context = ContextHelper.Create();

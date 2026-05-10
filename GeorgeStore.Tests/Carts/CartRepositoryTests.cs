@@ -9,7 +9,7 @@ using Moq;
 
 namespace GeorgeStore.Tests.CartTests;
 
-public class CartRepositoryTest
+public class CartRepositoryTests
 {
     [Fact]
     public async Task Get_CartNotExist()

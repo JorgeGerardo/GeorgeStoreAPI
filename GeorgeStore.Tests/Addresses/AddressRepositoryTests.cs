@@ -6,9 +6,9 @@ using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
 using Moq;
 
-namespace GeorgeStore.Tests.AddressTests;
+namespace GeorgeStore.Tests.Addresses;
 
-public class AddressRepositoryTest
+public class AddressRepositoryTests
 {
     [Fact]
     public async Task SetAsDefaultTest()

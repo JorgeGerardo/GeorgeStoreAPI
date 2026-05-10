@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace GeorgeStore.Tests.PasswordRecoveryTests;
+namespace GeorgeStore.Tests.PasswordRecoveries;
 
-public class RecoverPasswordServiceTest
+public class RecoverPasswordServiceTests
 {
     [Fact]
     public async Task SendRecoverEmailTest()

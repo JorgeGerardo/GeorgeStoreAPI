@@ -1,9 +1,9 @@
 ﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.PaymentMethods;
 
-namespace GeorgeStore.Tests.PaymentMethodTests;
+namespace GeorgeStore.Tests.PaymentMethods;
 
-public class PaymentMethodTest
+public class PaymentMethodTests
 {
     [Fact]
     public void Create_ShouldReturnSuccess()

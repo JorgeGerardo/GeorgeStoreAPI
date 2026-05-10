@@ -5,9 +5,9 @@ using GeorgeStore.Tests.Common;
 using GeorgeStore.Common.Shared;
 using Moq;
 
-namespace GeorgeStore.Tests.ProductTests;
+namespace GeorgeStore.Tests.Products;
 
-public class ProductRepositoryTest
+public class ProductRepositoryTests
 {
     [Fact]
     public async Task CreateTest()

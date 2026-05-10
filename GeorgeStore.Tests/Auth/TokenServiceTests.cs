@@ -3,9 +3,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace GeorgeStore.Tests.AuthTests;
+namespace GeorgeStore.Tests.Auth;
 
-public class TokenServiceTest
+public class TokenServiceTests
 {
     [Fact]
     public void GenerateToken_ShouldContainUserIdClaim()

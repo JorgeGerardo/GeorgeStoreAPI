@@ -10,9 +10,9 @@ using GeorgeStore.Tests.Common;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace GeorgeStore.Tests.OrderTests;
+namespace GeorgeStore.Tests.Orders;
 
-public class OrderServiceTest
+public class OrderServiceTests
 {
 
     [Theory]  //P1 $,    Qty,P2 $, Qty Total

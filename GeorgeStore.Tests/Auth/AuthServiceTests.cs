@@ -5,9 +5,9 @@ using GeorgeStore.Common.Shared;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace GeorgeStore.Tests.AuthTests;
+namespace GeorgeStore.Tests.Auth;
 
-public class AuthServiceTest
+public class AuthServiceTests
 {
     [Fact]
     public async Task LoginTest()

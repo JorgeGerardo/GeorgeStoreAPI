@@ -5,9 +5,9 @@ using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
 using Moq;
 
-namespace GeorgeStore.Tests.PaymentMethodTests;
+namespace GeorgeStore.Tests.PaymentMethods;
 
-public class PaymentMethodRepositoryTest
+public class PaymentMethodRepositoryTests
 {
     [Fact]
     public async Task AddTest()
