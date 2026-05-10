@@ -6,7 +6,7 @@ namespace GeorgeStore.Tests.PaymentMethodTests;
 public class PaymentMethodTest
 {
     [Fact]
-    public void Create_ShouldReturnSuccess_WhenDataIsValid()
+    public void Create_ShouldReturnSuccess()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -23,9 +23,7 @@ public class PaymentMethodTest
 
         // Assert
         Assert.True(result.IsSuccess);
-
         PaymentMethod? method = result.Value;
-
         Assert.Equal(userId, method.UserId);
         Assert.Equal("5678", method.LastDigits);
         Assert.Equal("VISA", method.Brand);
@@ -47,7 +45,7 @@ public class PaymentMethodTest
             2500,
             "John Doe"
         );
-
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.IsType<Error>(result.Error);
         Assert.Equal(PaymentMethodError.InvalidExpYear, result.Error);
@@ -69,7 +67,7 @@ public class PaymentMethodTest
             2030,
             "John Doe"
         );
-
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.IsType<Error>(result.Error);
         Assert.Equal(PaymentMethodError.InvalidCardNumber, result.Error);
