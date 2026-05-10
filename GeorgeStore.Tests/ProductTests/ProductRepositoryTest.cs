@@ -13,13 +13,12 @@ public class ProductRepositoryTest
     public async Task CreateTest()
     {
         using var context = ContextHelper.Create();
-        var connFactory = new Mock<IDbConnectionFactory>();
-
+        ProductRepository productRep = CreateRepository(context);
         ProductCreateDTO request = new("Pixel 10", 3200m, "", "", 1);
-        ProductRepository productRep = new(connFactory.Object, context);
 
         //Act
-        var result = await productRep.CreateAsync(request);
+        Result result = await productRep.CreateAsync(request);
+        //Assert
         Assert.True(result.IsSuccess);
     }
 
@@ -27,21 +26,15 @@ public class ProductRepositoryTest
     public async Task GetByIdTest()
     {
         using var context = ContextHelper.Create();
-        var connFactory = new Mock<IDbConnectionFactory>();
-        Category category1 = new() { Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", 1000, true);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", 1, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", 1, "", 8000, true);
-
-        context.Categories.Add(category1);
-        context.Products.AddRange([product1, product2, product3, product4]);
+        ProductRepository productRep = CreateRepository(context);
+        Category category = CreateRandomCategory(context);
+        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, true);
+        context.Products.Add(product1);
         context.SaveChanges();
-        ProductRepository productRep = new(connFactory.Object, context);
-
 
         //Act
         var result = await productRep.GetByIdAsync(product1.Id);
+        //Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(product1.Name, result.Value.Name);
     }
@@ -51,41 +44,37 @@ public class ProductRepositoryTest
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        Category category1 = new() { Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", 1000, false);
-
-        context.Categories.Add(category1);
+        Category category = CreateRandomCategory(context);
+        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, false);
         context.Products.Add(product1);
         context.SaveChanges();
-
 
         //Act
         ProductRepository productRep = new(connFactory.Object, context);
         var result = await productRep.GetByIdAsync(product1.Id);
+
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(ProductError.Notfound, result.Error);
         Assert.Throws<InvalidOperationException>(() => _ = result.Value);
-
     }
 
     [Fact]
     public async Task Exist_False_and_True_Test()
     {
         using var context = ContextHelper.Create();
-        var connFactory = new Mock<IDbConnectionFactory>();
-        Category category1 = new() { Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", 1000, true);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, false);
-
-        context.Categories.Add(category1);
+        ProductRepository productRep = CreateRepository(context);
+        Category category = CreateRandomCategory(context);
+        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, true);
+        Product product2 = Product.Create("Galaxy S26", "description", category.Id, "", 3000, false);
         context.Products.AddRange([product1, product2]);
         context.SaveChanges();
 
-
         //Act
-        ProductRepository productRep = new(connFactory.Object, context);
         bool result1 = await productRep.ExistAsync(product1.Id);
         bool result2 = await productRep.ExistAsync(product2.Id);
+
+        //Assert
         Assert.True(result1);
         Assert.False(result2);
     }
@@ -94,30 +83,27 @@ public class ProductRepositoryTest
     public async Task RemoveTest()
     {
         using var context = ContextHelper.Create();
-        var connFactory = new Mock<IDbConnectionFactory>();
-        Category category1 = new() { Name = "Electronic", Image = "" };
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", 1000, false);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-
-        context.Categories.Add(category1);
+        ProductRepository productRep = CreateRepository(context);
+        Category category = CreateRandomCategory(context);
+        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, false);
+        Product product2 = Product.Create("Galaxy S26", "description", category.Id, "", 3000, true);
         context.Products.AddRange([product1, product2]);
         context.SaveChanges();
 
 
         //Act
-        ProductRepository productRep = new(connFactory.Object, context);
         var result1 = await productRep.RemoveAsync(product1.Id);
         var result2 = await productRep.RemoveAsync(product2.Id);
 
+        //Assert
         var productSearch1 = await productRep.GetByIdAsync(product1.Id);
         Assert.False(productSearch1.IsSuccess);
         Assert.Equal(ProductError.Notfound, productSearch1.Error);
+        Assert.True(result1.IsSuccess);
 
         var productSearch2 = await productRep.GetByIdAsync(product2.Id);
         Assert.False(productSearch2.IsSuccess);
         Assert.Equal(ProductError.Notfound, productSearch2.Error);
-
-        Assert.True(result1.IsSuccess);
         Assert.True(result2.IsSuccess);
     }
 
@@ -125,14 +111,28 @@ public class ProductRepositoryTest
     public async Task RemoveTest_NotFound()
     {
         using var context = ContextHelper.Create();
-        var connFactory = new Mock<IDbConnectionFactory>();
-
+        ProductRepository productRep = CreateRepository(context);
 
         //Act
-        ProductRepository productRep = new(connFactory.Object, context);
         Result result = await productRep.RemoveAsync(int.MaxValue);
-
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(ProductError.Notfound, result.Error);
     }
+
+    //Common arranges
+    private ProductRepository CreateRepository(GeorgeStoreContext context)
+    {
+        var connFactory = new Mock<IDbConnectionFactory>();
+        return new(connFactory.Object, context);
+    }
+
+    private Category CreateRandomCategory(GeorgeStoreContext context)
+    {
+        Category newCategory = new() { Name = "Electronic", Image = "" };
+        context.Add(newCategory);
+        context.SaveChanges();
+        return newCategory;
+    }
+
 }
