@@ -1,9 +1,8 @@
-﻿using GeorgeStore.Features.Categories;
-using GeorgeStore.Features.Products;
-using GeorgeStore.Infrastructure.Data;
-using GeorgeStore.Tests.Common;
+﻿using Bogus;
 using GeorgeStore.Common.Shared;
-using Moq;
+using GeorgeStore.Features.Categories;
+using GeorgeStore.Features.Products;
+using GeorgeStore.Tests.Common;
 using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.Products;
@@ -14,8 +13,16 @@ public class ProductRepositoryTests
     public async Task CreateTest()
     {
         using var context = ContextHelper.Create();
+        Faker faker = new("es_MX");
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        ProductCreateDTO request = new("Pixel 10", 3200m, "", "", 1);
+        Category category = CategoryFactory.CreateRandom(context);
+        ProductCreateDTO request = new
+        (
+            faker.Commerce.ProductName(),
+            3200m, faker.Commerce.ProductDescription(),
+            faker.Image.PicsumUrl(),
+            category.Id
+        );
 
         //Act
         Result result = await productRep.CreateAsync(request);
@@ -28,30 +35,25 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        Category category = ProductFactory.CreateRandomCategory(context);
-        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, true);
-        context.Products.Add(product1);
-        context.SaveChanges();
+        Category category = CategoryFactory.CreateRandom(context);
+        Product product = ProductFactory.Create(context, 1000, true);
 
         //Act
-        var result = await productRep.GetByIdAsync(product1.Id);
+        var result = await productRep.GetByIdAsync(product.Id);
         //Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(product1.Name, result.Value.Name);
+        Assert.Equal(product.Name, result.Value.Name);
     }
 
     [Fact]
     public async Task GetById_ProductNoActiveTest()
     {
         using var context = ContextHelper.Create();
-        var connFactory = new Mock<IDbConnectionFactory>();
-        Category category = ProductFactory.CreateRandomCategory(context);
-        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, false);
-        context.Products.Add(product1);
-        context.SaveChanges();
+        ProductRepository productRep = ProductFactory.CreateRepository(context);
+        Category category = CategoryFactory.CreateRandom(context);
+        Product product1 = ProductFactory.Create(context, 1000, isActive: false);
 
         //Act
-        ProductRepository productRep = new(connFactory.Object, context);
         var result = await productRep.GetByIdAsync(product1.Id);
 
         //Assert
@@ -65,11 +67,9 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        Category category = ProductFactory.CreateRandomCategory(context);
-        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, true);
-        Product product2 = Product.Create("Galaxy S26", "description", category.Id, "", 3000, false);
-        context.Products.AddRange([product1, product2]);
-        context.SaveChanges();
+        Category category = CategoryFactory.CreateRandom(context);
+        Product product1 = ProductFactory.Create(context, 1000, isActive: true);
+        Product product2 = ProductFactory.Create(context, 3000, isActive: false);
 
         //Act
         bool result1 = await productRep.ExistAsync(product1.Id);
@@ -85,12 +85,9 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        Category category = ProductFactory.CreateRandomCategory(context);
-        Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, false);
-        Product product2 = Product.Create("Galaxy S26", "description", category.Id, "", 3000, true);
-        context.Products.AddRange([product1, product2]);
-        context.SaveChanges();
-
+        Category category = CategoryFactory.CreateRandom(context);
+        Product product1 = ProductFactory.Create(context, 1000, isActive: false);
+        Product product2 = ProductFactory.Create(context, 3000, isActive: true);
 
         //Act
         var result1 = await productRep.RemoveAsync(product1.Id);

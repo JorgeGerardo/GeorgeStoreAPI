@@ -12,9 +12,9 @@ namespace GeorgeStore.Tests.Factories;
 
 internal static class RecoverPasswordFactory
 {
-    public static RecoverPasswordService CreateRecoverPasswordService(GeorgeStoreContext context, User user)
+    public static RecoverPasswordService CreateService(GeorgeStoreContext context, User user)
     {
-        UserManager<User> userManager = ConfigurationHelper.CreateUserManager(user.Id, user.Email!, user);
+        UserManager<User> userManager = ConfigurationHelper.CreateUserManager(user);
         IOptionsSnapshot<BrevoOptions> brevoOptionsMock = ConfigurationHelper.CreateBrevoOptionsMock();
         IOptionsSnapshot<JWTConfig> iSnapshotJwt = ConfigurationHelper.CreateJwtConfigOptions(ConfigurationHelper.CreateJwtConfig(10, 10));
         IEmailSender emailSender = ConfigurationHelper.CreateEmailSender();

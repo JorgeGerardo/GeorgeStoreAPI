@@ -15,7 +15,7 @@ public class RecoverPasswordServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateRecoverPasswordService(context, user);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
         RecoverPassowrdDto request = new(user.Email!);
 
         //Act
@@ -42,7 +42,7 @@ public class RecoverPasswordServiceTests
         context.SaveChanges();
 
 
-        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateRecoverPasswordService(context, user);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
 
 
 
@@ -77,7 +77,7 @@ public class RecoverPasswordServiceTests
         using var context = ContextHelper.Create();
 
         User user = ContextHelper.CreateUser(context);
-        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateRecoverPasswordService(context, user);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
 
         //Act
         Result result = await recoverPasswordSvc.RecoverAsync("FakeRefreshToken", "new password123");
@@ -90,7 +90,7 @@ public class RecoverPasswordServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateRecoverPasswordService(context, user);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
 
         string recoverToken = Guid.NewGuid().ToString();
         PasswordRecoverToken tokenRecoverToken = new()
@@ -119,7 +119,7 @@ public class RecoverPasswordServiceTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateRecoverPasswordService(context, user);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
         string recoverToken = Guid.NewGuid().ToString();
         PasswordRecoverToken tokenRecoverToken = new()
         {
@@ -164,7 +164,7 @@ public class RecoverPasswordServiceTests
         Assert.NotNull(tokenEntity);
         Assert.Equal(fakeUserId, tokenEntity.UserId);
 
-        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateRecoverPasswordService(context, user);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
 
         //Act
         Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, "NewPassword123");

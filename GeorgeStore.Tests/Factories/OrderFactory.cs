@@ -1,5 +1,4 @@
-﻿using GeorgeStore.Features.Addresses;
-using GeorgeStore.Features.Categories;
+﻿using Bogus;
 using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
@@ -9,11 +8,10 @@ namespace GeorgeStore.Tests.Factories;
 
 internal static class OrderFactory
 {
-    public static OrderService CreateOrderService(GeorgeStoreContext context)
+    public static OrderService CreateService(GeorgeStoreContext context)
     {
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         return new OrderService(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-
     }
 
     public static OrderDetail CreateOrderDetail(Product product, int qty, decimal unitPrice, decimal subTotal)
@@ -27,55 +25,25 @@ internal static class OrderFactory
         };
     }
 
-    public static Product CreateProduct(string name, decimal price, bool isActive = true)
+    public static Order Create(Guid userId, params OrderDetail[] details)
     {
-        return new Product
-        {
-            Name = name,
-            Price = price,
-            IsActive = isActive,
-            Category = new Category { Name = "Cat" }, //Change to current method or CategoryFactory
-            Description = "",
-            Image = ""
-        };
-    }
-    //TODO: Change to Bugo
-    public static Order CreateOrder(Guid userId, params OrderDetail[] details)
-    {
+        Faker faker = new("es_MX");
         return new Order
         {
             UserId = userId,
             Details = [.. details],
             Total = details.Sum(d => d.SubTotal),
-            Brand = "Visa",
-            Last4 = "4030",
-            PostalCode = "830302",
-            CardHolderName = "Test",
-            City = "NW",
-            State = "SA",
+            Brand = faker.PickRandom("Visa", "Mastercard", "American Express"),
+            Last4 = faker.Random.ReplaceNumbers("####"),
+            PostalCode = faker.Address.ZipCode(),
+            CardHolderName = faker.Name.FullName(),
+            City = faker.Address.City(),
+            State = faker.Address.State(),
             DateUtc = DateTime.UtcNow,
-            Street = "Street",
-            Neighborhood = "Col"
+            Street = faker.Address.StreetAddress(),
+            Neighborhood = faker.Address.County(),
         };
     }
 
-    //Change to AddressFactory.CreateRandomAddress
-    public static Address CreateAddress(Guid userId, string alias, bool isDefault = false)
-    {
-        return new Address()
-        {
-            Alias = alias,
-            UserId = userId,
-            Street = "Default street",
-            Neighborhood = "default neighborhood",
-            City = "Default city",
-            State = "Default state",
-            PostalCode = "Default postalCode",
-            ExternalNumber = "68",
-            InternalNumber = "88",
-            References = "Default references",
-            IsDefault = isDefault
-        };
-    }
 
 }

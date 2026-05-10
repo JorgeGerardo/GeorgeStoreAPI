@@ -1,6 +1,5 @@
 ﻿using GeorgeStore.Features.Users;
 using GeorgeStore.Tests.Common;
-using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.Users;
 
@@ -10,8 +9,8 @@ public class UserServiceTests
     public async Task Login_Failure_UserNotFound()
     {
         using var context = ContextHelper.Create();
-        User user = UserFactory.CreateUser(context);
-        var userManager = UserFactory.CreateUserManager(user);
+        User user = ContextHelper.CreateUser(context);
+        var userManager = ConfigurationHelper.CreateUserManager(user);
         UserService userSrv = new(userManager);
 
         //Act
@@ -26,8 +25,8 @@ public class UserServiceTests
     public async Task Login_Failure_InvalidCredentials()
     {
         using var context = ContextHelper.Create();
-        User user = UserFactory.CreateUser(context);
-        var userManager = UserFactory.CreateUserManager(user);
+        User user = ContextHelper.CreateUser(context);
+        var userManager = ConfigurationHelper.CreateUserManager(user);
         UserService userSrv = new(userManager);
 
         //Act
@@ -42,8 +41,8 @@ public class UserServiceTests
     public async Task GetProfile_UserNotFound()
     {
         using var context = ContextHelper.Create();
-        User user = UserFactory.CreateUser(context);
-        var userManager = UserFactory.CreateUserManager(user);
+        User user = ContextHelper.CreateUser(context);
+        var userManager = ConfigurationHelper.CreateUserManager(user);
         UserService userSrv = new(userManager);
         //Act
         var result = await userSrv.GetProfile(Guid.NewGuid());
@@ -57,8 +56,8 @@ public class UserServiceTests
     public async Task GetProfile()
     {
         using var context = ContextHelper.Create();
-        User user = UserFactory.CreateUser(context);
-        var userManager = UserFactory.CreateUserManager(user);
+        User user = ContextHelper.CreateUser(context);
+        var userManager = ConfigurationHelper.CreateUserManager(user);
         UserService userSrv = new(userManager);
         //Act
         var result = await userSrv.GetProfile(user.Id);
@@ -73,8 +72,8 @@ public class UserServiceTests
     public async Task ExistTest()
     {
         using var context = ContextHelper.Create();
-        User user = UserFactory.CreateUser(context);
-        var userManager = UserFactory.CreateUserManager(user);
+        User user = ContextHelper.CreateUser(context);
+        var userManager = ConfigurationHelper.CreateUserManager(user);
         UserService userSrv = new(userManager);
 
         //Act

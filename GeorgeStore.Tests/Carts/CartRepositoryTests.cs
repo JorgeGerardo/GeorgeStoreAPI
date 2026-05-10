@@ -39,7 +39,7 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
-        Category newCategory = CategoryFactory.CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateRandom(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -95,7 +95,7 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
-        Category newCategory = CategoryFactory.CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateRandom(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -138,7 +138,7 @@ public class CartRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        Category newCategory = CategoryFactory.CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateRandom(context);
         Product product1 = Product.Create("LaptopAsus", "description", 1, "", 5500, true);
         Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
         context.AddRange([product1, product2]);
@@ -193,7 +193,7 @@ public class CartRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        Category newCategory = CategoryFactory.CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateRandom(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -277,7 +277,7 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        Category newCategory = CategoryFactory.CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateRandom(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", 1000, true);
 
         Cart currentCart = new()
@@ -314,7 +314,7 @@ public class CartRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        Category newCategory = CategoryFactory.CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateRandom(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);

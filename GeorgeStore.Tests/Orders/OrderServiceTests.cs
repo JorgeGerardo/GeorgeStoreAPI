@@ -25,23 +25,22 @@ public class OrderServiceTests
 
         // Arrange
         using var context = ContextHelper.Create();
-        OrderService orderService = OrderFactory.CreateOrderService(context);
+        OrderService orderService = OrderFactory.CreateService(context);
         User user = ContextHelper.CreateUser(context);
 
-        Product product1 = OrderFactory.CreateProduct("Laptop", Product1Price, isActive: true);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: true);
-        Product product3 = OrderFactory.CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1 = ProductFactory.Create(context, Product1Price, isActive: true);
+        Product product2 = ProductFactory.Create(context, Product2Price, isActive: true);
+        Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
-        Order order = OrderFactory.CreateOrder(
+        Order order = OrderFactory.Create(
             user.Id,
             OrderFactory.CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
             OrderFactory.CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
             OrderFactory.CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
-        context.Orders.Add(order);
+        context.Add(order);
         context.SaveChanges();
-
 
 
         //Act
@@ -67,21 +66,21 @@ public class OrderServiceTests
     {
         // Arrange
         using var context = ContextHelper.Create();
-        OrderService orderService = OrderFactory.CreateOrderService(context);
+        OrderService orderService = OrderFactory.CreateService(context);
 
         var user = ContextHelper.CreateUser(context);
-        Product product1 = OrderFactory.CreateProduct("Laptop", Product1Price, isActive: true);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: true);
-        Product product3 = OrderFactory.CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1 = ProductFactory.Create(context, Product1Price, isActive: true);
+        Product product2 = ProductFactory.Create(context, Product2Price, isActive: true);
+        Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
-        var order = OrderFactory.CreateOrder(
+        var order = OrderFactory.Create(
             user.Id,
             OrderFactory.CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
             OrderFactory.CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
             OrderFactory.CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
-        context.Orders.Add(order);
+        context.Add(order);
         context.SaveChanges();
 
 
@@ -105,21 +104,21 @@ public class OrderServiceTests
     {
         // Arrange
         using var context = ContextHelper.Create();
-        OrderService orderService = OrderFactory.CreateOrderService(context);
+        OrderService orderService = OrderFactory.CreateService(context);
 
         User user = ContextHelper.CreateUser(context);
-        Product product1 = OrderFactory.CreateProduct("Laptop",      1321m,  isActive: false);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", 31232m, isActive: false);
-        Product product3 = OrderFactory.CreateProduct("Fridge",      1000m,  isActive: false);
+        Product product1 = ProductFactory.Create(context, 1321m, isActive: false);
+        Product product2 = ProductFactory.Create(context, 31232m, isActive: false);
+        Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
-        var order = OrderFactory.CreateOrder(
+        var order = OrderFactory.Create(
             user.Id,
             OrderFactory.CreateOrderDetail(product1, 1, 8000m, 16_000m),
             OrderFactory.CreateOrderDetail(product2, 1, 4500m, 4500m),
             OrderFactory.CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
-        context.AddRange([order, product1, product2, product3]);
+        context.Add(order);
         context.SaveChanges();
 
 
@@ -140,33 +139,30 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateService(context);
 
         decimal subP1 = Product1Price * QtyP1;
         decimal subP2 = Product2Price * QtyP2;
         User user = ContextHelper.CreateUser(context);
-        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
+        Address address = AddressFactory.CreateRandom(context, user, isDefault: false);
 
         var result = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(result.IsSuccess);
         PaymentMethod paymentM = result.Value;
 
+        //TODO: Chante to product
+        Product product1  = ProductFactory.Create(context, Product1Price, isActive: true);
+        Product product2 = ProductFactory.Create(context, Product2Price, isActive: true);
+        Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
-        Product product1  = OrderFactory.CreateProduct("Laptop", Product1Price, isActive: true);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: true);
-        Product product3 = OrderFactory.CreateProduct("Fridge", 1000m, isActive: false);
-
-        Order order = OrderFactory.CreateOrder(
+        Order order = OrderFactory.Create(
             user.Id,
             new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
             new OrderDetail { Product = product3, Quantity = 3,     UnitPrice = 900m,  SubTotal = 2700m }
         );
 
-
-        context.Orders.Add(order);
-        context.Addresses.Add(address);
-        context.PaymentMethods.Add(paymentM);
+        context.AddRange([order, paymentM]);
         context.SaveChanges();
 
         //Act
@@ -196,21 +192,20 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateService(context);
 
         decimal subP1 = Product1Price * QtyP1;
         decimal subP2 = Product2Price * QtyP2;
         User user = ContextHelper.CreateUser(context);
-        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
+        Address address = AddressFactory.CreateRandom(context, user, isDefault: false);
 
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         PaymentMethod paymentM = pmResult.Value;
 
 
-        Product product1 = OrderFactory.CreateProduct("Laptop Asus", Product1Price);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price);
-        context.Products.AddRange(product1, product2);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, Product2Price);
         context.SaveChanges();
 
 
@@ -227,7 +222,7 @@ public class OrderServiceTests
                 Item = product2
             },
         ];
-        context.AddRange([activeCart, address, paymentM]);
+        context.AddRange([activeCart, paymentM]);
         context.SaveChanges();
 
         //Act
@@ -259,7 +254,7 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateService(context);
 
         decimal subP1 = Product1Price * QtyP1;
         decimal subP2 = Product2Price * QtyP2;
@@ -268,10 +263,10 @@ public class OrderServiceTests
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "Visa", 1, 2030, "Sofia L.");
         Assert.True(pmResult.IsSuccess);
 
-        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
+        Address address = AddressFactory.CreateRandom(context, user, isDefault: false);
         PaymentMethod paymentM = pmResult.Value;
-        Product product1 = OrderFactory.CreateProduct("Laptop Asus", Product1Price);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: false);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, Product2Price, isActive: false);
 
         Cart activeCart = Cart.Create(user.Id);
         activeCart.Items = [
@@ -286,7 +281,7 @@ public class OrderServiceTests
                 Item = product2,
             },
         ];
-        context.AddRange([activeCart, product1, product2, address, paymentM]);
+        context.AddRange([activeCart, paymentM]);
         context.SaveChanges();
 
         //Act
@@ -315,15 +310,15 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateService(context);
         User user = ContextHelper.CreateUser(context);
 
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         
         PaymentMethod paymentM = pmResult.Value;
-        Product product1 = OrderFactory.CreateProduct("Laptop Asus", 1000m);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", 2000m);
+        Product product1 = ProductFactory.Create(context, 1000m);
+        Product product2 = ProductFactory.Create(context, 2000m);
 
 
         Cart newCart = Cart.Create(user.Id);
@@ -334,7 +329,7 @@ public class OrderServiceTests
                 Item = product1,
             },
         ];
-        context.AddRange([newCart, product1, product2, paymentM]);
+        context.AddRange(newCart, paymentM);
         context.SaveChanges();
 
         //Act
@@ -353,10 +348,10 @@ public class OrderServiceTests
         //Arrange
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
-        Product product1 = OrderFactory.CreateProduct("Laptop Asus", 1000m);
-        Product product2 = OrderFactory.CreateProduct("Smarthphone", 2000m);
+        Address address = AddressFactory.CreateRandom(context, user, isDefault: false);
+        OrderService orderSvc = OrderFactory.CreateService(context);
+        Product product1 = ProductFactory.Create(context, 1000m);
+        Product product2 = ProductFactory.Create(context, 2000m);
 
         Cart newCart = Cart.Create(user.Id);
         newCart.Items = [
@@ -366,7 +361,7 @@ public class OrderServiceTests
                 Item = product1,
             },
         ];
-        context.AddRange([newCart, product1, product2, address]);
+        context.Add(newCart);
         context.SaveChanges();
 
         //Act
@@ -383,13 +378,12 @@ public class OrderServiceTests
     [Fact]
     public async Task Reorder_Failure_AddressNotFound()
     {
-        //var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
-        Product product1 = OrderFactory.CreateProduct("Laptop", 30123m, isActive: true);
+        OrderService orderSvc = OrderFactory.CreateService(context);
+        Product product1 = ProductFactory.Create(context, 30123m, isActive: true);
 
-        Order order = OrderFactory.CreateOrder(
+        Order order = OrderFactory.Create(
             user.Id,
             new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
@@ -412,16 +406,16 @@ public class OrderServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = OrderFactory.CreateOrderService(context);
-        Product newProduct = OrderFactory.CreateProduct("Laptop", 30123m, isActive: true);
+        OrderService orderSvc = OrderFactory.CreateService(context);
+        Product newProduct = ProductFactory.Create(context, 30123m, isActive: true);
 
-        Order order = OrderFactory.CreateOrder(
+        Order order = OrderFactory.Create(
             user.Id,
             new OrderDetail { Product = newProduct, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
 
-        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
-        context.AddRange(address, order);
+        Address address = AddressFactory.CreateRandom(context, user, isDefault: false);
+        context.Add(order);
         context.SaveChanges();
         ReorderRequest request = new(order.Id, address.Id, 1);
 

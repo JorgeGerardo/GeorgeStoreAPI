@@ -14,9 +14,9 @@ public class AddressRepositoryTests
         using var context = ContextHelper.Create();
         AddressRepository addressRepository = AddressFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
-        Address addr1 = AddressFactory.CreateRandomAddress(context, user, true);
-        Address addr2 = AddressFactory.CreateRandomAddress(context, user, false);
-        Address addr3 = AddressFactory.CreateRandomAddress(context, user, false);
+        Address addr1 = AddressFactory.CreateRandom(context, user, true);
+        Address addr2 = AddressFactory.CreateRandom(context, user, false);
+        Address addr3 = AddressFactory.CreateRandom(context, user, false);
 
         //Act
         Result result = await addressRepository.SetAsDefaultAsync(user.Id, addr2.Id);
@@ -32,8 +32,8 @@ public class AddressRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
         AddressRepository addressRepository = AddressFactory.CreateRepository(context);
-        Address addr1 =  AddressFactory.CreateRandomAddress(context, user, true);
-        Address addr2 = AddressFactory.CreateRandomAddress(context, user, false);
+        Address addr1 =  AddressFactory.CreateRandom(context, user, true);
+        Address addr2 = AddressFactory.CreateRandom(context, user, false);
 
         //Act
         context.Addresses.Remove(addr2);
@@ -52,9 +52,9 @@ public class AddressRepositoryTests
         User user = ContextHelper.CreateUser(context);
         AddressRepository addressRepository = AddressFactory.CreateRepository(context);
 
-        var addr1 = AddressFactory.CreateRandomAddress(context, user, true);
-        var addr2 = AddressFactory.CreateRandomAddress(context, user, false);
-        var addr3 = AddressFactory.CreateRandomAddress(context, user, false);
+        var addr1 = AddressFactory.CreateRandom(context, user, true);
+        var addr2 = AddressFactory.CreateRandom(context, user, false);
+        var addr3 = AddressFactory.CreateRandom(context, user, false);
 
         Result result = await addressRepository.RemoveAsync(user.Id, addr2.Id);
         Assert.True(result.IsSuccess);
@@ -69,8 +69,8 @@ public class AddressRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
         AddressRepository addressRepository = AddressFactory.CreateRepository(context);
-        Address addr1 = AddressFactory.CreateRandomAddress(context, user, false);
-        Address addr2 = AddressFactory.CreateRandomAddress(context, user, false);
+        Address addr1 = AddressFactory.CreateRandom(context, user, false);
+        Address addr2 = AddressFactory.CreateRandom(context, user, false);
         user.Addresses.Remove(addr1);
         context.SaveChanges();
 

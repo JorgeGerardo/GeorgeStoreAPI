@@ -14,9 +14,9 @@ internal static class CategoryFactory
         return new(context, connFactory.Object, new KeyedAsyncLock());
     }
 
-    public static Category CreateCategory(GeorgeStoreContext context)
+    public static Category CreateRandom(GeorgeStoreContext context)
     {
-        var faker = new Faker("es_MX");
+        Faker faker = new("es_MX");
         Category category = new()
         {
             Name = faker.Commerce.Categories(1).First(),
@@ -26,6 +26,5 @@ internal static class CategoryFactory
         context.SaveChanges();
         return category;
     }
-
 
 }

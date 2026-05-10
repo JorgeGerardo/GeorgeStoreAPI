@@ -16,7 +16,7 @@ internal static class AddressFactory
 
     public static AddressCreateDto CreateRandomAddressDto(bool isDefault = false, string? alias = null)
     {
-        var faker = new Faker("es_MX");
+        Faker faker = new("es_MX");
 
         return new AddressCreateDto(
             alias is null
@@ -36,9 +36,9 @@ internal static class AddressFactory
         );
     }
 
-    public static Address CreateRandomAddress(GeorgeStoreContext context, User user, bool isDefault = false)
+    public static Address CreateRandom(GeorgeStoreContext context, User user, bool isDefault = false)
     {
-        var faker = new Faker("es_MX");
+        Faker faker = new("es_MX");
         Address newAddr = Address.Create(
             user.Id,
             faker.Address.StreetName(),

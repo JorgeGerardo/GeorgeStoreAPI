@@ -1,8 +1,6 @@
 ﻿using GeorgeStore.Common.Core.Interfaces;
 using GeorgeStore.Features.Auth;
-using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.Users;
-using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Infrastructure.Email.Brevo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -54,8 +52,7 @@ internal static class ConfigurationHelper
         };
     }
 
-
-    public static UserManager<User> CreateUserManager(Guid userId, string email, User user)
+    public static UserManager<User> CreateUserManager(User user)
     {
         var store = new Mock<IUserStore<User>>();
         var passwordHasher = new PasswordHasher<User>();
@@ -65,17 +62,5 @@ internal static class ConfigurationHelper
 
         return userManager.Object;
     }
-
-    public static RecoverPasswordService CreateRecoverPasswordService(GeorgeStoreContext context, User user)
-    {
-        UserManager<User> userManager = CreateUserManager(user.Id, user.Email!, user);
-        IOptionsSnapshot<BrevoOptions> brevoOptionsMock = CreateBrevoOptionsMock();
-        IOptionsSnapshot<JWTConfig> iSnapshotJwt = CreateJwtConfigOptions(CreateJwtConfig(10, 10));
-        IEmailSender emailSender = CreateEmailSender();
-        return new(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
-
-    }
-
-
 
 }

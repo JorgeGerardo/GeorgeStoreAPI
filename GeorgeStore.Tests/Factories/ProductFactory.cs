@@ -1,4 +1,4 @@
-﻿using GeorgeStore.Features.Categories;
+﻿using Bogus;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
 using Moq;
@@ -13,13 +13,22 @@ internal static class ProductFactory
         return new(connFactory.Object, context);
     }
 
-    public static Category CreateRandomCategory(GeorgeStoreContext context)
+    public static Product Create(GeorgeStoreContext context, decimal price, bool isActive = true)
     {
-        Category newCategory = new() { Name = "Electronic", Image = "" };
-        context.Add(newCategory);
+        Faker faker = new("es_MX");
+        Product product = new()
+        {
+            Name = faker.Commerce.ProductName(),
+            Price = price,
+            IsActive = isActive,
+            Category = CategoryFactory.CreateRandom(context),
+            Description = faker.Commerce.ProductDescription(),
+            Image = faker.Image.PicsumUrl()
+        };
+        context.Add(product);
         context.SaveChanges();
-        return newCategory;
-    }
+        return product;
 
+    }
 
 }
