@@ -1,9 +1,8 @@
 ﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Users;
-using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
-using Moq;
+using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.PaymentMethods;
 
@@ -15,7 +14,7 @@ public class PaymentMethodRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         PaymentMethodCreateDto request1 = new("1234123412341234", "Visa", 1, 2030, "J Lopez");
         PaymentMethodCreateDto request2 = new("1234123412341234", "Visa", 1, 2030, "J Lopez", true);
 
@@ -35,9 +34,9 @@ public class PaymentMethodRepositoryTests
 
         User user = ContextHelper.CreateUser(context);
         for (int i = 0; i < PaymentMethodLimits.MaxRegisterPerUser; i++)
-            CreateRandomPaymentMethod(context, user);
+            PaymentMethodFactory.CreateRandomPaymentMethod(context, user);
 
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         PaymentMethodCreateDto request = new("1234123412341234", "Visa", 1, 2030, "J Lopez");
         //Act
         Result result = await paymentRep.AddAsync(user.Id, request);
@@ -51,9 +50,9 @@ public class PaymentMethodRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        PaymentMethod? paymentMethod1 = CreateRandomPaymentMethod(context, user, IsDefault: true);
-        PaymentMethod? paymentMethod2 = CreateRandomPaymentMethod(context, user, IsDefault: true);
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethod? paymentMethod1 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethod? paymentMethod2 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
 
         //Act
         Result result = await paymentRep.RemoveAsync(user.Id, paymentMethod2.Id);
@@ -72,8 +71,8 @@ public class PaymentMethodRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        PaymentMethod newPaymentM = CreateRandomPaymentMethod(context, user, IsDefault: true);
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethod newPaymentM = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
 
         //Act
         var result = await paymentRep.RemoveAsync(user.Id, newPaymentM.Id);
@@ -91,11 +90,11 @@ public class PaymentMethodRepositoryTests
     public async Task GetByIdTest()
     {
         using var context = ContextHelper.Create();
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         User user = ContextHelper.CreateUser(context);
-        PaymentMethod paymentMethod1 = CreateRandomPaymentMethod(context, user);
-        PaymentMethod paymentMethod2 = CreateRandomPaymentMethod(context, user);
-        PaymentMethod paymentMethod3 = CreateRandomPaymentMethod(context, user);
+        PaymentMethod paymentMethod1 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user);
+        PaymentMethod paymentMethod2 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user);
+        PaymentMethod paymentMethod3 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user);
 
         //Act
         var result = await paymentRep.GetByIdAsync(user.Id, paymentMethod3.Id);
@@ -112,10 +111,10 @@ public class PaymentMethodRepositoryTests
     public async Task GetById_NotFound()
     {
         using var context = ContextHelper.Create();
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         User user = ContextHelper.CreateUser(context);
         User anotherUser = new("Carlita", "carlita@gmail.com");
-        PaymentMethod anotherPaymentMethodUser = CreateRandomPaymentMethod(context, anotherUser);
+        PaymentMethod anotherPaymentMethodUser = PaymentMethodFactory.CreateRandomPaymentMethod(context, anotherUser);
 
         //Act
         var result = await paymentRep.GetByIdAsync(user.Id, anotherPaymentMethodUser.Id);
@@ -128,11 +127,11 @@ public class PaymentMethodRepositoryTests
     public async Task SetDefaultMultipleTimes()
     {
         using var context = ContextHelper.Create();
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         User user = ContextHelper.CreateUser(context);
-        PaymentMethod paymentMethod1 = CreateRandomPaymentMethod(context, user, IsDefault: true);
-        PaymentMethod paymentMethod2 = CreateRandomPaymentMethod(context, user, IsDefault: false);
-        PaymentMethod paymentMethod3 = CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethod paymentMethod1 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethod paymentMethod2 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: false);
+        PaymentMethod paymentMethod3 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
 
 
         //Act
@@ -149,11 +148,11 @@ public class PaymentMethodRepositoryTests
     public async Task SetAsDefault()
     {
         using var context = ContextHelper.Create();
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         User user = ContextHelper.CreateUser(context);
-        PaymentMethod paymentMethod1 = CreateRandomPaymentMethod(context, user, IsDefault: true);
-        PaymentMethod paymentMethod2 = CreateRandomPaymentMethod(context, user, IsDefault: true);
-        PaymentMethod paymentMethod3 = CreateRandomPaymentMethod(context, user, IsDefault: false);
+        PaymentMethod paymentMethod1 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethod paymentMethod2 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: true);
+        PaymentMethod paymentMethod3 = PaymentMethodFactory.CreateRandomPaymentMethod(context, user, IsDefault: false);
 
         //Act
         var resultPmSearch = await paymentRep.GetByIdAsync(user.Id, paymentMethod3.Id);
@@ -174,10 +173,10 @@ public class PaymentMethodRepositoryTests
     public async Task SetAsDefault_NotFound()
     {
         using var context = ContextHelper.Create();
-        PaymentMethodRepository paymentRep = CreatePaymentMethodRepository(context);
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreatePaymentMethodRepository(context);
         User userWithoutPM = ContextHelper.CreateUser(context);
         User userWithPM = new("Carlita", "carlita@gmail.com");
-        PaymentMethod paymentMethod1 = CreateRandomPaymentMethod(context, userWithPM, IsDefault: true);
+        PaymentMethod paymentMethod1 = PaymentMethodFactory.CreateRandomPaymentMethod(context, userWithPM, IsDefault: true);
 
         //Act
         Result result = await paymentRep.SetAsDefaultAsync(userWithoutPM.Id, paymentMethod1.Id);
@@ -185,33 +184,6 @@ public class PaymentMethodRepositoryTests
         //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(PaymentMethodError.NotFound, result.Error);
-    }
-
-    //Common arranges
-    private PaymentMethodRepository CreatePaymentMethodRepository(GeorgeStoreContext context)
-    {
-        var conn = new Mock<IDbConnectionFactory>();
-         return new PaymentMethodRepository(context, conn.Object);
-    }
-
-    private PaymentMethod CreateRandomPaymentMethod(GeorgeStoreContext context, User user, bool IsDefault = false)
-    {
-        var newPaymentMethod = new PaymentMethod
-        {
-            User = user,
-            Brand = "Visa",
-            Token = Guid.NewGuid().ToString(),
-            LastDigits = "1234",
-            CreatedAt = DateTime.UtcNow.AddDays(-1),
-            ExpYear = 2039,
-            ExpMonth = 1,
-            CardHolderName = "Jorguito Lopez",
-            IsDefault = IsDefault,
-        };
-
-        context.Add(newPaymentMethod);
-        context.SaveChanges();
-        return newPaymentMethod;
     }
 
 }

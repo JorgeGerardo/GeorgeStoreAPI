@@ -1,12 +1,12 @@
 ﻿using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Carts;
-using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
+using GeorgeStore.Tests.Factories;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
@@ -25,18 +25,18 @@ public class OrderServiceTests
 
         // Arrange
         using var context = ContextHelper.Create();
-        OrderService orderService = CreateOrderService(context);
+        OrderService orderService = OrderFactory.CreateOrderService(context);
         User user = ContextHelper.CreateUser(context);
 
-        Product product1 = CreateProduct("Laptop", Product1Price, isActive: true);
-        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
-        Product product3 = CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1 = OrderFactory.CreateProduct("Laptop", Product1Price, isActive: true);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: true);
+        Product product3 = OrderFactory.CreateProduct("Fridge", 1000m, isActive: false);
 
-        Order order = CreateOrder(
+        Order order = OrderFactory.CreateOrder(
             user.Id,
-            CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
-            CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
-            CreateOrderDetail(product3, 3, 900m, 2700m)
+            OrderFactory.CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
+            OrderFactory.CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
+            OrderFactory.CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
         context.Orders.Add(order);
@@ -67,18 +67,18 @@ public class OrderServiceTests
     {
         // Arrange
         using var context = ContextHelper.Create();
-        OrderService orderService = CreateOrderService(context);
+        OrderService orderService = OrderFactory.CreateOrderService(context);
 
         var user = ContextHelper.CreateUser(context);
-        Product product1 = CreateProduct("Laptop", Product1Price, isActive: true);
-        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
-        Product product3 = CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1 = OrderFactory.CreateProduct("Laptop", Product1Price, isActive: true);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: true);
+        Product product3 = OrderFactory.CreateProduct("Fridge", 1000m, isActive: false);
 
-        var order = CreateOrder(
+        var order = OrderFactory.CreateOrder(
             user.Id,
-            CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
-            CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
-            CreateOrderDetail(product3, 3, 900m, 2700m)
+            OrderFactory.CreateOrderDetail(product1, QtyP1, 8000m, 16_000m),
+            OrderFactory.CreateOrderDetail(product2, QtyP2, 4500m, 4500m),
+            OrderFactory.CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
         context.Orders.Add(order);
@@ -105,18 +105,18 @@ public class OrderServiceTests
     {
         // Arrange
         using var context = ContextHelper.Create();
-        OrderService orderService = CreateOrderService(context);
+        OrderService orderService = OrderFactory.CreateOrderService(context);
 
         User user = ContextHelper.CreateUser(context);
-        Product product1 = CreateProduct("Laptop",      1321m,  isActive: false);
-        Product product2 = CreateProduct("Smarthphone", 31232m, isActive: false);
-        Product product3 = CreateProduct("Fridge",      1000m,  isActive: false);
+        Product product1 = OrderFactory.CreateProduct("Laptop",      1321m,  isActive: false);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", 31232m, isActive: false);
+        Product product3 = OrderFactory.CreateProduct("Fridge",      1000m,  isActive: false);
 
-        var order = CreateOrder(
+        var order = OrderFactory.CreateOrder(
             user.Id,
-            CreateOrderDetail(product1, 1, 8000m, 16_000m),
-            CreateOrderDetail(product2, 1, 4500m, 4500m),
-            CreateOrderDetail(product3, 3, 900m, 2700m)
+            OrderFactory.CreateOrderDetail(product1, 1, 8000m, 16_000m),
+            OrderFactory.CreateOrderDetail(product2, 1, 4500m, 4500m),
+            OrderFactory.CreateOrderDetail(product3, 3, 900m, 2700m)
         );
 
         context.AddRange([order, product1, product2, product3]);
@@ -140,23 +140,23 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
 
         decimal subP1 = Product1Price * QtyP1;
         decimal subP2 = Product2Price * QtyP2;
         User user = ContextHelper.CreateUser(context);
-        Address address = CreateAddress(user.Id, "Work", false);
+        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
 
         var result = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(result.IsSuccess);
         PaymentMethod paymentM = result.Value;
 
 
-        Product product1  = CreateProduct("Laptop", Product1Price, isActive: true);
-        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: true);
-        Product product3 = CreateProduct("Fridge", 1000m, isActive: false);
+        Product product1  = OrderFactory.CreateProduct("Laptop", Product1Price, isActive: true);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: true);
+        Product product3 = OrderFactory.CreateProduct("Fridge", 1000m, isActive: false);
 
-        Order order = CreateOrder(
+        Order order = OrderFactory.CreateOrder(
             user.Id,
             new OrderDetail { Product = product1, Quantity = QtyP1, UnitPrice = 8000m, SubTotal = 16_000m },
             new OrderDetail { Product = product2, Quantity = QtyP2, UnitPrice = 4500m, SubTotal = 4500m },
@@ -196,20 +196,20 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
 
         decimal subP1 = Product1Price * QtyP1;
         decimal subP2 = Product2Price * QtyP2;
         User user = ContextHelper.CreateUser(context);
-        Address address = CreateAddress(user.Id, "Work", false);
+        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
 
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         PaymentMethod paymentM = pmResult.Value;
 
 
-        Product product1 = CreateProduct("Laptop Asus", Product1Price);
-        Product product2 = CreateProduct("Smarthphone", Product2Price);
+        Product product1 = OrderFactory.CreateProduct("Laptop Asus", Product1Price);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price);
         context.Products.AddRange(product1, product2);
         context.SaveChanges();
 
@@ -259,7 +259,7 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
 
         decimal subP1 = Product1Price * QtyP1;
         decimal subP2 = Product2Price * QtyP2;
@@ -268,10 +268,10 @@ public class OrderServiceTests
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "Visa", 1, 2030, "Sofia L.");
         Assert.True(pmResult.IsSuccess);
 
-        Address address = CreateAddress(user.Id, "Work", false);
+        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
         PaymentMethod paymentM = pmResult.Value;
-        Product product1 = CreateProduct("Laptop Asus", Product1Price);
-        Product product2 = CreateProduct("Smarthphone", Product2Price, isActive: false);
+        Product product1 = OrderFactory.CreateProduct("Laptop Asus", Product1Price);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", Product2Price, isActive: false);
 
         Cart activeCart = Cart.Create(user.Id);
         activeCart.Items = [
@@ -315,15 +315,15 @@ public class OrderServiceTests
     {
         //Arrange
         using var context = ContextHelper.Create();
-        OrderService orderSvc = CreateOrderService(context);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
         User user = ContextHelper.CreateUser(context);
 
         var pmResult = PaymentMethod.Create(user.Id, "1234123412341234", "", 1, 2030, "");
         Assert.True(pmResult.IsSuccess);
         
         PaymentMethod paymentM = pmResult.Value;
-        Product product1 = CreateProduct("Laptop Asus", 1000m);
-        Product product2 = CreateProduct("Smarthphone", 2000m);
+        Product product1 = OrderFactory.CreateProduct("Laptop Asus", 1000m);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", 2000m);
 
 
         Cart newCart = Cart.Create(user.Id);
@@ -353,10 +353,10 @@ public class OrderServiceTests
         //Arrange
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        Address address = CreateAddress(user.Id, "Work", false);
-        OrderService orderSvc = CreateOrderService(context);
-        Product product1 = CreateProduct("Laptop Asus", 1000m);
-        Product product2 = CreateProduct("Smarthphone", 2000m);
+        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        Product product1 = OrderFactory.CreateProduct("Laptop Asus", 1000m);
+        Product product2 = OrderFactory.CreateProduct("Smarthphone", 2000m);
 
         Cart newCart = Cart.Create(user.Id);
         newCart.Items = [
@@ -386,10 +386,10 @@ public class OrderServiceTests
         //var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = CreateOrderService(context);
-        Product product1 = CreateProduct("Laptop", 30123m, isActive: true);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        Product product1 = OrderFactory.CreateProduct("Laptop", 30123m, isActive: true);
 
-        Order order = CreateOrder(
+        Order order = OrderFactory.CreateOrder(
             user.Id,
             new OrderDetail { Product = product1, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
@@ -412,15 +412,15 @@ public class OrderServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = CreateOrderService(context);
-        Product newProduct = CreateProduct("Laptop", 30123m, isActive: true);
+        OrderService orderSvc = OrderFactory.CreateOrderService(context);
+        Product newProduct = OrderFactory.CreateProduct("Laptop", 30123m, isActive: true);
 
-        Order order = CreateOrder(
+        Order order = OrderFactory.CreateOrder(
             user.Id,
             new OrderDetail { Product = newProduct, Quantity = 1, UnitPrice = 8000m, SubTotal = 16_000m }
         );
 
-        Address address = CreateAddress(user.Id, "Work", false);
+        Address address = OrderFactory.CreateAddress(user.Id, "Work", false);
         context.AddRange(address, order);
         context.SaveChanges();
         ReorderRequest request = new(order.Id, address.Id, 1);
@@ -450,74 +450,4 @@ public class OrderServiceTests
         Assert.Throws<InvalidOperationException>(() => _ = result.Value);
     }
 
-
-
-    //Common Arranges:
-    private OrderService CreateOrderService(GeorgeStoreContext context)
-    {
-        var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        return new OrderService(connectionFactoryMock.Object, context, new KeyedAsyncLock());
-
-    }
-
-    private OrderDetail CreateOrderDetail(Product product, int qty, decimal unitPrice, decimal subTotal)
-    {
-        return new OrderDetail
-        {
-            Product = product,
-            Quantity = qty,
-            UnitPrice = unitPrice,
-            SubTotal = subTotal
-        };
-    }
-
-    private static Product CreateProduct(string name, decimal price, bool isActive = true)
-    {
-        return new Product
-        {
-            Name = name,
-            Price = price,
-            IsActive = isActive,
-            Category = new Category { Name = "Cat" },
-            Description = "",
-            Image = ""
-        };
-    }
-
-    private static Order CreateOrder(Guid userId, params OrderDetail[] details)
-    {
-        return new Order
-        {
-            UserId = userId,
-            Details = [.. details],
-            Total = details.Sum(d => d.SubTotal),
-            Brand = "Visa",
-            Last4 = "4030",
-            PostalCode = "830302",
-            CardHolderName = "Test",
-            City = "NW",
-            State = "SA",
-            DateUtc = DateTime.UtcNow,
-            Street = "Street",
-            Neighborhood = "Col"
-        };
-    }
-
-    private static Address CreateAddress(Guid userId, string alias, bool isDefault = false)
-    {
-        return new Address()
-        {
-            Alias = alias,
-            UserId = userId,
-            Street = "Default street",
-            Neighborhood = "default neighborhood",
-            City = "Default city",
-            State = "Default state",
-            PostalCode = "Default postalCode",
-            ExternalNumber = "68",
-            InternalNumber = "88",
-            References = "Default references",
-            IsDefault = isDefault
-        };
-    }
 }

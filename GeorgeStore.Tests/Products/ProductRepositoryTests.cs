@@ -4,6 +4,7 @@ using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
 using GeorgeStore.Common.Shared;
 using Moq;
+using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.Products;
 
@@ -13,7 +14,7 @@ public class ProductRepositoryTests
     public async Task CreateTest()
     {
         using var context = ContextHelper.Create();
-        ProductRepository productRep = CreateRepository(context);
+        ProductRepository productRep = ProductFactory.CreateRepository(context);
         ProductCreateDTO request = new("Pixel 10", 3200m, "", "", 1);
 
         //Act
@@ -26,8 +27,8 @@ public class ProductRepositoryTests
     public async Task GetByIdTest()
     {
         using var context = ContextHelper.Create();
-        ProductRepository productRep = CreateRepository(context);
-        Category category = CreateRandomCategory(context);
+        ProductRepository productRep = ProductFactory.CreateRepository(context);
+        Category category = ProductFactory.CreateRandomCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, true);
         context.Products.Add(product1);
         context.SaveChanges();
@@ -44,7 +45,7 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         var connFactory = new Mock<IDbConnectionFactory>();
-        Category category = CreateRandomCategory(context);
+        Category category = ProductFactory.CreateRandomCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, false);
         context.Products.Add(product1);
         context.SaveChanges();
@@ -63,8 +64,8 @@ public class ProductRepositoryTests
     public async Task Exist_False_and_True_Test()
     {
         using var context = ContextHelper.Create();
-        ProductRepository productRep = CreateRepository(context);
-        Category category = CreateRandomCategory(context);
+        ProductRepository productRep = ProductFactory.CreateRepository(context);
+        Category category = ProductFactory.CreateRandomCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, true);
         Product product2 = Product.Create("Galaxy S26", "description", category.Id, "", 3000, false);
         context.Products.AddRange([product1, product2]);
@@ -83,8 +84,8 @@ public class ProductRepositoryTests
     public async Task RemoveTest()
     {
         using var context = ContextHelper.Create();
-        ProductRepository productRep = CreateRepository(context);
-        Category category = CreateRandomCategory(context);
+        ProductRepository productRep = ProductFactory.CreateRepository(context);
+        Category category = ProductFactory.CreateRandomCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", category.Id, "", 1000, false);
         Product product2 = Product.Create("Galaxy S26", "description", category.Id, "", 3000, true);
         context.Products.AddRange([product1, product2]);
@@ -111,28 +112,13 @@ public class ProductRepositoryTests
     public async Task RemoveTest_NotFound()
     {
         using var context = ContextHelper.Create();
-        ProductRepository productRep = CreateRepository(context);
+        ProductRepository productRep = ProductFactory.CreateRepository(context);
 
         //Act
         Result result = await productRep.RemoveAsync(int.MaxValue);
         //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(ProductError.Notfound, result.Error);
-    }
-
-    //Common arranges
-    private ProductRepository CreateRepository(GeorgeStoreContext context)
-    {
-        var connFactory = new Mock<IDbConnectionFactory>();
-        return new(connFactory.Object, context);
-    }
-
-    private Category CreateRandomCategory(GeorgeStoreContext context)
-    {
-        Category newCategory = new() { Name = "Electronic", Image = "" };
-        context.Add(newCategory);
-        context.SaveChanges();
-        return newCategory;
     }
 
 }

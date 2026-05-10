@@ -3,9 +3,8 @@ using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
-using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
-using Moq;
+using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.CartTests;
 
@@ -18,7 +17,7 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
 
 
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         var result = await cartRep.GetAsync(user.Id, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
@@ -38,9 +37,9 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
-        Category newCategory = CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -94,9 +93,9 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
-        Category newCategory = CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -139,7 +138,7 @@ public class CartRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        Category newCategory = CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", 1, "", 5500, true);
         Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
         context.AddRange([product1, product2]);
@@ -151,7 +150,7 @@ public class CartRepositoryTests
 
 
 
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, 1, CancellationToken.None);
         Assert.True(result1.IsSuccess);
 
@@ -166,7 +165,7 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
         //Act
         Result removeResult = await cartRep.RemoveAsync(user.Id, 1, CancellationToken.None);
@@ -194,7 +193,7 @@ public class CartRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        Category newCategory = CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -218,7 +217,7 @@ public class CartRepositoryTests
         
         //Act
         context.ChangeTracker.Clear();
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, QtyP1, CancellationToken.None);
         Assert.True(result1.IsSuccess);
         Result result2 = await cartRep.AddAsync(user.Id, product4.Id, QtyP4, CancellationToken.None);
@@ -266,7 +265,7 @@ public class CartRepositoryTests
         context.Add(newCart);
         context.SaveChanges();
 
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         //Act
         Result result = await cartRep.AddAsync(user.Id, int.MaxValue, 1, CancellationToken.None);
         Assert.False(result.IsSuccess);
@@ -278,7 +277,7 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        Category newCategory = CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", 1000, true);
 
         Cart currentCart = new()
@@ -298,13 +297,12 @@ public class CartRepositoryTests
         context.SaveChanges();
 
 
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         context.ChangeTracker.Clear();
         Result result = await cartRep.DecreaseAsync(user.Id, product1.Id);
         Assert.False(result.IsSuccess);
         Assert.Equal(CartError.DecreaseLimit, result.Error);
     }
-
 
 
     [Theory]
@@ -316,7 +314,7 @@ public class CartRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
-        Category newCategory = CreateCategory(context);
+        Category newCategory = CategoryFactory.CreateCategory(context);
         Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
         Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
         Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
@@ -342,7 +340,7 @@ public class CartRepositoryTests
 
 
 
-        CartRepository cartRep = CreateCartRepository(context);
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         //Act
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, QtyP1, CancellationToken.None);
         Assert.True(result1.IsSuccess);
@@ -364,23 +362,6 @@ public class CartRepositoryTests
         Assert.Contains(userCart.Items, i => i.ProductId == product1.Id);
         Assert.DoesNotContain(userCart.Items, i => i.ProductId == product4.Id);
         Assert.Equal(Total, userCart.Total);
-    }
-
-
-
-    //Common arranges
-    private CartRepository CreateCartRepository(GeorgeStoreContext context)
-    {
-        var connFactory = new Mock<IDbConnectionFactory>();
-        return new(context, connFactory.Object, new KeyedAsyncLock());
-    }
-
-    public static Category CreateCategory(GeorgeStoreContext context)
-    {
-        Category newCategory = new() { Name = "Electronic", Image = "" };
-        context.Add(newCategory);
-        context.SaveChanges();
-        return newCategory;
     }
 
     public static TheoryData<decimal, int, int, decimal, int, int, decimal>

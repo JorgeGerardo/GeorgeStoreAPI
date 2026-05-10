@@ -1,10 +1,8 @@
-﻿using Bogus;
-using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Users;
-using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Tests.Common;
-using Moq;
+using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.Addresses;
 
@@ -14,11 +12,11 @@ public class AddressRepositoryTests
     public async Task SetAsDefaultTest()
     {
         using var context = ContextHelper.Create();
-        AddressRepository addressRepository = CreateRepository(context);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
-        Address addr1 = CreateRandomAddress(context, user, true);
-        Address addr2 = CreateRandomAddress(context, user, false);
-        Address addr3 = CreateRandomAddress(context, user, false);
+        Address addr1 = AddressFactory.CreateRandomAddress(context, user, true);
+        Address addr2 = AddressFactory.CreateRandomAddress(context, user, false);
+        Address addr3 = AddressFactory.CreateRandomAddress(context, user, false);
 
         //Act
         Result result = await addressRepository.SetAsDefaultAsync(user.Id, addr2.Id);
@@ -33,9 +31,9 @@ public class AddressRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        AddressRepository addressRepository = CreateRepository(context);
-        Address addr1 = CreateRandomAddress(context, user, true);
-        Address addr2 = CreateRandomAddress(context, user, false);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
+        Address addr1 =  AddressFactory.CreateRandomAddress(context, user, true);
+        Address addr2 = AddressFactory.CreateRandomAddress(context, user, false);
 
         //Act
         context.Addresses.Remove(addr2);
@@ -52,11 +50,11 @@ public class AddressRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        AddressRepository addressRepository = CreateRepository(context);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
 
-        var addr1 = CreateRandomAddress(context, user, true);
-        var addr2 = CreateRandomAddress(context, user, false);
-        var addr3 = CreateRandomAddress(context, user, false);
+        var addr1 = AddressFactory.CreateRandomAddress(context, user, true);
+        var addr2 = AddressFactory.CreateRandomAddress(context, user, false);
+        var addr3 = AddressFactory.CreateRandomAddress(context, user, false);
 
         Result result = await addressRepository.RemoveAsync(user.Id, addr2.Id);
         Assert.True(result.IsSuccess);
@@ -70,9 +68,9 @@ public class AddressRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        AddressRepository addressRepository = CreateRepository(context);
-        Address addr1 = CreateRandomAddress(context, user, false);
-        Address addr2 = CreateRandomAddress(context, user, false);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
+        Address addr1 = AddressFactory.CreateRandomAddress(context, user, false);
+        Address addr2 = AddressFactory.CreateRandomAddress(context, user, false);
         user.Addresses.Remove(addr1);
         context.SaveChanges();
 
@@ -89,10 +87,10 @@ public class AddressRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        AddressRepository addressRepository = CreateRepository(context);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
         const string defaultAddressAlias = "Work";
-        AddressCreateDto request1 = CreateRandomAddressDto(isDefault: false);
-        AddressCreateDto request2 = CreateRandomAddressDto(isDefault: true, alias: defaultAddressAlias);
+        AddressCreateDto request1 = AddressFactory.CreateRandomAddressDto(isDefault: false);
+        AddressCreateDto request2 = AddressFactory.CreateRandomAddressDto(isDefault: true, alias: defaultAddressAlias);
 
         //Act
         Result result1 = await addressRepository.AddAsync(user.Id, request1);
@@ -110,9 +108,9 @@ public class AddressRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        AddressRepository addressRepository = CreateRepository(context);
-        AddressCreateDto request1 = CreateRandomAddressDto(isDefault: false);
-        AddressCreateDto request2 = CreateRandomAddressDto(isDefault: false);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
+        AddressCreateDto request1 = AddressFactory.CreateRandomAddressDto(isDefault: false);
+        AddressCreateDto request2 = AddressFactory.CreateRandomAddressDto(isDefault: false);
 
         //Act
         Result result1 = await addressRepository.AddAsync(user.Id, request1);
@@ -129,12 +127,12 @@ public class AddressRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        AddressRepository addressRepository = CreateRepository(context);
+        AddressRepository addressRepository = AddressFactory.CreateRepository(context);
         const string defaultAddressAlias = "Work";
-        AddressCreateDto request1 = CreateRandomAddressDto(isDefault: true);
-        AddressCreateDto request2 = CreateRandomAddressDto(isDefault: true);
-        AddressCreateDto request3 = CreateRandomAddressDto(isDefault: true, alias:  defaultAddressAlias);
-        AddressCreateDto request4 = CreateRandomAddressDto(isDefault: true);
+        AddressCreateDto request1 = AddressFactory.CreateRandomAddressDto(isDefault: true);
+        AddressCreateDto request2 = AddressFactory.CreateRandomAddressDto(isDefault: true);
+        AddressCreateDto request3 = AddressFactory.CreateRandomAddressDto(isDefault: true, alias:  defaultAddressAlias);
+        AddressCreateDto request4 = AddressFactory.CreateRandomAddressDto(isDefault: true);
 
         //Act
         Result result1 = await addressRepository.AddAsync(user.Id, request1);
@@ -154,55 +152,5 @@ public class AddressRepositoryTests
         Address defaultAddress = Assert.Single(user.Addresses, a => a.IsDefault);
         Assert.NotNull(defaultAddress);
         Assert.Equal(defaultAddressAlias, defaultAddress.Alias);
-    }
-
-
-    //Common arranges
-    private static AddressRepository CreateRepository(GeorgeStoreContext context)
-    {
-        var dbConnection = new Mock<IDbConnectionFactory>();
-        return new(context, dbConnection.Object);
-    }
-
-    private static AddressCreateDto CreateRandomAddressDto(bool isDefault = false, string? alias = null)
-    {
-        var faker = new Faker("es_MX");
-
-        return new AddressCreateDto(
-            alias is null 
-                ? faker.PickRandom("Home", "Work", "Mom's House", "Office")
-                : alias,
-            faker.Address.StreetAddress(),
-            faker.Address.County(),
-            faker.Address.City(),
-            faker.Address.State(),
-            faker.Address.ZipCode(),
-            faker.Address.BuildingNumber(),
-            faker.Random.Bool()
-                ? faker.Random.Number(1, 20).ToString()
-                : null,
-            faker.Lorem.Sentence(),
-            isDefault
-        );
-    }
-    private static Address CreateRandomAddress(GeorgeStoreContext context, User user, bool isDefault = false)
-    {
-        var faker = new Faker("es_MX");
-        Address newAddr = Address.Create(
-            user.Id, 
-            faker.Address.StreetName(), 
-            faker.Address.StreetAddress(),
-            faker.Address.County(),
-            faker.Address.City(), 
-            faker.Address.State(),
-            faker.Address.ZipCode(),
-            faker.Address.BuildingNumber(),
-            faker.Random.Bool() ? faker.Random.Number(1, 20).ToString() : null,
-            faker.Lorem.Sentence(),
-            isDefault
-        );
-        context.Add(newAddr);
-        context.SaveChanges();
-        return newAddr;
     }
 }
