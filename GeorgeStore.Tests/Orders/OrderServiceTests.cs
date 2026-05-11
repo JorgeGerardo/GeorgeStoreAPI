@@ -432,7 +432,7 @@ public class OrderServiceTests
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        OrderService orderSvc = new(connectionFactoryMock.Object, context, new KeyedAsyncLock());
+        OrderService orderSvc = OrderFactory.CreateService(context);
         ReorderRequest request = new(1, 1, 1);
 
         //act

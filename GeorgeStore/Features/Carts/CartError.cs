@@ -13,6 +13,9 @@ public static class CartError
     public static readonly Error ItemNotfound =
         new("Item not found", "Item not found in the cart", "Cart.ItemNotfound", ErrorType.NotFound);
 
+    public static readonly Error ItemNotAvailable =
+        new("Item not available", "This item isn't available", "Cart.ItemNotAvailable", ErrorType.Validation);
+
     public static readonly Error DecreaseLimit =
         new("Can't decrease current quantity because is 1", "This product has the minimum quantity, if you want to remove, try press the trash button", "Cart.DecreaseLimit", ErrorType.Validation);
 

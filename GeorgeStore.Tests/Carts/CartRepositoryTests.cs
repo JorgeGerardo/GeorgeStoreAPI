@@ -6,7 +6,7 @@ using GeorgeStore.Features.Users;
 using GeorgeStore.Tests.Common;
 using GeorgeStore.Tests.Factories;
 
-namespace GeorgeStore.Tests.CartTests;
+namespace GeorgeStore.Tests.Carts;
 
 public class CartRepositoryTests
 {
@@ -295,6 +295,52 @@ public class CartRepositoryTests
         //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(CartError.DecreaseLimit, result.Error);
+    }
+
+
+    [Theory]
+    [InlineData(10_000.0, 2, 20_000)]
+    [InlineData( 5_000, 2, 10_000)]
+    public async Task Decrease_ProductNotAvailable(decimal product1Price, int qty, decimal total)
+    {
+        if (total != (product1Price * qty))
+            throw new ArgumentException("Invalid inline data");
+
+        using var context = ContextHelper.Create();
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        User user = ContextHelper.CreateUser(context);
+        Product product1 = ProductFactory.Create(context, product1Price);
+        Product product2 = ProductFactory.Create(context, 1000);
+
+        Cart activeCart = new()
+        {
+            UserId = user.Id,
+            Status = CartStatus.Active,
+            Items = [
+                new CartItem{
+                    ProductId = product1.Id,
+                    Quantity = qty,
+                    Item = product1
+                },
+                new CartItem{
+                    ProductId = product1.Id,
+                    Quantity = 2,
+                    Item = product2
+                },
+            ]
+        };
+        product2.IsActive = false;
+        context.Update(product2);
+        context.Add(activeCart);
+        context.SaveChanges();
+        context.ChangeTracker.Clear();
+
+        //Act
+        Result result = await cartRep.DecreaseAsync(user.Id, product2.Id);
+        //Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(CartError.ItemNotfound, result.Error);
+        Assert.Equal(total, activeCart.Total);
     }
 
 

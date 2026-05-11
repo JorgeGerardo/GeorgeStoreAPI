@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
@@ -10,8 +11,10 @@ internal static class OrderFactory
 {
     public static OrderService CreateService(GeorgeStoreContext context)
     {
+        KeyedAsyncLock locker = new();
         var connectionFactoryMock = new Mock<IDbConnectionFactory>();
-        return new OrderService(connectionFactoryMock.Object, context, new KeyedAsyncLock());
+        ICartRepository cartRep = new CartRepository(context, connectionFactoryMock.Object, locker);
+        return new OrderService(connectionFactoryMock.Object, context, locker, cartRep);
     }
 
     public static OrderDetail CreateOrderDetail(Product product, int qty, decimal unitPrice, decimal subTotal)

@@ -9,17 +9,17 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace GeorgeStore.Features.Orders;
-
-public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreContext context, KeyedAsyncLock locker) : IOrderService
+public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreContext context, KeyedAsyncLock locker, ICartRepository cartRep) : IOrderService
 {
     public async Task<Result<int>> Purchase(Guid UserId, int CartId, int AddressId, int PaymentMethodId)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(30));
 
-        Cart? cart = await context.Carts
-            .Include(c => c.Items.Where(i => i.Item.IsActive))
-            .ThenInclude(c => c.Item)
-            .FirstOrDefaultAsync(c => c.UserId == UserId && c.Id == CartId && c.Status == CartStatus.Active);
+        var result = await cartRep.GetAsync(UserId, CancellationToken.None);
+        if(!result.IsSuccess)
+            return Result.Failure<int>(OrderError.CartNotNotfound);
+
+        Cart cart = result.Value;
 
         Address? address = await context.Addresses
             .FirstOrDefaultAsync(addr => addr.UserId == UserId && addr.Id == AddressId);
@@ -30,12 +30,8 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
         if (address is null)
             return Result.Failure<int>(OrderError.AddressNotFound);
 
-        if (cart is null)
-            return Result.Failure<int>(OrderError.CartNotNotfound);
-
         if (paymentMethod is null)
             return Result.Failure<int>(OrderError.PaymentMethodNotFound);
-
 
         cart.Status = CartStatus.Converted;
         Order newOrder = CreateOrder(cart, UserId, address, paymentMethod);

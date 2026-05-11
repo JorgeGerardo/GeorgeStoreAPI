@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using GeorgeStore.Common.Shared;
-using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +9,10 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 {
     public async Task<Result<Cart>> GetAsync(Guid UserId, CancellationToken ct = default)
     {
-        Cart? cart = await GetActiveCart(UserId, ct, true);
+        Cart? cart = await GetActiveCart(UserId, ct);
+
+        if (cart is Cart ac && ac.Items.Any(i => !i.Item.IsActive))
+            await RemoveInvalidItems(ac);
 
         if (cart is not null)
             return Result.Success(cart);
@@ -24,7 +26,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     public async Task<Result> AddAsync(Guid UserId, int ProductId, int Quantity, CancellationToken ct = default)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10), ct);
-        Cart? cart = await GetActiveCart(UserId, ct);
+        Cart? cart = await GetActiveCart(UserId, ct, true);
 
         cart ??= CreateDraft(UserId);
 
@@ -80,22 +82,24 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
                 SELECT SUM(CI.Quantity) from Carts AS C
                     INNER JOIN CartItems as CI
                     ON CI.CartId = C.Id
-                    WHERE UserId = @UserId AND C.[Status] = @Status
+                    INNER JOIN Products AS P ON P.Id = CI.ProductId
+                    WHERE UserId = @UserId AND C.[Status] = @Status AND P.IsActive = 1
             """;
+
         return await connection.ExecuteScalarAsync<int>(query, new { UserId, Status = CartStatus.Active });
     }
 
     public async Task<Result> DecreaseAsync(Guid UserId, int ProductId)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10));
-        Cart? cart = await GetActiveCart(UserId, CancellationToken.None);
+        Cart? cart = await GetActiveCart(UserId, CancellationToken.None, true);
 
         if (cart is null)
             return Result.Failure(CartError.Notfound);
 
         CartItem? cartItem = cart.Items.FirstOrDefault(p => p.ProductId == ProductId);
         if (cartItem is null)
-            return Result.Failure(CartError.ProductNotfound);
+            return Result.Failure(CartError.ItemNotfound);
 
         if (cartItem.Quantity == 1)
             return Result.Failure(CartError.DecreaseLimit);
@@ -121,5 +125,13 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         return await query.FirstOrDefaultAsync(
             c => c.UserId == UserId && c.Status == CartStatus.Active, ct
         );
+    }
+
+    private async Task<Result> RemoveInvalidItems(Cart cart)
+    {
+        cart.Items.RemoveAll(i => !i.Item.IsActive);
+        await context.SaveChangesAsync();
+        return Result.Success();
+
     }
 }
