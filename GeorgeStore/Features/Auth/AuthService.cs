@@ -12,8 +12,7 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
     public async Task<LoginResponse> GenerateTokensAsync(Guid UserId)
     {
         var tokens = tokenService.GenerateToken(UserId);
-        byte[] hash = tokens.RefreshToken.GetHash();
-        string hashString = hash.GetHashString();
+        string hashString = tokens.RefreshToken.GetHash().GetHashString();
 
         RefreshToken newRefreshToken = RefreshToken.Create(UserId, hashString);
 
@@ -24,8 +23,7 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
 
     public async Task<Result<LoginResponse>> RefreshTokensAsync(string refreshToken)
     {
-        byte[] hash = refreshToken.GetHash();
-        string hashString = hash.GetHashString();
+        string hashString = refreshToken.GetHash().GetHashString();
 
         var token = await context.RefreshTokens.FirstOrDefaultAsync(rf => rf.Token == hashString);
         if (token is null)
@@ -55,8 +53,7 @@ public class AuthService(GeorgeStoreContext context, TokenService tokenService)
         if (string.IsNullOrWhiteSpace(refreshToken))
             return Result.Success();
 
-        byte[] hash = refreshToken.GetHash();
-        string hashString = hash.GetHashString();
+        string hashString = refreshToken.GetHash().GetHashString();
         var token = await context.RefreshTokens.FirstOrDefaultAsync(rf => rf.Token == hashString && !rf.IsRevoked);
 
         if (token is null)

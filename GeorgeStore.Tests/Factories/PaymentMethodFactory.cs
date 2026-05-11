@@ -1,8 +1,9 @@
-﻿using GeorgeStore.Features.PaymentMethods;
-using GeorgeStore.Infrastructure.Data;
+﻿using Bogus;
+using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Users;
-using Moq;
-using Bogus;
+using GeorgeStore.Infrastructure.Data;
+using GeorgeStore.Tests.Common;
+using System.Data;
 
 namespace GeorgeStore.Tests.Factories;
 
@@ -10,8 +11,9 @@ internal static class PaymentMethodFactory
 {
     public static PaymentMethodRepository CreateRepository(GeorgeStoreContext context)
     {
-        var conn = new Mock<IDbConnectionFactory>();
-        return new PaymentMethodRepository(context, conn.Object);
+        IDbConnection sqlConn = ContextHelper.CreateSqlConn(context);
+        var connFactory = ContextHelper.CreateConnectionFactory(sqlConn);
+        return new PaymentMethodRepository(context, connFactory.Object);
     }
 
     public static PaymentMethod Create(GeorgeStoreContext context, User user, bool IsDefault = false)

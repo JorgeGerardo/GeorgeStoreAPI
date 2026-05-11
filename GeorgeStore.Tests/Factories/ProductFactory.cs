@@ -1,7 +1,8 @@
 ﻿using Bogus;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
-using Moq;
+using GeorgeStore.Tests.Common;
+using System.Data;
 
 namespace GeorgeStore.Tests.Factories;
 
@@ -9,7 +10,8 @@ internal static class ProductFactory
 {
     public static ProductRepository CreateRepository(GeorgeStoreContext context)
     {
-        var connFactory = new Mock<IDbConnectionFactory>();
+        IDbConnection sqlConn = ContextHelper.CreateSqlConn(context);
+        var connFactory = ContextHelper.CreateConnectionFactory(sqlConn);
         return new(connFactory.Object, context);
     }
 

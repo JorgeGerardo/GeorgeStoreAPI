@@ -1,8 +1,8 @@
 ﻿using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System.Data;
 
 namespace GeorgeStore.Tests.Common;
@@ -37,6 +37,13 @@ public static class ContextHelper
     public static IDbConnection CreateSqlConn(GeorgeStoreContext context)
     {
         return context.Database.GetDbConnection();
+    }
+
+    public static Mock<IDbConnectionFactory> CreateConnectionFactory(IDbConnection sqlConn)
+    {
+        var connFactory = new Mock<IDbConnectionFactory>();
+        connFactory.Setup(c => c.CreateConnection()).Returns(sqlConn);
+        return connFactory;
     }
 
 }
