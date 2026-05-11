@@ -36,8 +36,7 @@ public class RecoverPasswordServiceTests
         const string oldPassword = "Password329%923&";
         const string email = "jorguito@gmail.com";
 
-        User user = new User("Jorguito88", email) 
-            { PasswordHash = oldPassword.GetHash().GetHashString() };
+        User user = new("Jorguito88", email) { PasswordHash = oldPassword.GetHash().GetHashString() };
         context.Users.Add(user);
         context.SaveChanges();
 
@@ -75,12 +74,12 @@ public class RecoverPasswordServiceTests
     public async Task Recover_Failure_TokenNotFound()
     {
         using var context = ContextHelper.Create();
-
         User user = ContextHelper.CreateUser(context);
         RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
 
         //Act
         Result result = await recoverPasswordSvc.RecoverAsync("FakeRefreshToken", "new password123");
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(PasswordRecoverTokenError.NotFound, result.Error);
     }
@@ -103,8 +102,6 @@ public class RecoverPasswordServiceTests
         context.PasswordResetTokens.Add(tokenRecoverToken);
         context.SaveChanges();
 
-
-
         //Act
         Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, "new password123");
 
@@ -118,8 +115,8 @@ public class RecoverPasswordServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-
         RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
+
         string recoverToken = Guid.NewGuid().ToString();
         PasswordRecoverToken tokenRecoverToken = new()
         {
@@ -131,8 +128,6 @@ public class RecoverPasswordServiceTests
         };
         context.PasswordResetTokens.Add(tokenRecoverToken);
         context.SaveChanges();
-
-
 
         //Act
         Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, "new password123");
@@ -146,7 +141,7 @@ public class RecoverPasswordServiceTests
     public async Task Recover_Failure_UserNotFound()
     {
         using var context = ContextHelper.Create();
-        User user = new User("Jorguito88", "jorguito@gmail.com");
+        User user = new("Jorguito88", "jorguito@gmail.com");
         string recoverToken = Guid.NewGuid().ToString();
         Guid fakeUserId = Guid.NewGuid();
         PasswordRecoverToken tokenRecoverToken = new()

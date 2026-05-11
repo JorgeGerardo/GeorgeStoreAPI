@@ -51,12 +51,13 @@ public class AddressRepositoryTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
         AddressRepository addressRepository = AddressFactory.CreateRepository(context);
+        Address addr1 = AddressFactory.CreateRandom(context, user, true);
+        Address addr2 = AddressFactory.CreateRandom(context, user, false);
+        Address addr3 = AddressFactory.CreateRandom(context, user, false);
 
-        var addr1 = AddressFactory.CreateRandom(context, user, true);
-        var addr2 = AddressFactory.CreateRandom(context, user, false);
-        var addr3 = AddressFactory.CreateRandom(context, user, false);
-
+        //Act
         Result result = await addressRepository.RemoveAsync(user.Id, addr2.Id);
+        //Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(2, user.Addresses.Count);
         Assert.DoesNotContain(user.Addresses, a => a.Id == addr2.Id);

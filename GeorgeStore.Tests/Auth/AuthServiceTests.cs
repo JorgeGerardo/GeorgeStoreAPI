@@ -1,28 +1,25 @@
 ﻿using GeorgeStore.Common.Core;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Tests.Common;
-using GeorgeStore.Common.Shared;
-using Microsoft.Extensions.Options;
-using Moq;
+using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.Auth;
 
 public class AuthServiceTests
 {
     [Fact]
-    public async Task LoginTest()
+    public async Task GenerateTokensTest()
     {
         using var context = ContextHelper.Create();
+        AuthService authSrv = AuthFactory.CreateService(context);
         Guid userId = new();
-        var optionsJwtConfig =CreateJwtConfigOptions();
-        AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
         
         //Act
         LoginResponse result = await authSrv.GenerateTokensAsync(userId);
         RefreshToken? refreshToken = context.RefreshTokens.FirstOrDefault();
         string hashRefreshToken = result.RefreshToken.GetHash().GetHashString();
-        
-
+        //Assert        
         Assert.NotNull(refreshToken);
         Assert.Equal(hashRefreshToken, refreshToken.Token);
     }
@@ -31,8 +28,7 @@ public class AuthServiceTests
     public async Task RefreshTest()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig =CreateJwtConfigOptions();
-        AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
+        AuthService authSrv = AuthFactory.CreateService(context);
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
         Guid userId = Guid.NewGuid();
@@ -50,7 +46,7 @@ public class AuthServiceTests
 
         //Act
         var result = await authSrv.RefreshTokensAsync(refreshTokenValue);
-
+        //Assert
         Assert.True(result.IsSuccess);
     }
 
@@ -58,8 +54,7 @@ public class AuthServiceTests
     public async Task Refresh_Revoked_Test()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig =CreateJwtConfigOptions();
-        AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
+        AuthService authSrv = AuthFactory.CreateService(context);
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
         Guid userId = Guid.NewGuid();
@@ -87,8 +82,7 @@ public class AuthServiceTests
     public async Task Refresh_Expired_Test()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig =CreateJwtConfigOptions();
-        AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
+        AuthService authSrv = AuthFactory.CreateService(context);
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
         Guid userId = Guid.NewGuid();
@@ -106,7 +100,7 @@ public class AuthServiceTests
 
         //Act
         var result = await authSrv.RefreshTokensAsync(refreshTokenValue);
-
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(RefreshTokenErrors.Expired, result.Error);
 
@@ -117,13 +111,12 @@ public class AuthServiceTests
     public async Task Refresh_NotFound_Test()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig =CreateJwtConfigOptions();
-        AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
+        AuthService authSrv = AuthFactory.CreateService(context);
         string randomString = Guid.NewGuid().ToString();
 
         //Act
         var result = await authSrv.RefreshTokensAsync(randomString);
-
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(RefreshTokenErrors.Notfound, result.Error);
     }
@@ -133,8 +126,7 @@ public class AuthServiceTests
     public async Task LogoutTest()
     {
         using var context = ContextHelper.Create();
-        var optionsJwtConfig =CreateJwtConfigOptions();
-        AuthService authSrv = new(context, new TokenService(optionsJwtConfig));
+        AuthService authSrv = AuthFactory.CreateService(context);
         string refreshTokenValue = Guid.NewGuid().ToString();
         string refreshTokenHash = refreshTokenValue.GetHash().GetHashString();
         Guid userId = Guid.NewGuid();
@@ -153,32 +145,10 @@ public class AuthServiceTests
 
         //Act
         Result result = await authSrv.LogoutAsync(refreshTokenValue);
-
+        //Assert
         Assert.True(result.IsSuccess);
         Assert.True(refreshToken.IsRevoked);
 
-    }
-
-
-    //Common arranges
-    private static IOptionsSnapshot<JWTConfig> CreateJwtConfigOptions()
-    {
-        var jwtConfig = CreateJwtConfig();
-        var jwtOptionsMock = new Mock<IOptionsSnapshot<JWTConfig>>();
-        jwtOptionsMock.Setup(o => o.Value).Returns(jwtConfig);
-        return jwtOptionsMock.Object;
-    }
-
-    private static JWTConfig CreateJwtConfig(int DurationMinutes = 10, int RefreshTokenDurationMinutes = 10)
-    {
-        return new()
-        {
-            Key = "Secret-key-Secret-key-Secret-key-Secret-key-Secret-key12323ls",
-            Issuer = "George Corporation",
-            Audience = "GeorgeStore",
-            DurationMinutes = DurationMinutes,
-            RefreshTokenDurationMinutes = RefreshTokenDurationMinutes,
-        };
     }
 
 }

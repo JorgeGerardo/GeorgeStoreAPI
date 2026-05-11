@@ -1,5 +1,6 @@
 ﻿using GeorgeStore.Features.Users;
 using GeorgeStore.Tests.Common;
+using GeorgeStore.Tests.Factories;
 
 namespace GeorgeStore.Tests.Users;
 
@@ -10,8 +11,7 @@ public class UserServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        var userManager = ConfigurationHelper.CreateUserManager(user);
-        UserService userSrv = new(userManager);
+        UserService userSrv = UserFactory.CreateService(user);
 
         //Act
         var result = await userSrv.Login("juanita@gmail.com", "Password123!");
@@ -26,8 +26,7 @@ public class UserServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        var userManager = ConfigurationHelper.CreateUserManager(user);
-        UserService userSrv = new(userManager);
+        UserService userSrv = UserFactory.CreateService(user);
 
         //Act
         var result = await userSrv.Login(user.Email!, "IcorrectPassword123!");
@@ -42,8 +41,8 @@ public class UserServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        var userManager = ConfigurationHelper.CreateUserManager(user);
-        UserService userSrv = new(userManager);
+        UserService userSrv = UserFactory.CreateService(user);
+        
         //Act
         var result = await userSrv.GetProfile(Guid.NewGuid());
         //Assert
@@ -57,8 +56,8 @@ public class UserServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        var userManager = ConfigurationHelper.CreateUserManager(user);
-        UserService userSrv = new(userManager);
+        UserService userSrv = UserFactory.CreateService(user);
+
         //Act
         var result = await userSrv.GetProfile(user.Id);
         //Assert
@@ -73,8 +72,7 @@ public class UserServiceTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        var userManager = ConfigurationHelper.CreateUserManager(user);
-        UserService userSrv = new(userManager);
+        UserService userSrv = UserFactory.CreateService(user);
 
         //Act
         var result = await userSrv.Exist(user.Email!);

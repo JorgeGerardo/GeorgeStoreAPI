@@ -49,10 +49,10 @@ public class PaymentMethodRepositoryTests
     public async Task RemoveTest()
     {
         using var context = ContextHelper.Create();
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
         PaymentMethod? paymentMethod1 = PaymentMethodFactory.Create(context, user, IsDefault: true);
         PaymentMethod? paymentMethod2 = PaymentMethodFactory.Create(context, user, IsDefault: true);
-        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreateRepository(context);
 
         //Act
         Result result = await paymentRep.RemoveAsync(user.Id, paymentMethod2.Id);
@@ -70,9 +70,9 @@ public class PaymentMethodRepositoryTests
     public async Task Remove_Failure_Notfound()
     {
         using var context = ContextHelper.Create();
+        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
         PaymentMethod newPaymentM = PaymentMethodFactory.Create(context, user, IsDefault: true);
-        PaymentMethodRepository paymentRep = PaymentMethodFactory.CreateRepository(context);
 
         //Act
         var result = await paymentRep.RemoveAsync(user.Id, newPaymentM.Id);

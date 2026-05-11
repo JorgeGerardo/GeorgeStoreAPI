@@ -13,9 +13,9 @@ public class ProductRepositoryTests
     public async Task CreateTest()
     {
         using var context = ContextHelper.Create();
-        Faker faker = new("es_MX");
         ProductRepository productRep = ProductFactory.CreateRepository(context);
         Category category = CategoryFactory.CreateRandom(context);
+        Faker faker = new("es_MX");
         ProductCreateDTO request = new
         (
             faker.Commerce.ProductName(),
@@ -35,8 +35,7 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        Category category = CategoryFactory.CreateRandom(context);
-        Product product = ProductFactory.Create(context, 1000, true);
+        Product product = ProductFactory.Create(context, 1000);
 
         //Act
         var result = await productRep.GetByIdAsync(product.Id);
@@ -50,7 +49,6 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        Category category = CategoryFactory.CreateRandom(context);
         Product product1 = ProductFactory.Create(context, 1000, isActive: false);
 
         //Act
@@ -67,8 +65,7 @@ public class ProductRepositoryTests
     {
         using var context = ContextHelper.Create();
         ProductRepository productRep = ProductFactory.CreateRepository(context);
-        Category category = CategoryFactory.CreateRandom(context);
-        Product product1 = ProductFactory.Create(context, 1000, isActive: true);
+        Product product1 = ProductFactory.Create(context, 1000);
         Product product2 = ProductFactory.Create(context, 3000, isActive: false);
 
         //Act
@@ -87,7 +84,7 @@ public class ProductRepositoryTests
         ProductRepository productRep = ProductFactory.CreateRepository(context);
         Category category = CategoryFactory.CreateRandom(context);
         Product product1 = ProductFactory.Create(context, 1000, isActive: false);
-        Product product2 = ProductFactory.Create(context, 3000, isActive: true);
+        Product product2 = ProductFactory.Create(context, 3000);
 
         //Act
         var result1 = await productRep.RemoveAsync(product1.Id);

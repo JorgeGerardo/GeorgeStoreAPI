@@ -14,9 +14,9 @@ internal static class RecoverPasswordFactory
 {
     public static RecoverPasswordService CreateService(GeorgeStoreContext context, User user)
     {
-        UserManager<User> userManager = ConfigurationHelper.CreateUserManager(user);
+        UserManager<User> userManager = UserFactory.CreateUserManager(user);
         IOptionsSnapshot<BrevoOptions> brevoOptionsMock = ConfigurationHelper.CreateBrevoOptionsMock();
-        IOptionsSnapshot<JWTConfig> iSnapshotJwt = ConfigurationHelper.CreateJwtConfigOptions(ConfigurationHelper.CreateJwtConfig(10, 10));
+        IOptionsSnapshot<JWTConfig> iSnapshotJwt = ConfigurationHelper.CreateJwtConfigOptions();
         IEmailSender emailSender = ConfigurationHelper.CreateEmailSender();
         return new(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
 

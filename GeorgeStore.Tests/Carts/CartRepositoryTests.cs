@@ -39,13 +39,10 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
-        Category newCategory = CategoryFactory.CreateRandom(context);
-        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price, true);
-        context.AddRange([product1, product2, product3, product4]);
-        context.SaveChanges();
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, 3000);
+        Product product3 = ProductFactory.Create(context, 7000);
+        Product product4 = ProductFactory.Create(context, Product4Price);
 
         Cart oldCart = new(){
             UserId = user.Id,
@@ -95,12 +92,10 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
-        Category newCategory = CategoryFactory.CreateRandom(context);
-        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price, true);
-        context.AddRange([product1, product2, product3, product4]);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, 3000);
+        Product product3 = ProductFactory.Create(context, 7000);
+        Product product4 = ProductFactory.Create(context, Product4Price);
 
         Cart newCart = Cart.Create(user.Id);
         context.Add(newCart);
@@ -139,16 +134,12 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
 
         Category newCategory = CategoryFactory.CreateRandom(context);
-        Product product1 = Product.Create("LaptopAsus", "description", 1, "", 5500, true);
-        Product product2 = Product.Create("Galaxy S26", "description", 1, "", 3000, true);
-        context.AddRange([product1, product2]);
-        
+        Product product1 = ProductFactory.Create(context, 5500);
+        Product product2 = ProductFactory.Create(context, 3000);        
         Cart newCart = Cart.Create(user.Id);
 
         context.Add(newCart);
         context.SaveChanges();
-
-
 
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, 1, CancellationToken.None);
@@ -156,6 +147,7 @@ public class CartRepositoryTests
 
         //Act
         Result removeResult = await cartRep.RemoveAsync(user.Id, product2.Id, CancellationToken.None);
+        //Assert
         Assert.False(removeResult.IsSuccess);
         Assert.Equal(CartError.ItemNotfound, removeResult.Error);
     }
@@ -168,7 +160,7 @@ public class CartRepositoryTests
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
 
         //Act
-        Result removeResult = await cartRep.RemoveAsync(user.Id, 1, CancellationToken.None);
+        Result removeResult = await cartRep.RemoveAsync(user.Id, int.MaxValue, CancellationToken.None);
 
         Assert.False(removeResult.IsSuccess);
         Assert.Equal(CartError.Notfound, removeResult.Error);
@@ -194,10 +186,11 @@ public class CartRepositoryTests
         User user = ContextHelper.CreateUser(context);
 
         Category newCategory = CategoryFactory.CreateRandom(context);
-        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price, true);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, 3000);
+        Product product3 = ProductFactory.Create(context, 7000);
+        Product product4 = ProductFactory.Create(context, Product4Price);
+
         Cart oldCart = new() {
             UserId = user.Id,
             Status = CartStatus.Converted,
@@ -209,10 +202,9 @@ public class CartRepositoryTests
                 }
             ]
         };
-
         Cart activeCart = Cart.Create(user.Id);
 
-        context.AddRange([product1, product2, product3, product4, activeCart, oldCart]);
+        context.AddRange([activeCart, oldCart]);
         context.SaveChanges();
         
         //Act
@@ -268,6 +260,7 @@ public class CartRepositoryTests
         CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         //Act
         Result result = await cartRep.AddAsync(user.Id, int.MaxValue, 1, CancellationToken.None);
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(CartError.ProductNotfound, result.Error);
     }
@@ -276,9 +269,9 @@ public class CartRepositoryTests
     public async Task DecreaseDecreaseLimit()
     {
         using var context = ContextHelper.Create();
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         User user = ContextHelper.CreateUser(context);
-        Category newCategory = CategoryFactory.CreateRandom(context);
-        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", 1000, true);
+        Product product1 = ProductFactory.Create(context, 1000);
 
         Cart currentCart = new()
         {
@@ -295,11 +288,11 @@ public class CartRepositoryTests
 
         context.Add(currentCart);
         context.SaveChanges();
-
-
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         context.ChangeTracker.Clear();
+        
+        //Act
         Result result = await cartRep.DecreaseAsync(user.Id, product1.Id);
+        //Assert
         Assert.False(result.IsSuccess);
         Assert.Equal(CartError.DecreaseLimit, result.Error);
     }
@@ -312,13 +305,12 @@ public class CartRepositoryTests
     public async Task GetCart_WhenSomeProductInCartIsInactive(decimal Product1Price, int QtyP1, decimal Product4Price, int QtyP4, decimal Total)
     {
         using var context = ContextHelper.Create();
+        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         User user = ContextHelper.CreateUser(context);
-
-        Category newCategory = CategoryFactory.CreateRandom(context);
-        Product product1 = Product.Create("LaptopAsus", "description", newCategory.Id, "", Product1Price, true);
-        Product product2 = Product.Create("Galaxy S26", "description", newCategory.Id, "", 3000, true);
-        Product product3 = Product.Create("Pixel 10XL", "description", newCategory.Id, "", 7000, true);
-        Product product4 = Product.Create("Huawei p60", "description", newCategory.Id, "", Product4Price);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, 3000);
+        Product product3 = ProductFactory.Create(context, 7000);
+        Product product4 = ProductFactory.Create(context, Product4Price);
 
         Cart oldCart = new()
         {
@@ -332,15 +324,13 @@ public class CartRepositoryTests
                 }
             ]
         };
-
         Cart activeCart = Cart.Create(user.Id);
 
-        context.AddRange([product1, product2, product3, product4, activeCart, oldCart]);
+        context.AddRange([activeCart, oldCart]);
         context.SaveChanges();
 
 
 
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
         //Act
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, QtyP1, CancellationToken.None);
         Assert.True(result1.IsSuccess);

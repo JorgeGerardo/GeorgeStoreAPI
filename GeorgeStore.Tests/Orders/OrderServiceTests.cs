@@ -28,8 +28,8 @@ public class OrderServiceTests
         OrderService orderService = OrderFactory.CreateService(context);
         User user = ContextHelper.CreateUser(context);
 
-        Product product1 = ProductFactory.Create(context, Product1Price, isActive: true);
-        Product product2 = ProductFactory.Create(context, Product2Price, isActive: true);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, Product2Price);
         Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
         Order order = OrderFactory.Create(
@@ -69,8 +69,8 @@ public class OrderServiceTests
         OrderService orderService = OrderFactory.CreateService(context);
 
         var user = ContextHelper.CreateUser(context);
-        Product product1 = ProductFactory.Create(context, Product1Price, isActive: true);
-        Product product2 = ProductFactory.Create(context, Product2Price, isActive: true);
+        Product product1 = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, Product2Price);
         Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
         var order = OrderFactory.Create(
@@ -150,9 +150,8 @@ public class OrderServiceTests
         Assert.True(result.IsSuccess);
         PaymentMethod paymentM = result.Value;
 
-        //TODO: Chante to product
-        Product product1  = ProductFactory.Create(context, Product1Price, isActive: true);
-        Product product2 = ProductFactory.Create(context, Product2Price, isActive: true);
+        Product product1  = ProductFactory.Create(context, Product1Price);
+        Product product2 = ProductFactory.Create(context, Product2Price);
         Product product3 = ProductFactory.Create(context, 1000m, isActive: false);
 
         Order order = OrderFactory.Create(
@@ -381,7 +380,7 @@ public class OrderServiceTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
         OrderService orderSvc = OrderFactory.CreateService(context);
-        Product product1 = ProductFactory.Create(context, 30123m, isActive: true);
+        Product product1 = ProductFactory.Create(context, 30123m);
 
         Order order = OrderFactory.Create(
             user.Id,
@@ -407,7 +406,7 @@ public class OrderServiceTests
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
         OrderService orderSvc = OrderFactory.CreateService(context);
-        Product newProduct = ProductFactory.Create(context, 30123m, isActive: true);
+        Product newProduct = ProductFactory.Create(context, 30123m);
 
         Order order = OrderFactory.Create(
             user.Id,
