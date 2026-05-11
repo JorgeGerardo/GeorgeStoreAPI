@@ -11,13 +11,57 @@ namespace GeorgeStore.Tests.Carts;
 public class CartRepositoryTests
 {
     [Fact]
+    public async Task CountAsync()
+    {
+        using var context = ContextHelper.Create();
+        User user = ContextHelper.CreateUser(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
+
+        Product product1 = ProductFactory.Create(context, 10);
+        Product product2 = ProductFactory.Create(context, 10);
+        Product product3 = ProductFactory.Create(context, 10);
+
+        int prod1Qty = 10;
+        int prod3Qty = 3;
+
+        Cart newCart = Cart.Create(user.Id);
+        newCart.Items = [
+            new CartItem(){
+                ProductId = product1.Id,
+                Quantity = prod1Qty,
+                Item = product1
+            },
+            new CartItem(){
+                ProductId = product2.Id,
+                Quantity = 5,
+                Item = product2
+            },
+            new CartItem(){
+                ProductId = product3.Id,
+                Quantity = prod3Qty,
+                Item = product3
+            }
+        ];
+        product2.IsActive = false;
+        context.Add(newCart);
+        context.SaveChanges();
+
+        int totalItems = prod1Qty + prod3Qty;
+        //Act
+        var qty = await cartRep.CountAsync(user.Id);
+        //Assert
+        Assert.Equal(totalItems, qty);
+    }
+
+
+    [Fact]
     public async Task Get_CartNotExist()
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
 
 
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         var result = await cartRep.GetAsync(user.Id, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
@@ -37,7 +81,7 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
 
         Product product1 = ProductFactory.Create(context, Product1Price);
         Product product2 = ProductFactory.Create(context, 3000);
@@ -90,7 +134,7 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
 
         Product product1 = ProductFactory.Create(context, Product1Price);
         Product product2 = ProductFactory.Create(context, 3000);
@@ -141,7 +185,7 @@ public class CartRepositoryTests
         context.Add(newCart);
         context.SaveChanges();
 
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, 1, CancellationToken.None);
         Assert.True(result1.IsSuccess);
 
@@ -157,7 +201,7 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
 
         //Act
         Result removeResult = await cartRep.RemoveAsync(user.Id, int.MaxValue, CancellationToken.None);
@@ -209,7 +253,7 @@ public class CartRepositoryTests
         
         //Act
         context.ChangeTracker.Clear();
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         Result result1 = await cartRep.AddAsync(user.Id, product1.Id, QtyP1, CancellationToken.None);
         Assert.True(result1.IsSuccess);
         Result result2 = await cartRep.AddAsync(user.Id, product4.Id, QtyP4, CancellationToken.None);
@@ -257,7 +301,7 @@ public class CartRepositoryTests
         context.Add(newCart);
         context.SaveChanges();
 
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         //Act
         Result result = await cartRep.AddAsync(user.Id, int.MaxValue, 1, CancellationToken.None);
         //Assert
@@ -269,7 +313,7 @@ public class CartRepositoryTests
     public async Task DecreaseDecreaseLimit()
     {
         using var context = ContextHelper.Create();
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
         Product product1 = ProductFactory.Create(context, 1000);
 
@@ -307,7 +351,7 @@ public class CartRepositoryTests
             throw new ArgumentException("Invalid inline data");
 
         using var context = ContextHelper.Create();
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
         Product product1 = ProductFactory.Create(context, product1Price);
         Product product2 = ProductFactory.Create(context, 1000);
@@ -351,7 +395,7 @@ public class CartRepositoryTests
     public async Task GetCart_WhenSomeProductInCartIsInactive(decimal Product1Price, int QtyP1, decimal Product4Price, int QtyP4, decimal Total)
     {
         using var context = ContextHelper.Create();
-        CartRepository cartRep = CategoryFactory.CreateCartRepository(context);
+        CartRepository cartRep = CartFactory.CreateRepository(context);
         User user = ContextHelper.CreateUser(context);
         Product product1 = ProductFactory.Create(context, Product1Price);
         Product product2 = ProductFactory.Create(context, 3000);

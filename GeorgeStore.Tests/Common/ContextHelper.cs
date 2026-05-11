@@ -1,7 +1,9 @@
 ﻿using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace GeorgeStore.Tests.Common;
 
@@ -9,12 +11,6 @@ public static class ContextHelper
 {
     public static GeorgeStoreContext Create()
     {
-        //var options = new DbContextOptionsBuilder<GeorgeStoreContext>()
-        //    .UseInMemoryDatabase(Guid.NewGuid().ToString())
-        //    .Options;
-
-        //return new GeorgeStoreContext(options);
-
         //Sqlite
         var connection = new SqliteConnection("Filename=:memory:");
         connection.Open();
@@ -36,6 +32,11 @@ public static class ContextHelper
         context.Add(user);
         context.SaveChanges();
         return user;
+    }
+
+    public static IDbConnection CreateSqlConn(GeorgeStoreContext context)
+    {
+        return context.Database.GetDbConnection();
     }
 
 }
