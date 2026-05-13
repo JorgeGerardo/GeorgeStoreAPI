@@ -68,13 +68,6 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         return Result.Success();
     }
 
-    private Cart CreateDraft(Guid UserId)
-    {
-        var newCart = Cart.Create(UserId);
-        context.Carts.Add(newCart);
-        return newCart;
-    }
-
     public async Task<int> CountAsync(Guid UserId)
     {
         var connection = dbConnection.CreateConnection();
@@ -110,6 +103,13 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
 
         await context.SaveChangesAsync();
         return Result.Success();
+    }
+
+    private Cart CreateDraft(Guid UserId)
+    {
+        var newCart = Cart.Create(UserId);
+        context.Carts.Add(newCart);
+        return newCart;
     }
 
     private async Task<Cart?> GetActiveCart(Guid UserId, CancellationToken ct, bool onlyActiveProducts = false)

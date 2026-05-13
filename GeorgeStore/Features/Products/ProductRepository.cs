@@ -75,7 +75,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         return new PagedResult<ProductDto>(products, total);
     }
 
-    private async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
+    private static async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
     {
         const string query = "SELECT COUNT(*) FROM Products WHERE IsActive = 1 AND [Name] like @Term";
         return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
