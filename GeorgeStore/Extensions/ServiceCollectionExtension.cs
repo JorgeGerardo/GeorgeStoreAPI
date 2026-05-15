@@ -20,7 +20,7 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddDBConnection(this IServiceCollection collection, WebApplicationBuilder builder)
     {
         collection.AddDbContext<GeorgeStoreContext>(opts =>
-            opts.UseSqlServer(builder.Configuration
+            opts.UseNpgsql(builder.Configuration
                 .GetConnectionString("GeorgeStoreConnection"))
         );
 
