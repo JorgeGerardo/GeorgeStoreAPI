@@ -11,9 +11,9 @@ public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory 
     {
         var connection = dbConnection.CreateConnection();
         const string query = """
-            SELECT Id, Alias, Street, Neighborhood, City, [State], PostalCode, ExternalNumber, InternalNumber, [References], IsDefault
-            FROM Addresses
-            WHERE UserId = @UserId
+            SELECT "Id", "Alias", "Street", "Neighborhood", "City", "State", "PostalCode", "ExternalNumber", "InternalNumber", "References", "IsDefault"
+            FROM "Addresses"
+            WHERE "UserId" = @UserId
          """;
 
         return await connection.QueryAsync<AddressDto>(query, new { UserId });

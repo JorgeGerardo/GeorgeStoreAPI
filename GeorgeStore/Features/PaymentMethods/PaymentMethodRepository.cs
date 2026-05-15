@@ -32,8 +32,8 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
     {
         var conn = connection.CreateConnection();
         const string query = """
-            SELECT Id, UserId, LastDigits, Brand, ExpMonth, ExpYear, CardHolderName, IsDefault, CreatedAt FROM PaymentMethods
-                WHERE UserId = @UserId
+            SELECT "Id", "UserId", "LastDigits", "Brand", "ExpMonth", "ExpYear", "CardHolderName", "IsDefault", "CreatedAt" FROM "PaymentMethods"
+                WHERE "UserId" = @UserId
             """;
 
         return await conn.QueryAsync<PaymentMethodDto>(query, new { UserId });

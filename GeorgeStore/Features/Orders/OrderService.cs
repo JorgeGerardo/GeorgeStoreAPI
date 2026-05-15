@@ -121,40 +121,51 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
     {
         var conn = connection.CreateConnection();
         const string query = """
-                WITH OrdersPaged AS (
+                WITH "OrdersPaged" AS (
                     SELECT 
-                        O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
-                        O.Street, O.Neighborhood, O.City, O.State, O.PostalCode,
-                        O.ExternalNumber, O.InternalNumber, O.[References],
-                        O.CardHolderName, O.Last4, O.Brand
+                        O."Id",
+                        O."UserId",
+                        O."DateUtc",
+                        O."Total",
+                        O."Status",
+                        O."Street",
+                        O."Neighborhood",
+                        O."City",
+                        O."State",
+                        O."PostalCode",
+                        O."ExternalNumber",
+                        O."InternalNumber",
+                        O."References",
+                        O."CardHolderName",
+                        O."Last4",
+                        O."Brand"
 
-                    FROM Orders AS O
-                    WHERE O.UserId = @UserId
+                    FROM "Orders" AS O
+                    WHERE O."UserId" = @UserId
                       AND (
                             @Term IS NULL
                             OR EXISTS (
                                 SELECT 1
-                                FROM OrderDetails OD
-                                INNER JOIN Products P ON P.Id = OD.ProductId
-                                WHERE OD.OrderId = O.Id
-                                  AND P.Name LIKE @Term
+                                FROM "OrderDetails" OD
+                                INNER JOIN "Products" P ON P."Id" = OD."ProductId"
+                                WHERE OD."OrderId" = O."Id"
+                                  AND P."Name" ILIKE @Term
                             )
                           )
-                    ORDER BY O.DateUtc DESC
-                    OFFSET @Offset ROWS
-                    FETCH NEXT @PageSize ROWS ONLY
+                    ORDER BY O."DateUtc" DESC
+                    LIMIT @PageSize OFFSET @Offset
                 )
                 SELECT
-                    O.Id, O.UserId, O.DateUtc, O.Total, O.Status,
-                    O.Street, O.Neighborhood, O.City, O.State, O.PostalCode,
-                    O.ExternalNumber, O.InternalNumber, O.[References],
-                    O.CardHolderName, O.Last4, O.Brand,
-                    OD.Id, OD.OrderId, OD.ProductId, OD.UnitPrice, OD.SubTotal, OD.Quantity,
-                    P.[Image], P.[Name]
-                FROM OrdersPaged AS O 
-                    INNER JOIN OrderDetails AS OD ON O.Id = OD.OrderId
-                    INNER JOIN Products AS P ON P.Id = OD.ProductId
-                ORDER BY O.DateUtc DESC
+                    O."Id", O."UserId", O."DateUtc", O."Total", O."Status",
+                    O."Street", O."Neighborhood", O."City", O."State", O."PostalCode",
+                    O."ExternalNumber", O."InternalNumber", O."References",
+                    O."CardHolderName", O."Last4", O."Brand",
+                    OD."Id", OD."OrderId", OD."ProductId", OD."UnitPrice", OD."SubTotal", OD."Quantity",
+                    P."Image", P."Name"
+                FROM "OrdersPaged" AS O 
+                    INNER JOIN "OrderDetails" AS OD ON O."Id" = OD."OrderId"
+                    INNER JOIN "Products" AS P ON P."Id" = OD."ProductId"
+                ORDER BY O."DateUtc" DESC
             """;
         var dic = new Dictionary<int, OrderDto>();
 
@@ -230,11 +241,11 @@ public partial class OrderService(IDbConnectionFactory connection, GeorgeStoreCo
     private static async Task<int> GetTotal(QueryParams prms, Guid UserId, IDbConnection conn)
     {
         string query = """
-             SELECT COUNT(*) from Orders AS O
-                 INNER JOIN OrderDetails AS OD ON O.Id = OD.OrderId
-                 INNER JOIN Products AS P ON OD.ProductId = P.Id
-             WHERE UserId = @UserId 
-                 AND P.Name LIKE @Term
+             SELECT COUNT(*) from "Orders" AS O
+                 INNER JOIN "OrderDetails" AS OD ON O.Id = OD."OrderId"
+                 INNER JOIN "Products" AS P ON OD."ProductId" = P."Id"
+             WHERE "UserId" = @UserId 
+                 AND P."Name" ILIKE @Term
             """;
         return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%", UserId });
     }

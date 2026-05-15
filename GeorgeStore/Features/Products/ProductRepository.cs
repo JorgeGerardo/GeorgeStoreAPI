@@ -52,21 +52,23 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
     {
         using var conn = dbConnection.CreateConnection();
         StringBuilder query = new("""
-             SELECT
-                p.Id, p.Name, p.Price, p.[Description], p.[Image], p.CategoryId, c.Name as [categoryName]
-             FROM Products as p
-                INNER JOIN Categories as c on p.CategoryId = c.Id 
-            """);
-
-        query.Append($"WHERE IsActive = 1");
-        if (prms.Term is not null)
-            query.Append($"AND p.Name like @term");
-
-        query.Append("""
-                ORDER by p.Id
-                OFFSET @offset Rows
-                FETCH NEXT @pageSize ROWS ONLY
+            SELECT
+                p."Id",
+                p."Name",
+                p."Price",
+                p."Description",
+                p."Image",
+                p."CategoryId",
+                c."Name" as "categoryName"
+            FROM "Products" as p
+                INNER JOIN "Categories" as c on p."CategoryId" = c."Id"
+            WHERE "IsActive" = true 
         """);
+        if (prms.Term is not null)
+            query.Append(""" AND p."Name" ILIKE @term """);
+
+        query.Append(" LIMIT @pageSize OFFSET @offset ");
+        var x = query.ToString();
         var products = await conn.QueryAsync<ProductDto>(query.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize });
         int total = prms.Term is not null
             ? await GetTotal(prms, conn)
@@ -77,7 +79,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
 
     private static async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
     {
-        const string query = "SELECT COUNT(*) FROM Products WHERE IsActive = 1 AND [Name] like @Term";
+        const string query = """SELECT COUNT(*) FROM "Products" WHERE "IsActive" = true AND "Name" ILIKE @Term""";
         return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
     }
 

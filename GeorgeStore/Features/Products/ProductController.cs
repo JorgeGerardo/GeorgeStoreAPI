@@ -24,13 +24,13 @@ public class ProductController(IProductRepository productRepository) : ApiContro
             : HandleResult(result);
     }
 
-    [HttpPost]
-    [Authorize]
-    public async Task<ActionResult> Create(ProductCreateDTO request)
-    {
-        Result result = await productRepository.CreateAsync(request);
-        return HandleResult(result);
-    }
+    //[HttpPost]
+    //[Authorize]
+    //public async Task<ActionResult> Create(ProductCreateDTO request)
+    //{
+    //    Result result = await productRepository.CreateAsync(request);
+    //    return HandleResult(result);
+    //}
 
     [HttpDelete("{id:int}")]
     [Authorize]
