@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -6,6 +8,22 @@ namespace GeorgeStore.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
+
+    public static WebApplicationBuilder AddKeyVaultIfProduction(this WebApplicationBuilder builder)
+    {
+        if (!builder.Environment.IsProduction())
+            return builder;
+
+        var keyVaultName = builder.Configuration.GetValue<string>("KeyVaultName");
+        var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+        builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential(), new AzureKeyVaultConfigurationOptions
+        {
+            ReloadInterval = TimeSpan.FromMinutes(60)
+        });
+
+        return builder;
+
+    }
     public static WebApplicationBuilder AddJWT(this WebApplicationBuilder builder)
     {
         var jwtOptions = builder.Configuration.GetSection("JWT").Get<JwtOptions>();
