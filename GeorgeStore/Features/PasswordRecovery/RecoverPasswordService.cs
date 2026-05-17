@@ -20,6 +20,10 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
         if (user is null)
             return Result.Success();
 
+        Result attemptsLimitCheck = await CheckResetAttemptsLimitAsync(user.Id);
+        if (attemptsLimitCheck.IsFailure)
+            return attemptsLimitCheck;
+
         var token = Guid.NewGuid().ToString();
         var tokenHasthString = token.GetHash().GetHashString();
         PasswordRecoverToken newResetToken = PasswordRecoverToken.Create(user.Id, tokenHasthString, IpAddress, Agent, jwt.Value.RefreshTokenDurationMinutes);
@@ -69,4 +73,17 @@ public class RecoverPasswordService(UserManager<User> manager, GeorgeStoreContex
         await context.SaveChangesAsync();
         return Result.Success();
     }
+
+    private async Task<Result> CheckResetAttemptsLimitAsync(Guid userId)
+    {
+        var oneHourAgo = DateTime.UtcNow.AddHours(-1);
+
+        int count = await context.PasswordResetTokens
+            .CountAsync(t =>
+                t.UserId == userId &&
+                t.CreatedAt >= oneHourAgo);
+
+        return count < 3 ? Result.Success() : Result.Failure(PasswordRecoverTokenError.AttempsLimitReached);
+    }
+
 }

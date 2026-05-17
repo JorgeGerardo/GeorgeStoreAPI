@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Common.Core;
+﻿using Azure.Core;
+using GeorgeStore.Common.Core;
 using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.Users;
@@ -165,6 +166,29 @@ public class RecoverPasswordServiceTests
         Result result = await recoverPasswordSvc.RecoverAsync(recoverToken, "NewPassword123");
         Assert.False(result.IsSuccess);
         Assert.Equal(PasswordRecoverTokenError.UserNotFound, result.Error);
+    }
+
+
+
+    [Fact]
+    public async Task Recover_Failure_AttempsLimiteReached()
+    {
+        using var context = ContextHelper.Create();
+        User user = ContextHelper.CreateUser(context);
+        RecoverPasswordService recoverPasswordSvc = RecoverPasswordFactory.CreateService(context, user);
+
+        string recoverToken = Guid.NewGuid().ToString();
+        RecoverPasswordFactory.CreateRandom(context, user, Guid.NewGuid().ToString());
+        RecoverPasswordFactory.CreateRandom(context, user, Guid.NewGuid().ToString());
+        RecoverPasswordFactory.CreateRandom(context, user, Guid.NewGuid().ToString());
+
+        RecoverPassowrdDto request = new(user.Email!);
+        //Act
+        Result result =  await recoverPasswordSvc.SendRecoverEmailAsync(request, null, null);
+
+        //Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(PasswordRecoverTokenError.AttempsLimitReached, result.Error);
     }
 
 }

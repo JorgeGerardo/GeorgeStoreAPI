@@ -4,6 +4,7 @@
 public class Result(bool IsSuccess, Error Error)
 {
     public bool IsSuccess { get; } = IsSuccess;
+    public bool IsFailure { get; } = !IsSuccess;
     public Error Error { get; } = Error;
 
     public static Result Success() => new(true, Error.None);

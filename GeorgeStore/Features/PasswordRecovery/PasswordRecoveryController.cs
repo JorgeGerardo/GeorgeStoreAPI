@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using GeorgeStore.Features.Shared.Base;
+using GeorgeStore.Common.Shared;
 
 namespace GeorgeStore.Features.PasswordRecovery;
 
@@ -15,14 +16,14 @@ public class PasswordRecoveryController(RecoverPasswordService recoverPasswordSe
             ip = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = HttpContext.Request.Headers.UserAgent.ToString();
 
-        await recoverPasswordService.SendRecoverEmailAsync(request, ip, userAgent);
-        return Ok();
+        Result result = await recoverPasswordService.SendRecoverEmailAsync(request, ip, userAgent);
+        return HandleResult(result);
     }
 
     [HttpPost("recover")]
     public async Task<ActionResult> Recover(RecoverPassowordInfoRequest request)
     {
-        var result = await recoverPasswordService.RecoverAsync(request.Token, request.NewPassowrd);
+        Result result = await recoverPasswordService.RecoverAsync(request.Token, request.NewPassowrd);
         return HandleResult(result);
     }
 }

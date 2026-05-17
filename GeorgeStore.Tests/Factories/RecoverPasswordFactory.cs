@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Common.Core.Interfaces;
+﻿using GeorgeStore.Common.Core;
+using GeorgeStore.Common.Core.Interfaces;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.Users;
@@ -19,6 +20,21 @@ internal static class RecoverPasswordFactory
         IOptionsSnapshot<JWTConfig> iSnapshotJwt = ConfigurationHelper.CreateJwtConfigOptions();
         IEmailSender emailSender = ConfigurationHelper.CreateEmailSender();
         return new(userManager, context, emailSender, brevoOptionsMock, iSnapshotJwt);
+
+    }
+
+    public static PasswordRecoverToken CreateRandom(GeorgeStoreContext context, User user, string token)
+    {
+        PasswordRecoverToken newToken = new()
+        {
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            UserId = user.Id,
+            TokenHash = token.GetHash().GetHashString()
+        };
+        context.Add(newToken);
+        context.SaveChanges();
+        return newToken;
 
     }
 
