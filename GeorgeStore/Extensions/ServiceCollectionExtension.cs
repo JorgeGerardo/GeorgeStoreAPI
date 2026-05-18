@@ -1,4 +1,5 @@
-﻿using GeorgeStore.Common.Core.Interfaces;
+﻿using Dapper;
+using GeorgeStore.Common.Core.Interfaces;
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.Carts;
@@ -19,9 +20,11 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddDBConnection(this IServiceCollection collection, WebApplicationBuilder builder)
     {
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
         collection.AddDbContext<GeorgeStoreContext>(opts =>
             opts.UseNpgsql(builder.Configuration
                 .GetConnectionString("GeorgeStoreConnection"))
+                .UseSnakeCaseNamingConvention()
         );
 
         return collection;

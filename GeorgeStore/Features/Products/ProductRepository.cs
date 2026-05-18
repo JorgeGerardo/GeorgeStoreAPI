@@ -53,19 +53,19 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
         using var conn = dbConnection.CreateConnection();
         StringBuilder query = new("""
             SELECT
-                p."Id",
-                p."Name",
-                p."Price",
-                p."Description",
-                p."Image",
-                p."CategoryId",
-                c."Name" as "categoryName"
-            FROM "Products" as p
-                INNER JOIN "Categories" as c on p."CategoryId" = c."Id"
-            WHERE "IsActive" = true 
+                p.id,
+                p.name,
+                p.price,
+                p.description,
+                p.image,
+                p.category_id,
+                c.name as category_name
+            FROM products as p
+                INNER JOIN categories as c on p.category_id = c.id
+            WHERE is_active = true 
         """);
         if (prms.Term is not null)
-            query.Append(""" AND p."Name" ILIKE @term """);
+            query.Append(""" AND p.name ILIKE @term """);
 
         query.Append(" LIMIT @pageSize OFFSET @offset ");
         var x = query.ToString();
@@ -79,7 +79,7 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
 
     private static async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
     {
-        const string query = """SELECT COUNT(*) FROM "Products" WHERE "IsActive" = true AND "Name" ILIKE @Term""";
+        const string query = """SELECT COUNT(*) FROM products WHERE is_active = true AND name ILIKE @Term""";
         return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
     }
 

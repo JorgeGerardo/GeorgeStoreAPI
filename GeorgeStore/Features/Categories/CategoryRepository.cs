@@ -10,8 +10,8 @@ public class CategoryRepository(IDbConnectionFactory dbConnection) : ICategoryRe
     {
         using var conn = dbConnection.CreateConnection();
         const string query = """
-            SELECT "Id", "Name", "Image" FROM "Categories"
-                ORDER BY "Id"
+            SELECT id, name, image FROM categories
+                ORDER BY id
                 LIMIT @PageSize OFFSET @Offset
         """;
 

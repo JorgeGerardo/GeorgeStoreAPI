@@ -72,11 +72,11 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
     {
         var connection = dbConnection.CreateConnection();
         const string query = """
-                SELECT SUM(CI."Quantity") from "Carts" AS C
-                    INNER JOIN "CartItems" as CI
-                    ON CI."CartId" = C."Id"
-                    INNER JOIN "Products" AS P ON P."Id" = CI."ProductId"
-                    WHERE "UserId" = @UserId AND C."Status" = @Status AND P."IsActive" = true
+                SELECT COALESCE(SUM(CI.quantity), 0) from carts AS C
+                  INNER JOIN cart_items as CI
+            	    ON CI.cart_id = C.id
+                  INNER JOIN products AS P ON P.id = CI.product_id
+                WHERE user_id = @UserId AND C.status = @Status AND P.is_active = true
             """;
 
         return await connection.ExecuteScalarAsync<int>(query, new { UserId, Status = CartStatus.Active });
