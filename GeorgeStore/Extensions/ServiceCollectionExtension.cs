@@ -4,11 +4,13 @@ using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Categories;
+using GeorgeStore.Features.Categories.Queries.GetCategories;
 using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
+using GeorgeStore.Infrastructure.CQRS;
 using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Infrastructure.Email.Brevo;
 using Microsoft.AspNetCore.Identity;
@@ -62,6 +64,13 @@ public static class ServiceCollectionExtension
         collection.AddScoped<RecoverPasswordService>();
         collection.AddScoped<TokenService>();
         collection.AddScoped<AuthService>();
+
+        //CQRS:
+        collection.AddScoped<IQueryDispatcher, QueryDispatcher>();
+
+        collection.AddScoped<
+            IQueryHandler<GetCategoriesQuery, IEnumerable<Category>>,
+            GetCategoriesHandler>();
 
 
         return collection;
