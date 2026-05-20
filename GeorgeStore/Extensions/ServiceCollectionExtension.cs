@@ -1,14 +1,21 @@
 ﻿using Dapper;
 using GeorgeStore.Common.Core.Interfaces;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Addresses;
+using GeorgeStore.Features.Addresses.Queries.GetAddresses;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Features.Carts;
+using GeorgeStore.Features.Carts.Query.GetCartItemsCount;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Categories.Queries.GetCategories;
 using GeorgeStore.Features.Orders;
+using GeorgeStore.Features.Orders.Queries.Get;
+using GeorgeStore.Features.Orders.Queries.GetById;
 using GeorgeStore.Features.PasswordRecovery;
 using GeorgeStore.Features.PaymentMethods;
+using GeorgeStore.Features.PaymentMethods.Queries;
 using GeorgeStore.Features.Products;
+using GeorgeStore.Features.Products.Queries.GetProducts;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.CQRS;
 using GeorgeStore.Infrastructure.Data;
@@ -69,8 +76,32 @@ public static class ServiceCollectionExtension
         collection.AddScoped<IQueryDispatcher, QueryDispatcher>();
 
         collection.AddScoped<
-            IQueryHandler<GetCategoriesQuery, IEnumerable<Category>>,
+            IQueryHandler<GetCategoriesQuery, IEnumerable<CategoryDto>>,
             GetCategoriesHandler>();
+
+        collection.AddScoped<
+            IQueryHandler<GetAddressesQuery, IEnumerable<AddressDto>>,
+            GetAddressesHandler>();
+
+        collection.AddScoped<
+            IQueryHandler<GetProductsQuery, PagedResult<ProductDto>>,
+            GetProductsHandler>();
+
+        collection.AddScoped<
+            IQueryHandler<GetPaymentMethodsQuery, IEnumerable<PaymentMethodDto>>,
+            GetPaymentMethodsHandler>();
+
+        collection.AddScoped<
+            IQueryHandler<GetOrderByIdQuery, Result<OrderDto>>,
+            GetOrderByIdHandler>();
+
+        collection.AddScoped<
+            IQueryHandler<GetOrdersQuery, PagedResult<OrderDto>>,
+            GetOrdersHandler>();
+
+        collection.AddScoped<
+            IQueryHandler<GetCartItemsCountQuery, int>,
+            GetCartItemsCountHandler>();
 
 
         return collection;

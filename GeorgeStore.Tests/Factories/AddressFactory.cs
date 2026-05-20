@@ -2,8 +2,6 @@
 using GeorgeStore.Features.Addresses;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
-using GeorgeStore.Tests.Common;
-using System.Data;
 
 namespace GeorgeStore.Tests.Factories;
 
@@ -11,9 +9,7 @@ internal static class AddressFactory
 {
     public static AddressRepository CreateRepository(GeorgeStoreContext context)
     {
-        IDbConnection sqlConn = ContextHelper.CreateSqlConn(context);
-        var connFactory = ContextHelper.CreateConnectionFactory(sqlConn);
-        return new(context, connFactory.Object);
+        return new(context);
     }
 
     public static AddressCreateDto CreateRandomAddressDto(bool isDefault = false, string? alias = null)

@@ -1,5 +1,6 @@
 ﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Carts;
+using GeorgeStore.Features.Carts.Query.GetCartItemsCount;
 using GeorgeStore.Features.Categories;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Features.Users;
@@ -15,7 +16,8 @@ public class CartRepositoryTests
     {
         using var context = ContextHelper.Create();
         User user = ContextHelper.CreateUser(context);
-        CartRepository cartRep = CartFactory.CreateRepository(context);
+        GetCartItemsCountQuery query = new(user.Id);
+        GetCartItemsCountHandler handler = new(ContextHelper.CreateConnectionFactory(context));
 
         Product product1 = ProductFactory.Create(context, 10);
         Product product2 = ProductFactory.Create(context, 10);
@@ -47,8 +49,10 @@ public class CartRepositoryTests
         context.SaveChanges();
 
         int totalItems = prod1Qty + prod3Qty;
+        
         //Act
-        var qty = await cartRep.CountAsync(user.Id);
+        int qty = await handler.Handle(query);
+
         //Assert
         Assert.Equal(totalItems, qty);
     }

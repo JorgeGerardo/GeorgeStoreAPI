@@ -1,11 +1,10 @@
-﻿using Dapper;
-using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeorgeStore.Features.PaymentMethods;
 
-public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFactory connection) : IPaymentMethodRepository
+public class PaymentMethodRepository(GeorgeStoreContext context) : IPaymentMethodRepository
 {
     public async Task<Result> AddAsync(Guid UserId, PaymentMethodCreateDto Dto)
     {
@@ -26,19 +25,6 @@ public class PaymentMethodRepository(GeorgeStoreContext context, IDbConnectionFa
         context.PaymentMethods.Add(result.Value);
         await context.SaveChangesAsync();
         return Result.Success();
-    }
-
-    public async Task<IEnumerable<PaymentMethodDto>> GetAsync(Guid UserId)
-    {
-        var conn = connection.CreateConnection();
-        const string query = """
-            SELECT 
-                id, user_id, last_digits, brand, exp_month, exp_year, card_holder_name, is_default, created_at 
-            FROM payment_methods
-            	WHERE user_id = @UserId
-            """;
-
-        return await conn.QueryAsync<PaymentMethodDto>(query, new { UserId });
     }
 
     public async Task<Result<PaymentMethod>> GetByIdAsync(Guid UserId, int Id)

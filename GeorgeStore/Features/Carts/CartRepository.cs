@@ -1,11 +1,10 @@
-﻿using Dapper;
-using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeorgeStore.Features.Carts;
 
-public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbConnection, KeyedAsyncLock locker) : ICartRepository
+public class CartRepository(GeorgeStoreContext context, KeyedAsyncLock locker) : ICartRepository
 {
     public async Task<Result<Cart>> GetAsync(Guid UserId, CancellationToken ct = default)
     {
@@ -68,20 +67,6 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         return Result.Success();
     }
 
-    public async Task<int> CountAsync(Guid UserId)
-    {
-        var connection = dbConnection.CreateConnection();
-        const string query = """
-                SELECT COALESCE(SUM(CI.quantity), 0) from carts AS C
-                  INNER JOIN cart_items as CI
-            	    ON CI.cart_id = C.id
-                  INNER JOIN products AS P ON P.id = CI.product_id
-                WHERE user_id = @UserId AND C.status = @Status AND P.is_active = true
-            """;
-
-        return await connection.ExecuteScalarAsync<int>(query, new { UserId, Status = CartStatus.Active });
-    }
-
     public async Task<Result> DecreaseAsync(Guid UserId, int ProductId)
     {
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(10));
@@ -104,6 +89,7 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         await context.SaveChangesAsync();
         return Result.Success();
     }
+
 
     private Cart CreateDraft(Guid UserId)
     {
@@ -132,6 +118,6 @@ public class CartRepository(GeorgeStoreContext context, IDbConnectionFactory dbC
         cart.Items.RemoveAll(i => !i.Item.IsActive);
         await context.SaveChangesAsync();
         return Result.Success();
-
     }
+
 }

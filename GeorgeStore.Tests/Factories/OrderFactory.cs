@@ -3,8 +3,6 @@ using GeorgeStore.Features.Carts;
 using GeorgeStore.Features.Orders;
 using GeorgeStore.Features.Products;
 using GeorgeStore.Infrastructure.Data;
-using GeorgeStore.Tests.Common;
-using System.Data;
 
 namespace GeorgeStore.Tests.Factories;
 
@@ -12,11 +10,9 @@ internal static class OrderFactory
 {
     public static OrderService CreateService(GeorgeStoreContext context)
     {
-        IDbConnection sqlConn = ContextHelper.CreateSqlConn(context);
-        var connFactory = ContextHelper.CreateConnectionFactory(sqlConn);
         KeyedAsyncLock locker = new();
-        ICartRepository cartRep = new CartRepository(context, connFactory.Object, locker);
-        return new OrderService(connFactory.Object, context, locker, cartRep);
+        ICartRepository cartRep = new CartRepository(context, locker);
+        return new OrderService(context, locker, cartRep);
     }
 
     public static OrderDetail CreateOrderDetail(Product product, int qty, decimal unitPrice, decimal subTotal)

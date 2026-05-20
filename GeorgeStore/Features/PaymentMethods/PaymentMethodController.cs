@@ -1,16 +1,19 @@
-﻿using GeorgeStore.Features.Shared.Base;
+﻿using GeorgeStore.Common.Core.Interfaces;
+using GeorgeStore.Features.PaymentMethods.Queries;
+using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeorgeStore.Features.PaymentMethods;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentMethodController(IPaymentMethodRepository repository) : AuthorizedController
+public class PaymentMethodController(IPaymentMethodRepository repository, IQueryDispatcher dispatcher) : AuthorizedController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PaymentMethodDto>>> Get()
     {
-        return Ok(await repository.GetAsync(UserId));
+        var paymentMethods = await dispatcher.Send<GetPaymentMethodsQuery, IEnumerable<PaymentMethodDto>>(new(UserId));
+        return Ok(paymentMethods);
     }
 
     [HttpGet("{PaymentMethodId:int}")]

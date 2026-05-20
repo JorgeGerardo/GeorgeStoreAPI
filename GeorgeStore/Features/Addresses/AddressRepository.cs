@@ -1,25 +1,11 @@
-﻿using Dapper;
-using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeorgeStore.Features.Addresses;
 
-public class AddressRepository(GeorgeStoreContext context, IDbConnectionFactory dbConnection) : IAddressRepository
+public class AddressRepository(GeorgeStoreContext context) : IAddressRepository
 {
-    public async Task<IEnumerable<AddressDto>> GetAsync(Guid UserId)
-    {
-        var connection = dbConnection.CreateConnection();
-        const string query = """
-             SELECT
-                 id, alias, street, neighborhood, city, state, postal_code, external_number, internal_number, "references", is_default
-             FROM addresses
-                WHERE user_id = @UserId
-         """;
-
-        return await connection.QueryAsync<AddressDto>(query, new { UserId });
-    }
-
     public async Task<Result> AddAsync(Guid UserId, AddressCreateDto request)
     {
         int AddressesRegistered = await context.Addresses.CountAsync(a => a.UserId == UserId);

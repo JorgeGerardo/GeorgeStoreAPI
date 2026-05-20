@@ -2,8 +2,6 @@
 using GeorgeStore.Features.PaymentMethods;
 using GeorgeStore.Features.Users;
 using GeorgeStore.Infrastructure.Data;
-using GeorgeStore.Tests.Common;
-using System.Data;
 
 namespace GeorgeStore.Tests.Factories;
 
@@ -11,9 +9,7 @@ internal static class PaymentMethodFactory
 {
     public static PaymentMethodRepository CreateRepository(GeorgeStoreContext context)
     {
-        IDbConnection sqlConn = ContextHelper.CreateSqlConn(context);
-        var connFactory = ContextHelper.CreateConnectionFactory(sqlConn);
-        return new PaymentMethodRepository(context, connFactory.Object);
+        return new PaymentMethodRepository(context);
     }
 
     public static PaymentMethod Create(GeorgeStoreContext context, User user, bool IsDefault = false)

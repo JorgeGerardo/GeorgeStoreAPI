@@ -17,6 +17,7 @@ public static class ContextHelper
 
         var options = new DbContextOptionsBuilder<GeorgeStoreContext>()
             .UseSqlite(connection)
+            .UseSnakeCaseNamingConvention()
             .Options;
 
         var context = new GeorgeStoreContext(options);
@@ -39,11 +40,18 @@ public static class ContextHelper
         return context.Database.GetDbConnection();
     }
 
-    public static Mock<IDbConnectionFactory> CreateConnectionFactory(IDbConnection sqlConn)
+    public static Mock<IDbConnectionFactory> CreateMockConnectionFactory(IDbConnection dbConnection)
     {
         var connFactory = new Mock<IDbConnectionFactory>();
-        connFactory.Setup(c => c.CreateConnection()).Returns(sqlConn);
+        connFactory.Setup(c => c.CreateConnection()).Returns(dbConnection);
         return connFactory;
+    }
+
+    public static IDbConnectionFactory CreateConnectionFactory(GeorgeStoreContext context)
+    {
+        IDbConnection dbConn = CreateSqlConn(context);
+        Mock<IDbConnectionFactory> mock = CreateMockConnectionFactory(dbConn);
+        return mock.Object;
     }
 
 }

@@ -12,7 +12,7 @@ public class CategoryController(IQueryDispatcher dispatcher) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> Get([FromQuery] QueryParams prms)
     {
-        var categories = await dispatcher.Send<GetCategoriesQuery, IEnumerable<Category>>(new(prms));
-        return Ok(categories.Select(CategoryDto.FromEntity));
+        var categories = await dispatcher.Send<GetCategoriesQuery, IEnumerable<CategoryDto>>(new(prms));
+        return Ok(categories);
     }
 }

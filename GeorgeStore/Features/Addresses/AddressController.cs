@@ -1,4 +1,6 @@
-﻿using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Core.Interfaces;
+using GeorgeStore.Common.Shared;
+using GeorgeStore.Features.Addresses.Queries.GetAddresses;
 using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,12 +8,13 @@ namespace GeorgeStore.Features.Addresses;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AddressController(IAddressRepository addressRepository) : AuthorizedController
+public class AddressController(IAddressRepository addressRepository, IQueryDispatcher dispatcher) : AuthorizedController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AddressDto>>> Get()
     {
-        var addresses = await addressRepository.GetAsync(UserId);
+        var addresses = await dispatcher
+            .Send<GetAddressesQuery, IEnumerable<AddressDto>>(new(UserId));
         return Ok(addresses);
     }
 

@@ -1,5 +1,7 @@
-﻿using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Core.Interfaces;
+using GeorgeStore.Common.Shared;
 using GeorgeStore.Extensions;
+using GeorgeStore.Features.Carts.Query.GetCartItemsCount;
 using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +9,7 @@ namespace GeorgeStore.Features.Carts;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CartController(ICartRepository cartRepository) : AuthorizedController
+public class CartController(ICartRepository cartRepository, IQueryDispatcher dispatcher) : AuthorizedController
 {
     [HttpGet]
     public async Task<ActionResult<CartDto>> Get(CancellationToken ct = default)
@@ -46,7 +48,7 @@ public class CartController(ICartRepository cartRepository) : AuthorizedControll
     [HttpGet("count")]
     public async Task<ActionResult<int>> GetCount()
     {
-        int count = await cartRepository.CountAsync(UserId);
+        int count = await dispatcher.Send<GetCartItemsCountQuery, int>(new(UserId));
         return Ok(count);
     }
 }

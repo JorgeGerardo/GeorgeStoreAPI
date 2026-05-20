@@ -1,13 +1,11 @@
-﻿using Dapper;
-using GeorgeStore.Common.Shared;
+﻿using GeorgeStore.Common.Shared;
 using GeorgeStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Text;
 
 namespace GeorgeStore.Features.Products;
 
-public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreContext context) : IProductRepository
+public class ProductRepository(GeorgeStoreContext context) : IProductRepository
 {
     public async Task<Result> CreateAsync(ProductCreateDTO request)
     {
@@ -46,41 +44,6 @@ public class ProductRepository(IDbConnectionFactory dbConnection, GeorgeStoreCon
             return Result.Failure<Product>(ProductError.Notfound);
 
         return Result.Success(product);
-    }
-
-    public async Task<PagedResult<ProductDto>> GetProductsAsync(QueryParams prms)
-    {
-        using var conn = dbConnection.CreateConnection();
-        StringBuilder query = new("""
-            SELECT
-                p.id,
-                p.name,
-                p.price,
-                p.description,
-                p.image,
-                p.category_id,
-                c.name as category_name
-            FROM products as p
-                INNER JOIN categories as c on p.category_id = c.id
-            WHERE is_active = true 
-        """);
-        if (prms.Term is not null)
-            query.Append(""" AND p.name ILIKE @term """);
-
-        query.Append(" LIMIT @pageSize OFFSET @offset ");
-        var x = query.ToString();
-        var products = await conn.QueryAsync<ProductDto>(query.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize });
-        int total = prms.Term is not null
-            ? await GetTotal(prms, conn)
-            : await context.Products.CountAsync(p => p.IsActive);
-
-        return new PagedResult<ProductDto>(products, total);
-    }
-
-    private static async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
-    {
-        const string query = """SELECT COUNT(*) FROM products WHERE is_active = true AND name ILIKE @Term""";
-        return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
     }
 
 }
