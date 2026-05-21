@@ -15,7 +15,7 @@ public partial class OrderService(GeorgeStoreContext context, KeyedAsyncLock loc
         await using var _ = await locker.AcquireAsync(UserId.ToString(), TimeSpan.FromSeconds(30));
 
         var result = await cartRep.GetAsync(UserId, CancellationToken.None);
-        if(!result.IsSuccess)
+        if(result.IsFailure)
             return Result.Failure<int>(OrderError.CartNotNotfound);
 
         Cart cart = result.Value;

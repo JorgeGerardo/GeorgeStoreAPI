@@ -1,11 +1,17 @@
 ﻿namespace GeorgeStore.Common.Shared;
 
 
-public class Result(bool IsSuccess, Error Error)
+public class Result
 {
-    public bool IsSuccess { get; } = IsSuccess;
-    public bool IsFailure { get; } = !IsSuccess;
-    public Error Error { get; } = Error;
+    public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
+    public Error Error { get; }
+
+    protected Result(bool isSuccess, Error error)
+    {
+        IsSuccess = isSuccess;
+        Error = error;
+    }
 
     public static Result Success() => new(true, Error.None);
     public static Result Failure(Error error)
@@ -28,17 +34,12 @@ public class Result(bool IsSuccess, Error Error)
     }
 }
 
-public partial class Result<T> : Result
+public partial class Result<T>(bool IsSuccess, Error Error, T? Value) : Result(IsSuccess, Error)
 {
-    private readonly T? _value;
+
+    private readonly T? _value = Value;
     public T Value => IsSuccess
         ? _value!
         : throw new InvalidOperationException("No value for failure.");
-
-    public Result(bool IsSuccessfuly, Error Error, T? Value) : base(IsSuccessfuly, Error)
-    {
-        _value = Value;
-    }
-
 }
 

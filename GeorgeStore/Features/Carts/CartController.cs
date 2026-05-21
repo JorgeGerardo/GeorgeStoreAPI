@@ -15,7 +15,7 @@ public class CartController(ICartRepository cartRepository, IQueryDispatcher dis
     public async Task<ActionResult<CartDto>> Get(CancellationToken ct = default)
     {
         var result = await cartRepository.GetAsync(UserId, ct);
-        if (!result.IsSuccess)
+        if (result.IsFailure)
             return HandleResult(result);
 
         var itemsDto = result.Value.Items.Select(CartItemDto.FromEntity).ToList();

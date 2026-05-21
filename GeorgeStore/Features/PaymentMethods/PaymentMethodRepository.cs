@@ -15,7 +15,7 @@ public class PaymentMethodRepository(GeorgeStoreContext context) : IPaymentMetho
             userPaymentMethods.ForEach(p => p.IsDefault = false);
         }
 
-        if (!result.IsSuccess)
+        if (result.IsFailure)
             return Result.Failure(result.Error);
 
         var methodsRegister = await context.PaymentMethods.CountAsync(p => p.UserId == UserId);
