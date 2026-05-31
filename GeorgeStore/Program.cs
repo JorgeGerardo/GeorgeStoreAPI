@@ -4,6 +4,11 @@ using GeorgeStore.Infrastructure.Email.Brevo;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
+    builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Services.AddProblemDetails();
+
 builder.Services.AddDependencies();
 builder.Services.AddDBConnection(builder);
 builder.Services.AddIdentity();
@@ -22,6 +27,7 @@ builder.Services.AddCors(opts =>
 });
 builder.AddJWT();
 var app = builder.Build();
+app.UseExceptionHandler();
 app.UseStaticFiles();
 app.UseCors("Develop");
 app.UseSwagger();
