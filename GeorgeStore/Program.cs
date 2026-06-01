@@ -8,7 +8,7 @@ if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
     builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddProblemDetails();
-
+builder.Services.AddOutputCache();
 builder.Services.AddDependencies();
 builder.Services.AddDBConnection(builder);
 builder.Services.AddIdentity();
@@ -32,9 +32,9 @@ app.UseStaticFiles();
 app.UseCors("Develop");
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseOutputCache();
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
