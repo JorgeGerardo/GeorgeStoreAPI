@@ -2,6 +2,7 @@
 using GeorgeStore.Common.Shared;
 using GeorgeStore.Features.Categories.Queries.GetCategories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace GeorgeStore.Features.Categories;
 
@@ -10,6 +11,7 @@ namespace GeorgeStore.Features.Categories;
 public class CategoryController(IQueryDispatcher dispatcher) : ControllerBase
 {
     [HttpGet]
+    [OutputCache(Duration = 86400)]
     public async Task<ActionResult<List<CategoryDto>>> Get([FromQuery] QueryParams prms)
     {
         var categories = await dispatcher.Send<GetCategoriesQuery, IEnumerable<CategoryDto>>(new(prms));

@@ -4,6 +4,7 @@ using GeorgeStore.Features.Products.Queries.GetProducts;
 using GeorgeStore.Features.Shared.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace GeorgeStore.Features.Products;
 
@@ -12,6 +13,7 @@ namespace GeorgeStore.Features.Products;
 public class ProductController(IProductRepository productRepository, IQueryDispatcher dispatcher) : ApiControllerBase
 {
     [HttpGet]
+    [OutputCache(Duration = 86400)]
     public async Task<ActionResult<PagedResult<ProductDto>>> Get([FromQuery] QueryParams prms)
     {
         var products = await dispatcher.Send<GetProductsQuery, PagedResult<ProductDto>>(new(prms));
@@ -19,6 +21,7 @@ public class ProductController(IProductRepository productRepository, IQueryDispa
     }
 
     [HttpGet("{id:int}")]
+    [OutputCache(Duration = 86400)]
     public async Task<ActionResult<ProductDto>> GetById(int id)
     {
         var result = await productRepository.GetByIdAsync(id);

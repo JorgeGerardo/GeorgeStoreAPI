@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using GeorgeStore.Features.Shared.Base;
 using GeorgeStore.Common.Shared;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GeorgeStore.Features.PasswordRecovery;
 
@@ -9,6 +10,7 @@ namespace GeorgeStore.Features.PasswordRecovery;
 public class PasswordRecoveryController(RecoverPasswordService recoverPasswordService) : ApiControllerBase
 {
     [HttpPost]
+    [EnableRateLimiting("RecoverPassword")]
     public async Task<ActionResult<dynamic>> ForgotPassword(RecoverPassowrdDto request)
     {
         var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
