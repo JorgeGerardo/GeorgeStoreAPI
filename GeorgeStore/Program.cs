@@ -31,7 +31,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 app.MapEasyData(opts => opts.UseDbContext<AdminContext>());
 app.MapControllers();
