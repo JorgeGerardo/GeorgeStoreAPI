@@ -33,7 +33,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.MapEasyData(opts => opts.UseDbContext<AdminContext>()); 
+app.MapEasyData(opts => opts.UseDbContext<AdminContext>());
 app.MapControllers();
 app.MapRazorPages();
 app.Run();
