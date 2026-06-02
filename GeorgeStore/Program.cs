@@ -1,6 +1,7 @@
 using GeorgeStore.Extensions;
 using GeorgeStore.Features.Auth;
 using GeorgeStore.Infrastructure.Email.Brevo;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,22 +23,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddExternalHttpClients(builder.Configuration);
-builder.Services.AddCors(opts =>
-{
-    opts.AddPolicy("Develop", opts => opts.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
-});
+builder.Services.AddCors(opts => opts.AddPolicy("Develop", opts => opts.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
 builder.AddJWT();
 var app = builder.Build();
 app.UseExceptionHandler();
 app.UseStaticFiles();
 app.UseCors("Develop");
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(opts => opts.DocExpansion(DocExpansion.None));
 app.UseOutputCache();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapControllers();
-
+app.MapGet("/", () => Results.Redirect("/swagger"));
 app.Run();
