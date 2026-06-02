@@ -11,7 +11,7 @@ public static class WebApplicationBuilderExtension
 
     public static WebApplicationBuilder AddKeyVaultIfProduction(this WebApplicationBuilder builder)
     {
-        if (!builder.Environment.IsProduction())
+        if (!builder.Environment.IsProduction() && !builder.Environment.IsStaging())
             return builder;
 
         var keyVaultName = builder.Configuration.GetValue<string>("KeyVaultName");

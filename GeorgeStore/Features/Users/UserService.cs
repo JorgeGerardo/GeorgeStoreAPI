@@ -25,7 +25,7 @@ public class UserService(UserManager<User> manager) : IUserService
     public async Task<Result<User>> Login(string email, string password)
     {
         var result = await Exist(email);
-        if (!result.IsSuccess)
+        if (result.IsFailure)
             return Result.Failure<User>(UserError.Notfound);
 
         return await manager.CheckPasswordAsync(result.Value, password) is false ?

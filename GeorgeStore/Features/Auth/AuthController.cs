@@ -2,6 +2,7 @@
 using GeorgeStore.Features.Shared.Base;
 using GeorgeStore.Features.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GeorgeStore.Features.Auth;
 
@@ -19,6 +20,7 @@ public class AuthController(IUserService userService, AuthService authService) :
     }
 
     [HttpPost("register")]
+    [EnableRateLimiting("Register")]
     public async Task<ActionResult> Create(CreateUserRequest credentials)
     {
         Result result = await userService.Register(credentials.UserName, credentials.Email, credentials.Password);

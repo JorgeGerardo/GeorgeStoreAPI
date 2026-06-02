@@ -22,6 +22,7 @@ using GeorgeStore.Infrastructure.Data;
 using GeorgeStore.Infrastructure.Email.Brevo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 namespace GeorgeStore.Extensions;
 
@@ -126,4 +127,50 @@ public static class ServiceCollectionExtension
 
         return collection;
     }
+
+    public static IServiceCollection AddRateLimit(this IServiceCollection collection)
+    {
+        collection.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
+                context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 25,
+                            Window = TimeSpan.FromSeconds(10),
+                            QueueLimit = 0
+                        })
+            );
+
+
+            options.AddPolicy("Register", context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 1,
+                        Window = TimeSpan.FromMinutes(5),
+                        QueueLimit = 0
+                    })
+            );
+
+            options.AddPolicy("RecoverPassword", context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(30),
+                        QueueLimit = 0
+                    })
+            );
+
+        });
+        return collection;
+    }
+
 }
