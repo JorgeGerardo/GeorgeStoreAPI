@@ -12,6 +12,8 @@
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="brevo_csharp" Version="1.1.2" />
     <PackageReference Include="Dapper" Version="2.1.79" />
+    <PackageReference Include="EasyData.AspNetCore" Version="1.5.12" />
+    <PackageReference Include="EasyData.EntityFrameworkCore.Relational" Version="1.5.12" />
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />

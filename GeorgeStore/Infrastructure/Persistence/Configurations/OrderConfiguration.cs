@@ -1,6 +1,7 @@
 ﻿using GeorgeStore.Extensions;
 using GeorgeStore.Features.Orders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GeorgeStore.Infrastructure.Persistence.Configurations;
@@ -12,6 +13,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(p => p.Total)
             .HasPrecision(18, 2);
 
+        builder.Property(p => p.DateUtc).Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
         builder.SeedFromJson("Order.json");
 
