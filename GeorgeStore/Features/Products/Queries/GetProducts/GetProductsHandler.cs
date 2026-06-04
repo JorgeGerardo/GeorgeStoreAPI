@@ -13,7 +13,7 @@ public class GetProductsHandler(IDbConnectionFactory dbConnection, GeorgeStoreCo
     public async Task<PagedResult<ProductDto>> Handle(GetProductsQuery query)
     {
         using var conn = dbConnection.CreateConnection();
-        QueryParams prms = query.prms;
+        ProductQueryParams prms = query.Prms;
         StringBuilder sql = new("""
             SELECT
                 p.id,
@@ -30,20 +30,26 @@ public class GetProductsHandler(IDbConnectionFactory dbConnection, GeorgeStoreCo
         if (prms.Term is not null)
             sql.Append(""" AND p.name ILIKE @term """);
 
+        if (query.Prms.CategoryId is not null)
+            sql.Append(""" AND p.category_id = @categoryId """);
+
         sql.Append(" LIMIT @pageSize OFFSET @offset ");
-        var x = sql.ToString();
-        var products = await conn.QueryAsync<ProductDto>(sql.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize });
-        int total = query.prms.Term is not null
-            ? await GetTotal(query.prms, conn)
+
+        var products = await conn.QueryAsync<ProductDto>(sql.ToString(), new { term = $"%{prms.Term}%", prms.Offset, prms.PageSize, categoryId = prms.CategoryId });
+        int total = query.Prms.Term is not null || query.Prms.CategoryId is not null
+            ? await GetTotal(query.Prms, conn)
             : await context.Products.CountAsync(p => p.IsActive);
 
         return new PagedResult<ProductDto>(products, total);
     }
 
-    private static async Task<int> GetTotal(QueryParams prms, IDbConnection conn)
+    private static async Task<int> GetTotal(ProductQueryParams prms, IDbConnection conn)
     {
-        const string query = """SELECT COUNT(*) FROM products WHERE is_active = true AND name ILIKE @Term""";
-        return await conn.ExecuteScalarAsync<int>(query, new { Term = $"%{prms.Term}%" });
+        StringBuilder sql = new("""SELECT COUNT(*) FROM products as p WHERE is_active = true AND p.name ILIKE @Term  """);
+        if (prms.CategoryId is not null)
+            sql.Append(" AND p.category_id = @categoryId ");
+
+        return await conn.ExecuteScalarAsync<int>(sql.ToString(), new { Term = $"%{prms.Term}%", categoryId = prms.CategoryId });
     }
 
 }
