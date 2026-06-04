@@ -14,7 +14,7 @@ public class ProductController(IProductRepository productRepository, IQueryDispa
 {
     [HttpGet]
     [OutputCache(Duration = 86400)]
-    public async Task<ActionResult<PagedResult<ProductDto>>> Get([FromQuery] QueryParams prms)
+    public async Task<ActionResult<PagedResult<ProductDto>>> Get([FromQuery] ProductQueryParams prms)
     {
         var products = await dispatcher.Send<GetProductsQuery, PagedResult<ProductDto>>(new(prms));
         return Ok(products);
@@ -29,14 +29,6 @@ public class ProductController(IProductRepository productRepository, IQueryDispa
             ? Ok(ProductDto.FromEntity(result.Value))
             : HandleResult(result);
     }
-
-    //[HttpPost]
-    //[Authorize]
-    //public async Task<ActionResult> Create(ProductCreateDTO request)
-    //{
-    //    Result result = await productRepository.CreateAsync(request);
-    //    return HandleResult(result);
-    //}
 
     [HttpDelete("{id:int}")]
     [Authorize]
