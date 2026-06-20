@@ -93,7 +93,7 @@ La recuperación de contraseña se realiza mediante envío de correo electrónic
 - ASP.NET Core
 - Entity Framework Core
 - Dapper
-- SQL Server
+- PostgreSql
 - JWT Authentication
 
 ### Testing
@@ -125,7 +125,7 @@ Users/
 
 ## Base de datos
 
-La aplicación utiliza SQL Server como sistema gestor de base de datos.
+La aplicación utiliza PostgreSql como sistema gestor de base de datos.
 
 El proyecto incluye:
 
